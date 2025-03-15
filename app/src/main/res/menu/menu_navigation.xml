@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_navigation"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:background="@drawable/gradient_overlay">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/comunicate"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_matches"
+        android:icon="@drawable/infoplus"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+    <!-- Thunder icon lớn hơn, màu xanh -->
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/thunder"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_like_you"
+        android:icon="@drawable/liked"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/ic_chat"
+        android:title=""
+        app:showAsAction="ifRoom"/>
+
+</menu>

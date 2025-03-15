@@ -1,6 +1,9 @@
 package com.example.datingapp.adapter;
 
 import android.content.Context;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +64,10 @@ public class ImageGridAdapter extends BaseAdapter {
             holder.textAge.setText(String.valueOf(ageList.get(position)));
         }
 
-        holder.imageView.setAlpha(0.2f); // 50% mờ
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31+
+            RenderEffect blurEffect = RenderEffect.createBlurEffect(90f, 90f, Shader.TileMode.CLAMP);
+            holder.imageView.setRenderEffect(blurEffect);
+        }
 
         return convertView;
     }

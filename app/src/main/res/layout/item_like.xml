@@ -12,24 +12,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:adjustViewBounds="true"/>
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
 
-        <!-- Hiển thị số tuổi -->
         <TextView
             android:id="@+id/textAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
             android:textStyle="bold"
+            android:padding="8dp"
+            android:shadowRadius="24"
+            android:shadowColor="#DD000000"
+            android:shadowDx="4"
+            android:shadowDy="4"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"/>
+
+
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
