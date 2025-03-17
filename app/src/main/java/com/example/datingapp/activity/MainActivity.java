@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Load Fragment mặc định (HomeFragment)
         loadFragment(new ProfileFragment());
-
+        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
         // Xử lý sự kiện khi chọn item trong Bottom Navigation
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
