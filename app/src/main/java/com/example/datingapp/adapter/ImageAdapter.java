@@ -40,7 +40,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
             Glide.with(holder.itemView.getContext())
                     .load(imageUrl)
-                    .placeholder(R.drawable.ic_like) // Hình chờ
+                    .placeholder(R.drawable.load) // Hình chờ
                     .error(R.drawable.ic_dislike) // Thử dùng hình error khác để kiểm tra
                     .fallback(R.drawable.ic_chat) // Khi URL null hoặc rỗng
                     .into(holder.imageView);

@@ -75,7 +75,7 @@
         android:background="#FFFFFF"
         app:itemIconTint="@drawable/bottom_nav_icon_tint"
         app:labelVisibilityMode="unlabeled"
-        app:itemIconSize="24dp"
+        app:itemIconSize="35dp"
         app:menu="@menu/menu_navigation"
         app:layout_constraintBottom_toBottomOf="parent" />
 
