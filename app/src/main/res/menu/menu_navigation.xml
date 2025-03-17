@@ -7,14 +7,14 @@
     android:layout_gravity="bottom"
     android:background="@drawable/gradient_overlay">
     <item
-        android:id="@+id/nav_home"
-        android:icon="@drawable/comunicate"
+        android:id="@+id/nav_liked"
+        android:icon="@drawable/liked"
         android:title=""
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/nav_matches"
-        android:icon="@drawable/infoplus"
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/chat"
         android:title=""
         app:showAsAction="ifRoom"/>
 
@@ -26,14 +26,14 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/nav_like_you"
-        android:icon="@drawable/liked"
+        android:id="@+id/nav_notify"
+        android:icon="@drawable/notify"
         android:title=""
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/nav_chat"
-        android:icon="@drawable/ic_chat"
+        android:id="@+id/nav_setting"
+        android:icon="@drawable/setting"
         android:title=""
         app:showAsAction="ifRoom"/>
 

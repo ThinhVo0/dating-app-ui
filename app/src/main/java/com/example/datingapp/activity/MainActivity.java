@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             Fragment selectedFragment = null;
 
             // Sử dụng if-else thay vì switch-case để tránh lỗi "constant expression required"
-            if (item.getItemId() == R.id.nav_like_you) {
+            if (item.getItemId() == R.id.nav_liked) {
                 selectedFragment = new LikeYouFragment();
             } else if (item.getItemId() == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();
