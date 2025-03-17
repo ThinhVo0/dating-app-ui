@@ -1,6 +1,7 @@
 package com.example.datingapp.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 
 import java.util.List;
@@ -16,9 +18,9 @@ import java.util.List;
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
     private Context context;
-    private List<Integer> imageList;
+    private List<String> imageList;
 
-    public ImageAdapter(Context context, List<Integer> imageList) {
+    public ImageAdapter(Context context, List<String> imageList) {
         this.context = context;
         this.imageList = imageList;
     }
@@ -32,7 +34,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
-        holder.imageView.setImageResource(imageList.get(position));
+        String imageUrl = imageList.get(position);
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            Log.d("ImageAdapter", "Loading image URL: " + imageUrl);
+
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_like) // Hình chờ
+                    .error(R.drawable.ic_dislike) // Thử dùng hình error khác để kiểm tra
+                    .fallback(R.drawable.ic_chat) // Khi URL null hoặc rỗng
+                    .into(holder.imageView);
+
+        } else {
+            holder.imageView.setImageResource(R.drawable.btn_arraw1); // Sao lưu nếu URL null/rỗng
+        }
     }
 
     @Override
