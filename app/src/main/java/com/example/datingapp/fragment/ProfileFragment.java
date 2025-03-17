@@ -40,27 +40,12 @@ public class ProfileFragment extends Fragment {
                 "  \"status\": 200,\n" +
                 "  \"message\": \"\",\n" +
                 "  \"data\": {\n" +
-                "    \"street\": null,\n" +
-                "    \"district\": null,\n" +
-                "    \"province\": \"Thành Ph  Chí Minh\",\n" +
-                "    \"pic1\": \"https://res.cloudinary.com/dx1irzekz/image/upload/v1741889436/nlvhyjnkuooeytegdfoq.jpg\",\n" +
-                "    \"pic2\": \"https://res.cloudinary.com/dx1irzekz/image/upload/v1741889436/nlvhyjnkuooeytegdfoq.jpg\",\n" +
-                "    \"pic3\": null,\n" +
-                "    \"pic4\": null,\n" +
-                "    \"pic5\": null,\n" +
-                "    \"pic6\": null,\n" +
-                "    \"pic7\": null,\n" +
-                "    \"pic8\": null,\n" +
-                "    \"pic9\": null,\n" +
-                "    \"firstName\": \"Phi\",\n" +
-                "    \"lastName\": \"Thắng\",\n" +
-                "    \"hobbies\": [\n" +
-                "      \"Bóng đá\"\n" +
-                "    ],\n" +
+                "    \"firstName\": \"Trần\",\n" +
+                "    \"lastName\": \"Phi Thắng\",\n" +
                 "    \"gender\": \"Nam\",\n" +
                 "    \"age\": 20,\n" +
-                "    \"height\": 171,\n" +
-                "    \"bio\": \"Thắng đẹp trai\",\n" +
+                "    \"height\": 170,\n" +
+                "    \"bio\": \"Xin chào\",\n" +
                 "    \"zodiacSign\": \"Nhân Mã\",\n" +
                 "    \"personalityType\": \"INTJ\",\n" +
                 "    \"communicationStyle\": \"Nghiện nhắn tin\",\n" +
@@ -68,7 +53,22 @@ public class ProfileFragment extends Fragment {
                 "    \"petPreference\": \"Chó\",\n" +
                 "    \"drinkingHabit\": \"Không dành cho mình\",\n" +
                 "    \"smokingHabit\": \"Hút thuốc với bạn bè\",\n" +
-                "    \"sleepingHabit\": \"Dậy sớm\"\n" +
+                "    \"sleepingHabit\": \"Dậy sớm\",\n" +
+                "    \"hobbies\": [\n" +
+                "      \"Bóng đá\"\n" +
+                "    ],\n" +
+                "    \"street\": null,\n" +
+                "    \"district\": null,\n" +
+                "    \"province\":  \"Long An\",\n" +
+                "    \"pic1\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889265/egtjer9vahkmvuxfeh9c.jpg\",\n" +
+                "    \"pic2\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889267/ozbr9map5epifjqhoxqd.jpg\",\n" +
+                "    \"pic3\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889413/gpxynwwtg5ola9pa5yni.jpg\",\n" +
+                "    \"pic4\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889415/diujokp4q6kldckj1epi.jpg\",\n" +
+                "    \"pic5\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889429/suuaheexjgbqcw8nt3sp.jpg\",\n" +
+                "    \"pic6\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889431/iars5bpkhvjtdlvg3v1m.jpg\",\n" +
+                "    \"pic7\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889436/nlvhyjnkuooeytegdfoq.jpg\",\n" +
+                "    \"pic8\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889436/nlvhyjnkuooeytegdfoq.jpg\",\n" +
+                "    \"pic9\": \"http://res.cloudinary.com/dx1irzekz/image/upload/v1741889441/gioktcseo3srksqfmhcm.jpg\"\n" +
                 "  }\n" +
                 "}";
 
