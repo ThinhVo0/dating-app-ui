@@ -68,7 +68,7 @@
             android:layout_marginBottom="16dp"
             android:drawableStart="@drawable/email"
             android:drawablePadding="8dp"
-            android:hint="Email"
+            android:hint="Tên đăng nhập"
             android:inputType="textEmailAddress"
             android:padding="12dp" />
 
@@ -87,6 +87,7 @@
         <!-- Nút Đăng nhập -->
         <Button
             android:id="@+id/loginButton"
+            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -95,31 +96,30 @@
             android:text="Đăng nhập"
             android:textColor="@android:color/white" />
 
-        <!-- Nút Đăng nhập với Google -->
-        <Button
-            android:id="@+id/googleLoginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@android:color/holo_red_light"
-            android:drawableStart="@drawable/google"
-            android:drawablePadding="8dp"
-            android:elevation="4dp"
-            android:text="Đăng nhập với Google"
-            android:textColor="@android:color/white" />
-
-        <!-- Nút Đăng nhập với Facebook -->
-        <Button
-            android:id="@+id/facebookLoginButton"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:drawableStart="@drawable/facebook"
-            android:drawablePadding="8dp"
-            android:elevation="4dp"
-            android:text="Đăng nhập với Facebook"
-            android:textColor="@android:color/white" />
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/googleLoginButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="50dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/google" />
+
+            <ImageButton
+                android:id="@+id/facebookLoginButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/facebook" />
+        </LinearLayout>
 
         <!-- Liên kết Quên mật khẩu và Đăng ký -->
         <LinearLayout
