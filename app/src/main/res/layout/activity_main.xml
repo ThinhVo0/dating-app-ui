@@ -48,7 +48,7 @@
             android:id="@+id/filter_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/filter"
+            android:src="@drawable/btn_filter"
         android:contentDescription="Bộ Lọc"
         android:padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"

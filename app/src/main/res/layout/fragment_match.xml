@@ -70,37 +70,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-
-        <ImageButton
-            android:id="@+id/btnDislike"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/skip"
-            />
-
-        <ImageButton
-            android:id="@+id/btnLike"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/like" />
-
         <ImageButton
             android:id="@+id/btnChat"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/send" />
+            android:src="@drawable/btn_send" />
+
+        <ImageButton
+            android:id="@+id/btnDislike"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_skip"
+            />
+
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_like" />
+
 
         <ImageButton
             android:id="@+id/btnViewDetails"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/info" />
+            android:src="@drawable/btn_info" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

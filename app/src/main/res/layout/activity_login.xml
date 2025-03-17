@@ -110,7 +110,7 @@
                 android:layout_marginEnd="50dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/google" />
+                android:src="@drawable/btn_google" />
 
             <ImageButton
                 android:id="@+id/facebookLoginButton"
@@ -118,7 +118,7 @@
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerInside"
-                android:src="@drawable/facebook" />
+                android:src="@drawable/btn_facebook" />
         </LinearLayout>
 
         <!-- Liên kết Quên mật khẩu và Đăng ký -->

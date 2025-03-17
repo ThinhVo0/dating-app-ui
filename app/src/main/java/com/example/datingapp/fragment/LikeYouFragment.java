@@ -20,7 +20,7 @@ public class LikeYouFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate layout cho Fragment
-        return inflater.inflate(R.layout.likeyou, container, false);
+        return inflater.inflate(R.layout.fragment_like_you, container, false);
     }
 
     @Override
