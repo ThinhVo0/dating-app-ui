@@ -19,7 +19,6 @@
         android:title=""
         app:showAsAction="ifRoom"/>
 
-    <!-- Thunder icon lớn hơn, màu xanh -->
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/thunder"
