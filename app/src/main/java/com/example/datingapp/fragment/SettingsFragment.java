@@ -9,6 +9,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import com.example.datingapp.R;
 
 public class SettingsFragment extends Fragment {
@@ -36,7 +38,12 @@ public class SettingsFragment extends Fragment {
         // Xử lý sự kiện click cho từng mục
         tvEditProfile.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
-            // TODO: Điều hướng đến màn hình chỉnh sửa profile
+            ProfileUpdateFragment profileUpdateFragment = new ProfileUpdateFragment();
+            ((FragmentActivity) v.getContext()).getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, profileUpdateFragment) // Thay `fragment_container` bằng ID FrameLayout của bạn
+                    .addToBackStack(null) // Cho phép quay lại Fragment trước đó
+                    .commit();
         });
 
         tvEditAccount.setOnClickListener(v -> {

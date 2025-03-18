@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!-- Zodiac Sign -->
+    <ImageView
+        android:id="@+id/ivZodiacIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_zodiacsign"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spZodiac"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivZodiacIcon"
+        app:layout_constraintStart_toEndOf="@id/ivZodiacIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Personality Type -->
+    <ImageView
+        android:id="@+id/ivPersonalityIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_mind"
+        app:layout_constraintTop_toBottomOf="@id/spZodiac"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spPersonality"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivPersonalityIcon"
+        app:layout_constraintStart_toEndOf="@id/ivPersonalityIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Communication Style -->
+    <ImageView
+        android:id="@+id/ivCommunicationIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_comunicate"
+        app:layout_constraintTop_toBottomOf="@id/spPersonality"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spCommunication"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivCommunicationIcon"
+        app:layout_constraintStart_toEndOf="@id/ivCommunicationIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Love Language -->
+    <ImageView
+        android:id="@+id/ivLoveLanguageIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_romance"
+        app:layout_constraintTop_toBottomOf="@id/spCommunication"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spLoveLanguage"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivLoveLanguageIcon"
+        app:layout_constraintStart_toEndOf="@id/ivLoveLanguageIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Pet Preference -->
+    <ImageView
+        android:id="@+id/ivPetPreferenceIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_pet"
+        app:layout_constraintTop_toBottomOf="@id/spLoveLanguage"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spPetPreference"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivPetPreferenceIcon"
+        app:layout_constraintStart_toEndOf="@id/ivPetPreferenceIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Drinking Habit -->
+    <ImageView
+        android:id="@+id/ivDrinkingIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_drink"
+        app:layout_constraintTop_toBottomOf="@id/spPetPreference"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spDrinking"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivDrinkingIcon"
+        app:layout_constraintStart_toEndOf="@id/ivDrinkingIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Smoking Habit -->
+    <ImageView
+        android:id="@+id/ivSmokingIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_smoking"
+        app:layout_constraintTop_toBottomOf="@id/spDrinking"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spSmoking"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivSmokingIcon"
+        app:layout_constraintStart_toEndOf="@id/ivSmokingIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Sleeping Habit -->
+    <ImageView
+        android:id="@+id/ivSleepingIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_sleep"
+        app:layout_constraintTop_toBottomOf="@id/spSmoking"
+        app:layout_constraintStart_toStartOf="parent" />
+    <Spinner
+        android:id="@+id/spSleeping"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/spinner_background"
+        android:spinnerMode="dropdown"
+        app:layout_constraintTop_toTopOf="@id/ivSleepingIcon"
+        app:layout_constraintStart_toEndOf="@id/ivSleepingIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

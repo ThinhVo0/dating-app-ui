@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">datingapp</string>
+    <string name="app_name">Thunder</string>
+    <string name="app_logo">Logo Ứng Dụng</string>
+    <string name="filter">Bộ Lọc</string>
+    <string name="liked">Liked</string>
+    <string name="chat">Chat</string>
+    <string name="profile">Profile</string>
+    <string name="notifications">Notifications</string>
+    <string name="settings">Settings</string>
 </resources>

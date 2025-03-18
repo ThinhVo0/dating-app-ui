@@ -18,8 +18,8 @@
         <!-- Icon Thunder -->
         <ImageView
             android:id="@+id/thunder_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:src="@drawable/thunder"
             android:contentDescription="Logo Ứng Dụng"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,16 +32,16 @@
             android:id="@+id/app_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Thunder"
+            android:layout_marginStart="0dp"
             android:fontFamily="@font/roboto"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
             android:gravity="center"
-            app:layout_constraintStart_toEndOf="@id/thunder_icon"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="Thunder"
+            android:textColor="#000000"
+            android:textSize="40sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="8dp" />
+            app:layout_constraintStart_toEndOf="@id/thunder_icon"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Nút Bộ Lọc -->
         <ImageView
