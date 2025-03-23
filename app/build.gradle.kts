@@ -43,4 +43,12 @@ dependencies {
 
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler) // Optional, for Glide annotations
+
+    implementation(libs.google.play.services.location)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
+    // Thêm Lombok
+    implementation(libs.lombok)
+    annotationProcessor(libs.lombok)
 }

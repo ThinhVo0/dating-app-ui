@@ -9,6 +9,10 @@ activity = "1.10.0"
 constraintlayout = "2.2.0"
 glide = "4.12.0"
 navigationFragment = "2.8.9"
+# Thêm phiên bản cho google-play-services-location và retrofit
+google-play-services-location = "21.0.1"
+retrofit = "2.9.0"
+lombok = "1.18.34"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -21,7 +25,11 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+# Thêm các thư viện mới
+google-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "google-play-services-location" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-
