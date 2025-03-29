@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.datingapp.R;
+import com.example.datingapp.dto.request.AccessTokenDto;
 import com.example.datingapp.dto.request.LoginDto;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
@@ -39,15 +40,12 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassword = findViewById(R.id.forgotPassword);
         registerLink = findViewById(R.id.registerLink);
 
-        // Kiểm tra nếu đã có token (người dùng đã đăng nhập trước đó)
+        // Kiểm tra nếu đã có token
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", null);
         if (authToken != null) {
-            // Nếu đã có token, chuyển thẳng đến MainActivity
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-            return;
+            // Kiểm tra token trước khi chuyển sang MainActivity
+            checkTokenValidity(authToken);
         }
 
         // Handle Login button click
@@ -66,6 +64,40 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void checkTokenValidity(String authToken) {
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        AccessTokenDto tokenDto = new AccessTokenDto(authToken);
+
+        Call<ApiResponse<String>> call = authService.introspect(tokenDto);
+        call.enqueue(new Callback<ApiResponse<String>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                    // Token hợp lệ, chuyển sang MainActivity
+                    Log.d("LoginActivity", "Token hợp lệ: " + authToken);
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    // Token không hợp lệ, xóa token và giữ người dùng ở LoginActivity
+                    Log.d("LoginActivity", "Token không hợp lệ: " + authToken);
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove("authToken");
+                    editor.apply();
+                    Toast.makeText(LoginActivity.this, "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
+                // Xử lý lỗi mạng hoặc server
+                Log.e("LoginActivity", "Lỗi khi kiểm tra token: " + t.getMessage());
+                Toast.makeText(LoginActivity.this, "Lỗi khi kiểm tra phiên đăng nhập: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void loginUser() {
         String username = emailInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
@@ -75,20 +107,18 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Sử dụng RetrofitClient
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         LoginDto request = new LoginDto();
         request.setUsername(username);
         request.setPassword(password);
 
-        // Gửi request đăng nhập
         Call<ApiResponse<UserResponse>> call = authService.login(request);
         call.enqueue(new Callback<ApiResponse<UserResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<UserResponse>> call, Response<ApiResponse<UserResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<UserResponse> apiResponse = response.body();
-                    if (apiResponse.getStatus() == 200) { // HttpStatus.OK.value()
+                    if (apiResponse.getStatus() == 200) {
                         UserResponse userResponse = apiResponse.getData();
                         String token = userResponse.getToken();
 
@@ -97,6 +127,7 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("authToken", token);
                         editor.apply();
+                        Log.d("LoginActivity", "Saved token: " + token);
 
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
