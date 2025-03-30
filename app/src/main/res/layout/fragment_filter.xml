@@ -36,8 +36,8 @@
         app:trackColorActive="#00BCD4"
         app:trackHeight="8dp"
         app:haloRadius="0dp"
-    app:thumbElevation="0dp"
-    app:thumbColor="#00BCD4"/>
+        app:thumbElevation="0dp"
+        app:thumbColor="#00BCD4"/>
 
     <TextView
         android:id="@+id/tvAgeRange"
@@ -96,6 +96,50 @@
             android:textColor="#212121"
             android:textSize="16sp" />
     </RadioGroup>
+
+    <!-- Lọc theo khoảng cách -->
+    <TextView
+        android:id="@+id/tvDistanceLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Khoảng cách tối đa (km)"
+        android:textColor="#212121"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rgGender" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/distanceSlider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:stepSize="1"
+        android:valueFrom="1"
+        android:valueTo="100"
+        android:value="10"
+        app:layout_constraintTop_toBottomOf="@id/tvDistanceLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:thumbRadius="12dp"
+        app:tickVisible="false"
+        app:trackColorInactive="#B0BEC5"
+        app:trackColorActive="#00BCD4"
+        app:trackHeight="8dp"
+        app:haloRadius="0dp"
+        app:thumbElevation="0dp"
+        app:thumbColor="#00BCD4"/>
+
+    <TextView
+        android:id="@+id/tvDistanceValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="10 km"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/distanceSlider" />
 
     <!-- Nút áp dụng -->
     <Button

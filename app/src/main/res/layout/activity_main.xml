@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"> <!-- Nền sáng cho giao diện -->
+    android:background="#F5F5F5">
 
     <!-- Thanh tiêu đề -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,7 +13,7 @@
         android:layout_height="56dp"
         android:background="@android:color/white"
         app:layout_constraintTop_toTopOf="parent"
-        android:elevation="4dp"> <!-- Đổ bóng nhẹ -->
+        android:elevation="4dp">
 
         <!-- Icon Thunder -->
         <ImageView
@@ -49,34 +49,41 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/btn_filter"
-        android:contentDescription="Bộ Lọc"
-        android:padding="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginEnd="16dp" />
+            android:contentDescription="Bộ Lọc"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="16dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- FrameLayout để chứa Fragment -->
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
+    <!-- FragmentContainerView để chứa các Fragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/app_bar"
-    app:layout_constraintBottom_toTopOf="@id/menu_navigation"
-    android:background="@android:color/white" />
+        app:layout_constraintBottom_toTopOf="@id/menu_navigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navGraph="@navigation/nav_graph"
+        app:defaultNavHost="true"
+        android:background="@android:color/white" />
 
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/menu_navigation"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         app:itemIconTint="@drawable/bottom_nav_icon_tint"
         app:labelVisibilityMode="unlabeled"
         app:itemIconSize="35dp"
         app:menu="@menu/menu_navigation"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

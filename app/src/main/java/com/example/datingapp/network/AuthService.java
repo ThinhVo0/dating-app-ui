@@ -3,7 +3,7 @@ package com.example.datingapp.network;
 import android.provider.ContactsContract;
 
 import com.example.datingapp.dto.request.AccessTokenDto;
-import com.example.datingapp.dto.request.LocationUpdateRequest;
+import com.example.datingapp.dto.request.LocationUpdateDto;
 import com.example.datingapp.dto.request.LoginDto;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
@@ -24,9 +24,9 @@ public interface AuthService {
     Call<ApiResponse<String>> introspect(@Body AccessTokenDto token);
 
     @POST("api/profiles/update-location")
-    Call<Void> updateLocation(
+    Call<ApiResponse<Void>> updateLocation(
             @Header("Authorization") String authToken,
-            @Body LocationUpdateRequest request
+            @Body LocationUpdateDto request
     );
 
 

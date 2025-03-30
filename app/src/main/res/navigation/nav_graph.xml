@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_profile">
+
+    <fragment
+        android:id="@+id/nav_liked"
+        android:name="com.example.datingapp.fragment.LikeYouFragment"
+        android:label="LikeYouFragment" />
+
+    <fragment
+        android:id="@+id/nav_chat"
+        android:name="com.example.datingapp.fragment.ChatFragment"
+        android:label="ChatFragment">
+        <action
+            android:id="@+id/action_chat_to_chat_detail"
+            app:destination="@id/nav_chat_detail"
+            app:popUpTo="@id/nav_chat"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_chat_detail"
+        android:name="com.example.datingapp.fragment.ChatDetailFragment"
+        android:label="ChatDetailFragment" />
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.example.datingapp.fragment.ProfileFragment"
+        android:label="ProfileFragment" />
+
+    <fragment
+        android:id="@+id/nav_notify"
+        android:name="com.example.datingapp.fragment.NotificationsFragment"
+        android:label="NotificationsFragment" />
+
+    <fragment
+        android:id="@+id/nav_setting"
+        android:name="com.example.datingapp.fragment.SettingsFragment"
+        android:label="SettingsFragment">
+        <action
+            android:id="@+id/action_setting_to_profile_update"
+            app:destination="@id/nav_profile_update"
+            app:popUpTo="@id/nav_setting"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_profile_update"
+        android:name="com.example.datingapp.fragment.ProfileUpdateFragment"
+        android:label="ProfileUpdateFragment" />
+
+    <fragment
+        android:id="@+id/nav_filter"
+        android:name="com.example.datingapp.fragment.FilterFragment"
+        android:label="FilterFragment">
+        <action
+            android:id="@+id/action_filter_to_profile"
+            app:destination="@id/nav_profile"
+            app:popUpTo="@id/nav_filter"
+            app:popUpToInclusive="true" />
+    </fragment>
+</navigation>

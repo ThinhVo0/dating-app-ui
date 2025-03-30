@@ -3,7 +3,7 @@ package com.example.datingapp.dto.request;
 import lombok.Data;
 
 @Data
-public class LocationUpdateRequest {
+public class LocationUpdateDto {
     private double latitude;
     private double longitude;
 }

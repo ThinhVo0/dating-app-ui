@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -117,21 +117,14 @@ public class ChatFragment extends Fragment {
 
                 // Sự kiện click để mở cuộc trò chuyện
                 itemView.setOnClickListener(v -> {
-                    ChatDetailFragment chatDetailFragment = new ChatDetailFragment();
-
-                    // Gửi dữ liệu bằng Bundle
+                    // Tạo Bundle để gửi dữ liệu
                     Bundle bundle = new Bundle();
                     bundle.putString("userName", chats.get(getAdapterPosition()).userName);
-                    chatDetailFragment.setArguments(bundle);
 
-                    // Chuyển Fragment
-                    ((FragmentActivity) v.getContext()).getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.fragment_container, chatDetailFragment) // Thay `fragment_container` bằng ID FrameLayout của bạn
-                            .addToBackStack(null) // Cho phép quay lại Fragment trước đó
-                            .commit();
+                    // Điều hướng bằng NavController
+                    NavController navController = Navigation.findNavController(v);
+                    navController.navigate(R.id.action_chat_to_chat_detail, bundle);
                 });
-
             }
         }
     }

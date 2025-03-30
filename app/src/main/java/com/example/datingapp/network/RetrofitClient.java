@@ -19,7 +19,7 @@ public class RetrofitClient {
                     .create();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/") // Dùng 10.0.2.2 nếu chạy trên emulator
+                    .baseUrl("http://10.0.2.2:8080/") // Dùng 10.0.2.2 nếu chạy trên emulator, 192.168.1.11 nếu chạy trên thiết bị
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }

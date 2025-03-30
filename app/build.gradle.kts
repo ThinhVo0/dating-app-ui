@@ -51,4 +51,7 @@ dependencies {
     // Thêm Lombok
     implementation(libs.lombok)
     annotationProcessor(libs.lombok)
+
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
 }

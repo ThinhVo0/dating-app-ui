@@ -14,7 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.datingapp.R;
 import com.example.datingapp.activity.LoginActivity;
@@ -51,12 +52,8 @@ public class SettingsFragment extends Fragment {
 
         tvEditProfile.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
-            ProfileUpdateFragment profileUpdateFragment = new ProfileUpdateFragment();
-            ((FragmentActivity) v.getContext()).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, profileUpdateFragment)
-                    .addToBackStack(null)
-                    .commit();
+            NavController navController = Navigation.findNavController(v);
+            navController.navigate(R.id.action_setting_to_profile_update);
         });
 
         tvEditAccount.setOnClickListener(v -> {
