@@ -48,7 +48,7 @@
             android:id="@+id/tvNameAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phi Thắng, 20"
+            android:text=", 0"
             android:textColor="@android:color/white"
             android:textSize="35sp"
             android:textStyle="bold" />
@@ -58,7 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="TP. Hồ Chí Minh"
+            android:text=""
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </LinearLayout>

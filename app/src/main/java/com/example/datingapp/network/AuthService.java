@@ -11,6 +11,7 @@ import com.example.datingapp.dto.request.SignUpDto;
 import com.example.datingapp.dto.request.VerifySignUpDto;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
+import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileDetailResponse;
 import com.example.datingapp.model.ProfileResponse;
 import com.example.datingapp.model.User;
@@ -52,11 +53,28 @@ public interface AuthService {
 
 
     @GET("api/profiles/search")
-    Call<ProfileResponse> getProfileIds(@Header("Authorization") String authToken);
-
+    Call<ProfileResponse> getProfileIds(
+            @Header("Authorization") String authToken,
+            @Query("gender") String gender,
+            @Query("minAge") Integer minAge,
+            @Query("maxAge") Integer maxAge,
+            @Query("maxDistance") Double maxDistance
+    );
     @GET("api/profiles/{id}")
     Call<ProfileDetailResponse> getProfileDetail(
             @Header("Authorization") String authToken,
             @Path("id") String id
+    );
+
+    @POST("api/relationships/{profileId}/skip")
+    Call<ProfileActionResponse> skipProfile(
+            @Header("Authorization") String authToken,
+            @Path("profileId") String profileId
+    );
+
+    @POST("api/relationships/{profileId}/like")
+    Call<ProfileActionResponse> likeProfile(
+            @Header("Authorization") String authToken,
+            @Path("profileId") String profileId
     );
 }

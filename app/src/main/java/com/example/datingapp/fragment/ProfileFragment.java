@@ -1,6 +1,8 @@
 package com.example.datingapp.fragment;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -19,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.datingapp.R;
 import com.example.datingapp.adapter.ImageAdapter;
+import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileData;
 import com.example.datingapp.model.ProfileDetailResponse;
 import com.example.datingapp.model.ProfileResponse;
@@ -42,12 +45,9 @@ public class ProfileFragment extends Fragment {
     private int currentProfileIndex = 0;
     private ImageButton btnDislike;
     private ImageButton btnLike;
-    SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
-    
-    private final String authToken = sharedPreferences.getString("authToken", null);
+    private String authToken;
     private static final int SWIPE_THRESHOLD = 100;
     private static final int SWIPE_VELOCITY_THRESHOLD = 100;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_match, container, false);
@@ -56,6 +56,9 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        authToken = sharedPreferences.getString("authToken", null);
 
         viewPager = view.findViewById(R.id.viewPager);
         viewPager.setUserInputEnabled(false);
@@ -71,7 +74,6 @@ public class ProfileFragment extends Fragment {
         btnViewDetails.setOnClickListener(v -> showDetailsBottomSheet());
 
         initializeProfileList(view);
-
         GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -109,23 +111,40 @@ public class ProfileFragment extends Fragment {
     }
 
     private void initializeProfileList(View view) {
+        profileIds.clear();
+        profileDataList.clear();
+        currentProfileIndex = 0;
+
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-        Call<ProfileResponse> call = authService.getProfileIds(authToken);
+
+        SharedPreferences filterPrefs = requireContext().getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
+        String gender = filterPrefs.contains("gender") ? filterPrefs.getString("gender", null) : null;
+        Integer minAge = filterPrefs.contains("minAge") ? filterPrefs.getInt("minAge", 18) : null;
+        Integer maxAge = filterPrefs.contains("maxAge") ? filterPrefs.getInt("maxAge", 100) : null;
+
+        Call<ProfileResponse> call = authService.getProfileIds(
+                "Bearer " + authToken,
+                gender, minAge, maxAge, null
+        );
+
         call.enqueue(new Callback<ProfileResponse>() {
             @Override
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
                     profileIds = response.body().getData();
-                    loadAllProfiles(view);
+                    if (profileIds.isEmpty()) {
+                        Toast.makeText(requireContext(), "Không tìm thấy profile nào!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        loadAllProfiles(view);
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Failed to load profile IDs", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Không thể tải danh sách profile", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ProfileResponse> call, Throwable t) {
-                Log.e(TAG, "Error loading profile IDs: " + t.getMessage());
-                Toast.makeText(requireContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -133,13 +152,13 @@ public class ProfileFragment extends Fragment {
     private void loadAllProfiles(View view) {
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         for (String id : profileIds) {
-            Call<ProfileDetailResponse> call = authService.getProfileDetail(authToken, id);
+            Call<ProfileDetailResponse> call = authService.getProfileDetail("Bearer " + authToken, id);
             call.enqueue(new Callback<ProfileDetailResponse>() {
                 @Override
                 public void onResponse(Call<ProfileDetailResponse> call, Response<ProfileDetailResponse> response) {
                     if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
                         profileDataList.add(response.body().getData());
-                        if (profileDataList.size() == 1) {
+                        if (profileDataList.size() == profileIds.size()) {
                             loadProfile(view, profileDataList.get(0));
                         }
                     }
@@ -147,14 +166,19 @@ public class ProfileFragment extends Fragment {
 
                 @Override
                 public void onFailure(Call<ProfileDetailResponse> call, Throwable t) {
-                    Log.e(TAG, "Error loading profile: " + t.getMessage());
+                    Log.e(TAG, "Error loading profile " + id + ": " + t.getMessage());
                 }
             });
         }
     }
 
     private void performSwipe(View view, boolean isSwipeRight) {
-        Toast.makeText(requireContext(), isSwipeRight ? "Liked!" : "Disliked!", Toast.LENGTH_SHORT).show();
+        if (currentProfileIndex >= profileIds.size() || currentProfileIndex >= profileDataList.size()) {
+            Toast.makeText(requireContext(), "Không còn profile để swipe", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String profileId = profileIds.get(currentProfileIndex); // Lấy profileId từ danh sách profileIds
 
         ImageButton button = isSwipeRight ? btnLike : btnDislike;
         Animation scaleUp = AnimationUtils.loadAnimation(getContext(), R.anim.scale_up);
@@ -168,11 +192,33 @@ public class ProfileFragment extends Fragment {
                         isSwipeRight ? R.anim.swipe_right : R.anim.swipe_left);
                 swipeAnimation.setAnimationListener(new Animation.AnimationListener() {
                     @Override
-                    public void onAnimationStart(Animation animation) {}
+                    public void onAnimationStart(Animation animation) {
+                        // Gọi API khi bắt đầu swipe
+                        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+                        Call<ProfileActionResponse> call = isSwipeRight
+                                ? authService.likeProfile("Bearer " + authToken, profileId)
+                                : authService.skipProfile("Bearer " + authToken, profileId);
+
+                        call.enqueue(new Callback<ProfileActionResponse>() {
+                            @Override
+                            public void onResponse(Call<ProfileActionResponse> call, Response<ProfileActionResponse> response) {
+                                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                                    Toast.makeText(requireContext(), response.body().getData(), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(requireContext(), "Lỗi khi thực hiện hành động", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<ProfileActionResponse> call, Throwable t) {
+                                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        nextProfile(view);
+                        nextProfile(view); // Chuyển sang profile tiếp theo sau khi swipe
                         button.setScaleX(1.0f);
                         button.setScaleY(1.0f);
                     }
@@ -192,14 +238,35 @@ public class ProfileFragment extends Fragment {
     private void nextProfile(View view) {
         currentProfileIndex++;
         if (currentProfileIndex >= profileDataList.size()) {
-            currentProfileIndex = 0;
-            Toast.makeText(requireContext(), "Hết profile, quay lại đầu!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Đã hết profile!", Toast.LENGTH_SHORT).show();
+
+            // Reset lại trạng thái ban đầu
+            profileDataList.clear(); // Xóa danh sách profile đã load
+            currentProfileIndex = 0; // Đặt lại chỉ số về 0
+
+            // Quay lại trạng thái mặc định, chưa load data
+            resetUI(view);
+
+            return;
         }
-        if (!profileDataList.isEmpty()) {
-            loadProfile(view, profileDataList.get(currentProfileIndex));
-        }
+        loadProfile(view, profileDataList.get(currentProfileIndex));
     }
 
+    private void resetUI(View view) {
+        // Đặt các giá trị về trạng thái mặc định
+        TextView tvNameAge = view.findViewById(R.id.tvNameAge);
+        TextView tvAddress = view.findViewById(R.id.tvAddress);
+        tvNameAge.setText(",0");
+        tvAddress.setText("");
+
+        // Reset lại ViewPager
+        if (viewPager != null) {
+            viewPager.setAdapter(null);
+        }
+
+        // Cập nhật giao diện với dữ liệu mặc định (nếu có)
+        // Ví dụ: bạn có thể đặt background hoặc hiển thị thông báo nếu cần.
+    }
     private void loadProfile(View view, ProfileData data) {
         List<String> imageUrls = new ArrayList<>();
         String[] pics = {data.getPic1(), data.getPic2(), data.getPic3(), data.getPic4(),
@@ -226,7 +293,9 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showDetailsBottomSheet() {
-        if (profileDataList.isEmpty() || currentProfileIndex >= profileDataList.size()) return;
+        if (profileDataList.isEmpty() || currentProfileIndex >= profileDataList.size()) {
+            return;
+        }
 
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.layout_details, null);
@@ -234,47 +303,24 @@ public class ProfileFragment extends Fragment {
 
         ProfileData data = profileDataList.get(currentProfileIndex);
 
-        try {
-            // Tiểu sử
-            TextView bioText = view.findViewById(R.id.bio_text);
-            bioText.setText(data.getBio() != null ? data.getBio() : "Chưa có tiểu sử");
+        TextView bioText = view.findViewById(R.id.bio_text);
+        bioText.setText(data.getBio() != null ? data.getBio() : "Chưa có tiểu sử");
 
-            // Thông tin chính
-            TextView genderText = view.findViewById(R.id.gender_text);
-            TextView heightText = view.findViewById(R.id.height_text);
-            TextView zodiacText = view.findViewById(R.id.zodiac_text);
-            TextView personalityText = view.findViewById(R.id.personality_text);
+        ((TextView) view.findViewById(R.id.gender_text)).setText(data.getGender() != null ? data.getGender() : "Không xác định");
+        ((TextView) view.findViewById(R.id.height_text)).setText(data.getHeight() > 0 ? data.getHeight() + " cm" : "Không xác định");
+        ((TextView) view.findViewById(R.id.zodiac_text)).setText(data.getZodiacSign() != null ? data.getZodiacSign() : "Không xác định");
+        ((TextView) view.findViewById(R.id.personality_text)).setText(data.getPersonalityType() != null ? data.getPersonalityType() : "Không xác định");
 
-            genderText.setText(data.getGender() != null ? data.getGender() : "Không xác định");
-            heightText.setText(data.getHeight() > 0 ? data.getHeight() + " cm" : "Không xác định");
-            zodiacText.setText(data.getZodiacSign() != null ? data.getZodiacSign() : "Không xác định");
-            personalityText.setText(data.getPersonalityType() != null ? data.getPersonalityType() : "Không xác định");
+        ((TextView) view.findViewById(R.id.communication_text)).setText(data.getCommunicationStyle() != null ? data.getCommunicationStyle() : "Không xác định");
+        ((TextView) view.findViewById(R.id.love_language_text)).setText(data.getLoveLanguage() != null ? data.getLoveLanguage() : "Không xác định");
+        ((TextView) view.findViewById(R.id.pet_text)).setText(data.getPetPreference() != null ? data.getPetPreference() : "Không xác định");
 
-            // Thông tin thêm
-            TextView communicationText = view.findViewById(R.id.communication_text);
-            TextView loveLanguageText = view.findViewById(R.id.love_language_text);
-            TextView petText = view.findViewById(R.id.pet_text);
-            TextView hobbiesText = view.findViewById(R.id.hobbies_text);
+        String hobbies = data.getHobbies() != null ? String.join(", ", data.getHobbies()) : "Không có sở thích";
+        ((TextView) view.findViewById(R.id.hobbies_text)).setText(hobbies);
 
-            communicationText.setText(data.getCommunicationStyle() != null ? data.getCommunicationStyle() : "Không xác định");
-            loveLanguageText.setText(data.getLoveLanguage() != null ? data.getLoveLanguage() : "Không xác định");
-            petText.setText(data.getPetPreference() != null ? data.getPetPreference() : "Không xác định");
-            String hobbies = data.getHobbies() != null ? String.join(", ", data.getHobbies()) : "Không có sở thích";
-            hobbiesText.setText(hobbies);
-
-            // Phong cách sống
-            TextView drinkingText = view.findViewById(R.id.drinking_text);
-            TextView smokingText = view.findViewById(R.id.smoking_text);
-            TextView sleepText = view.findViewById(R.id.sleep_text);
-
-            drinkingText.setText(data.getDrinkingHabit() != null ? data.getDrinkingHabit() : "Không xác định");
-            smokingText.setText(data.getSmokingHabit() != null ? data.getSmokingHabit() : "Không xác định");
-            sleepText.setText(data.getSleepingHabit() != null ? data.getSleepingHabit() : "Không xác định");
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error loading details: " + e.getMessage());
-            Toast.makeText(requireContext(), "Error loading details", Toast.LENGTH_SHORT).show();
-        }
+        ((TextView) view.findViewById(R.id.drinking_text)).setText(data.getDrinkingHabit() != null ? data.getDrinkingHabit() : "Không xác định");
+        ((TextView) view.findViewById(R.id.smoking_text)).setText(data.getSmokingHabit() != null ? data.getSmokingHabit() : "Không xác định");
+        ((TextView) view.findViewById(R.id.sleep_text)).setText(data.getSleepingHabit() != null ? data.getSleepingHabit() : "Không xác định");
 
         bottomSheetDialog.show();
     }
