@@ -11,6 +11,8 @@ import com.example.datingapp.dto.request.SignUpDto;
 import com.example.datingapp.dto.request.VerifySignUpDto;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
+import com.example.datingapp.model.ProfileDetailResponse;
+import com.example.datingapp.model.ProfileResponse;
 import com.example.datingapp.model.User;
 
 import java.util.List;
@@ -50,16 +52,11 @@ public interface AuthService {
 
 
     @GET("api/profiles/search")
-    Call<ApiResponse<List<ContactsContract.Profile>>> searchProfiles(
-            @Query("firstName") String firstName,
-            @Query("lastName") String lastName,
-            @Query("gender") String gender,
-            @Query("age") Integer age,
-            @Query("minAge") Integer minAge,
-            @Query("maxAge") Integer maxAge,
-            @Query("minHeight") Integer minHeight,
-            @Query("maxHeight") Integer maxHeight,
-            @Query("maxDistance") Double maxDistance,
-            @Header("Authorization") String token
+    Call<ProfileResponse> getProfileIds(@Header("Authorization") String authToken);
+
+    @GET("api/profiles/{id}")
+    Call<ProfileDetailResponse> getProfileDetail(
+            @Header("Authorization") String authToken,
+            @Path("id") String id
     );
 }

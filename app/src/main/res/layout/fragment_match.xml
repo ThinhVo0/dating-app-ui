@@ -11,12 +11,16 @@
         android:layout_height="0dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:padding="0dp"
+        android:background="@drawable/rounded_background"
+        android:clipToOutline="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
 
     <View
         android:id="@+id/backgroundOverlay"

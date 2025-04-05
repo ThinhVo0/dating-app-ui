@@ -30,11 +30,9 @@
         android:icon="@drawable/btn_notify"
         android:title=""
         app:showAsAction="ifRoom"/>
-
     <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/btn_setting"
         android:title=""
         app:showAsAction="ifRoom"/>
-
 </menu>
