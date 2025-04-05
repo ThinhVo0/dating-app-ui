@@ -78,15 +78,18 @@
                 android:hint="Mật khẩu"
                 android:inputType="textPassword"
                 android:layout_marginBottom="16dp" />
+
+            <!-- OTP Input (ẩn mặc định) -->
             <EditText
-                android:id="@+id/passwordInputCheck"
+                android:id="@+id/otpInput"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:background="@drawable/rounded_input"
                 android:padding="16dp"
-                android:hint="Xác nhận mật khẩu"
-                android:inputType="textPassword"
-                android:layout_marginBottom="24dp" />
+                android:hint="Mã OTP"
+                android:inputType="number"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp" />
 
             <!-- Signup Button -->
             <Button
@@ -97,6 +100,19 @@
                 android:text="Đăng ký"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
+                android:layout_marginBottom="16dp"
+                app:cornerRadius="28dp" />
+
+            <!-- Verify OTP Button (ẩn mặc định) -->
+            <Button
+                android:id="@+id/verifyOtpButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="#00BCD4"
+                android:text="Xác nhận OTP"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:visibility="gone"
                 android:layout_marginBottom="16dp"
                 app:cornerRadius="28dp" />
 

@@ -5,8 +5,11 @@ import android.provider.ContactsContract;
 import com.example.datingapp.dto.request.AccessTokenDto;
 import com.example.datingapp.dto.request.LocationUpdateDto;
 import com.example.datingapp.dto.request.LoginDto;
+import com.example.datingapp.dto.request.SignUpDto;
+import com.example.datingapp.dto.request.VerifySignUpDto;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
+import com.example.datingapp.model.User;
 
 import java.util.List;
 
@@ -22,6 +25,12 @@ public interface AuthService {
 
     @POST("api/auth/introspect")
     Call<ApiResponse<String>> introspect(@Body AccessTokenDto token);
+
+    @POST("api/auth/signup/request")
+    Call<ApiResponse<String>> requestSignup(@Body SignUpDto signUpDto);
+
+    @POST("api/auth/signup/verify")
+    Call<ApiResponse<User>> verifySignup(@Body VerifySignUpDto verifySignUpDto);
 
     @POST("api/profiles/update-location")
     Call<ApiResponse<Void>> updateLocation(

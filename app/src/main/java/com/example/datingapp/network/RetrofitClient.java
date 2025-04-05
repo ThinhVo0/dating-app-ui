@@ -3,6 +3,7 @@ package com.example.datingapp.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime; // Nếu dùng minSdk 26
 
 import retrofit2.Retrofit;
@@ -16,6 +17,7 @@ public class RetrofitClient {
             // Tạo Gson với TypeAdapter cho LocalDateTime
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter()) // Thêm TypeAdapter cho LocalDate
                     .create();
 
             retrofit = new Retrofit.Builder()
