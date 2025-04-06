@@ -121,10 +121,11 @@ public class ProfileFragment extends Fragment {
         String gender = filterPrefs.contains("gender") ? filterPrefs.getString("gender", null) : null;
         Integer minAge = filterPrefs.contains("minAge") ? filterPrefs.getInt("minAge", 18) : null;
         Integer maxAge = filterPrefs.contains("maxAge") ? filterPrefs.getInt("maxAge", 100) : null;
+        Double maxDistance = filterPrefs.contains("maxDistance") ? (double) filterPrefs.getFloat("maxDistance", 10.0f) : null;
 
         Call<ProfileResponse> call = authService.getProfileIds(
                 "Bearer " + authToken,
-                gender, minAge, maxAge, null
+                gender, minAge, maxAge, maxDistance
         );
 
         call.enqueue(new Callback<ProfileResponse>() {

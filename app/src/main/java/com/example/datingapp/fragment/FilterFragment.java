@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.datingapp.R;
 import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.slider.Slider;
 
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class FilterFragment extends Fragment {
     private RangeSlider ageRangeSlider;
     private TextView tvAgeRange;
     private RadioGroup rgGender;
+    private Slider distanceSlider; // Thêm Slider cho khoảng cách
+    private TextView tvDistanceValue; // Thêm TextView để hiển thị giá trị khoảng cách
     private Button btnApplyFilter;
 
     @Override
@@ -38,6 +41,8 @@ public class FilterFragment extends Fragment {
         ageRangeSlider = view.findViewById(R.id.ageRangeSlider);
         tvAgeRange = view.findViewById(R.id.tvAgeRange);
         rgGender = view.findViewById(R.id.rgGender);
+        distanceSlider = view.findViewById(R.id.distanceSlider); // Ánh xạ Slider
+        tvDistanceValue = view.findViewById(R.id.tvDistanceValue); // Ánh xạ TextView
         btnApplyFilter = view.findViewById(R.id.btnApplyFilter);
 
         // Log giá trị ban đầu của RangeSlider
@@ -50,6 +55,13 @@ public class FilterFragment extends Fragment {
             int maxAge = Math.round(values.get(1));
             tvAgeRange.setText(minAge + " - " + maxAge);
             Log.d(TAG, "Age Range changed: " + minAge + " - " + maxAge);
+        });
+
+        // Xử lý sự kiện thay đổi giá trị của distanceSlider
+        distanceSlider.addOnChangeListener((slider, value, fromUser) -> {
+            int distance = Math.round(value);
+            tvDistanceValue.setText(distance + " km");
+            Log.d(TAG, "Distance changed: " + distance + " km");
         });
 
         btnApplyFilter.setOnClickListener(v -> {
@@ -65,14 +77,17 @@ public class FilterFragment extends Fragment {
                 gender = "FEMALE";
             }
 
+            float maxDistance = distanceSlider.getValue(); // Lấy giá trị từ distanceSlider
+
             SharedPreferences filterPrefs = requireContext().getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = filterPrefs.edit();
             editor.putInt("minAge", minAge);
             editor.putInt("maxAge", maxAge);
             editor.putString("gender", gender);
+            editor.putFloat("maxDistance", maxDistance); // Lưu maxDistance vào SharedPreferences
             editor.apply();
 
-            Log.d(TAG, "Filter applied - MinAge: " + minAge + ", MaxAge: " + maxAge + ", Gender: " + gender);
+            Log.d(TAG, "Filter applied - MinAge: " + minAge + ", MaxAge: " + maxAge + ", Gender: " + gender + ", MaxDistance: " + maxDistance + " km");
             Toast.makeText(getContext(), "Đã lưu bộ lọc!", Toast.LENGTH_SHORT).show();
 
             requireActivity().onBackPressed();
