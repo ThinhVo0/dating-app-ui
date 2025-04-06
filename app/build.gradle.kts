@@ -36,22 +36,30 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.fragment) // Chỉ giữ một lần
+    implementation(libs.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+    // Glide
     implementation(libs.glide)
-    annotationProcessor(libs.glide.compiler) // Optional, for Glide annotations
+    annotationProcessor(libs.glide.compiler)
 
+    // Google Play Services
     implementation(libs.google.play.services.location)
+
+    // Retrofit và Gson
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-
-    // Thêm Lombok
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3") // Để debug request/response
+    implementation ("com.google.android.material:material:1.9.0")
+    // Lombok
     implementation(libs.lombok)
     annotationProcessor(libs.lombok)
 
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
+    // Flexbox
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 }

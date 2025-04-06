@@ -3,6 +3,7 @@ package com.example.datingapp.network;
 import android.provider.ContactsContract;
 
 import com.example.datingapp.dto.request.AccessTokenDto;
+import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.request.ForgotPassWordDto;
 import com.example.datingapp.dto.request.LocationUpdateDto;
 import com.example.datingapp.dto.request.LoginDto;
@@ -14,10 +15,12 @@ import com.example.datingapp.dto.response.UserResponse;
 import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileDetailResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
+import com.example.datingapp.model.ProfileUpdateDTO;
 import com.example.datingapp.model.User;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -81,5 +84,18 @@ public interface AuthService {
     @GET("api/relationships/liked-users")
     Call<ApiResponse<List<ProfileResponse>>> getLikedUsers(
             @Header("Authorization") String authToken
+    );
+
+    @PUT("api/profiles/update")
+    Call<ApiResponse<Void>> updateProfile(
+            @Header("Authorization") String authToken,
+            @Body ProfileUpdateDTO profile
+    );
+
+    @Multipart
+    @POST("api/profiles/images/upload")
+    Call<ApiResponse<Album>> uploadImages(
+            @Header("Authorization") String authToken,
+            @Part List<MultipartBody.Part> files
     );
 }

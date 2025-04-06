@@ -26,17 +26,15 @@
         app:layout_constraintStart_toEndOf="@id/ivHobbiesIcon"
         android:layout_marginStart="8dp" />
 
-    <ListView
-        android:id="@+id/lvHobbies"
-        android:layout_width="0dp"
-        android:layout_height="150dp"
-        android:background="@drawable/list_background"
-        android:choiceMode="multipleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/flHobbies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:flexWrap="wrap"
+        app:justifyContent="flex_start"
         app:layout_constraintTop_toBottomOf="@id/ivHobbiesIcon"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
