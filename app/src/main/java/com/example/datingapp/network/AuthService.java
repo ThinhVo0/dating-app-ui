@@ -13,7 +13,7 @@ import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserResponse;
 import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileDetailResponse;
-import com.example.datingapp.model.ProfileResponse;
+import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.model.User;
 
 import java.util.List;
@@ -76,5 +76,10 @@ public interface AuthService {
     Call<ProfileActionResponse> likeProfile(
             @Header("Authorization") String authToken,
             @Path("profileId") String profileId
+    );
+
+    @GET("api/relationships/liked-users")
+    Call<ApiResponse<List<ProfileResponse>>> getLikedUsers(
+            @Header("Authorization") String authToken
     );
 }

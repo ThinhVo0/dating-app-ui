@@ -11,31 +11,30 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 
 import java.util.List;
 
 public class ImageGridAdapter extends BaseAdapter {
     private Context context;
-    private List<Integer> imageList;
-
+    private List<String> imageUrls; // Thay từ List<Integer> sang List<String> để chứa URL
     private List<Integer> ageList;
 
-
-    public ImageGridAdapter(Context context, List<Integer> imageList, List<Integer> ageList) {
+    public ImageGridAdapter(Context context, List<String> imageUrls, List<Integer> ageList) {
         this.context = context;
-        this.imageList = imageList;
+        this.imageUrls = imageUrls;
         this.ageList = ageList;
     }
 
     @Override
     public int getCount() {
-        return imageList.size();
+        return imageUrls.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return imageList.get(position);
+        return imageUrls.get(position);
     }
 
     @Override
@@ -50,21 +49,24 @@ public class ImageGridAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_like, parent, false);
             holder = new ViewHolder();
             holder.imageView = convertView.findViewById(R.id.imageView);
-            holder.textAge = convertView.findViewById(R.id.textAge); // Gán đúng TextView
+            holder.textAge = convertView.findViewById(R.id.textAge);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        // Hiển thị ảnh từ danh sách drawable
-        holder.imageView.setImageResource(imageList.get(position));
+        // Tải ảnh từ URL bằng Glide
+        Glide.with(context)
+                .load(imageUrls.get(position))
+                .into(holder.imageView);
 
         // Hiển thị tuổi
         if (ageList != null && position < ageList.size()) {
             holder.textAge.setText(String.valueOf(ageList.get(position)));
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // API 31+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             RenderEffect blurEffect = RenderEffect.createBlurEffect(90f, 90f, Shader.TileMode.CLAMP);
             holder.imageView.setRenderEffect(blurEffect);
         }
@@ -75,6 +77,5 @@ public class ImageGridAdapter extends BaseAdapter {
     static class ViewHolder {
         ImageView imageView;
         TextView textAge;
-
     }
 }

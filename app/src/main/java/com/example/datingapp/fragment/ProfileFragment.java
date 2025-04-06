@@ -2,7 +2,6 @@ package com.example.datingapp.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -21,10 +20,10 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.datingapp.R;
 import com.example.datingapp.adapter.ImageAdapter;
+import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileData;
 import com.example.datingapp.model.ProfileDetailResponse;
-import com.example.datingapp.model.ProfileResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
