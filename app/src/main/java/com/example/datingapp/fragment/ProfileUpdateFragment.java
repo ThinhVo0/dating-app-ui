@@ -29,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.response.ApiResponse;
@@ -51,6 +52,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,8 +129,11 @@ public class ProfileUpdateFragment extends Fragment {
         // Setup adapters
         setupHobbiesFlexbox();
         setupSpinners();
-        setupImageClickListeners(view);  // Pass the inflated view here
+        setupImageClickListeners(view);
         Log.d(TAG, "onCreateView: Adapters and listeners set up");
+
+        // Load profile data
+        loadProfileData(sharedPreferences, view);
 
         // Setup save button listener
         btnSave.setOnClickListener(v -> {
@@ -140,8 +145,76 @@ public class ProfileUpdateFragment extends Fragment {
         return view;
     }
 
+    private void loadProfileData(SharedPreferences sharedPreferences, View view) {
+        // Load text fields
+        etFirstName.setText(sharedPreferences.getString("firstName", ""));
+        etLastName.setText(sharedPreferences.getString("lastName", ""));
+        etAge.setText(String.valueOf(sharedPreferences.getInt("age", 0)));
+        etHeight.setText(String.valueOf(sharedPreferences.getInt("height", 0)));
+        etBio.setText(sharedPreferences.getString("bio", ""));
+
+        // Load gender
+        String gender = sharedPreferences.getString("gender", "");
+        if ("Nam".equals(gender)) {
+            rgGender.check(R.id.rbMale);
+        } else if ("Nữ".equals(gender)) {
+            rgGender.check(R.id.rbFemale);
+        }
+
+        // Load hobbies
+        String hobbiesStr = sharedPreferences.getString("hobbies", "");
+        if (!hobbiesStr.isEmpty()) {
+            List<String> hobbiesList = Arrays.asList(hobbiesStr.split(","));
+            for (int i = 0; i < flHobbies.getChildCount(); i++) {
+                CheckBox checkBox = (CheckBox) flHobbies.getChildAt(i);
+                String hobbyText = checkBox.getText().toString();
+                if (hobbiesList.contains(hobbyText)) {
+                    checkBox.setChecked(true);
+                    selectedHobbies.add(Hobbies.fromDisplayName(hobbyText));
+                }
+            }
+        }
+
+        // Load spinners with display name mapping
+        setSpinnerSelection(spZodiac, ZodiacSign.values(), sharedPreferences.getString("zodiacSign", ""), ZodiacSign::getDisplayName);
+        setSpinnerSelection(spPersonality, PersonalityType.values(), sharedPreferences.getString("personalityType", ""), PersonalityType::toString);
+        setSpinnerSelection(spCommunication, CommunicationStyle.values(), sharedPreferences.getString("communicationStyle", ""), CommunicationStyle::getDisplayName);
+        setSpinnerSelection(spLoveLanguage, LoveLanguage.values(), sharedPreferences.getString("loveLanguage", ""), LoveLanguage::getDisplayName);
+        setSpinnerSelection(spPetPreference, PetPreference.values(), sharedPreferences.getString("petPreference", ""), PetPreference::getDisplayName);
+        setSpinnerSelection(spDrinking, DrinkingHabit.values(), sharedPreferences.getString("drinkingHabit", ""), DrinkingHabit::getDisplayName);
+        setSpinnerSelection(spSmoking, SmokingHabit.values(), sharedPreferences.getString("smokingHabit", ""), SmokingHabit::getDisplayName);
+        setSpinnerSelection(spSleeping, SleepingHabit.values(), sharedPreferences.getString("sleepingHabit", ""), SleepingHabit::getDisplayName);
+
+        // Load images using the passed view
+        for (int i = 1; i <= 9; i++) {
+            String picUrl = sharedPreferences.getString("pic" + i, null);
+            if (picUrl != null && !picUrl.isEmpty()) {
+                int imageViewId = getResources().getIdentifier("img" + i, "id", requireContext().getPackageName());
+                ImageView imageView = view.findViewById(imageViewId);
+                if (imageView != null) {
+                    Glide.with(this)
+                            .load(picUrl)
+                            .placeholder(R.drawable.ic_dislike)
+                            .into(imageView);
+                }
+            }
+        }
+    }
+
+    private <T> void setSpinnerSelection(Spinner spinner, T[] values, String displayValue, java.util.function.Function<T, String> displayNameMapper) {
+        if (displayValue != null && !displayValue.isEmpty()) {
+            ArrayAdapter<T> adapter = (ArrayAdapter<T>) spinner.getAdapter();
+            for (int i = 0; i < values.length; i++) {
+                if (displayNameMapper.apply(values[i]).equals(displayValue)) {
+                    spinner.setSelection(i);
+                    break;
+                }
+            }
+        }
+    }
+
     private String[] getPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // API 33+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return new String[]{Manifest.permission.READ_MEDIA_IMAGES};
         } else {
             return new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};

@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class User {
     @SerializedName("id")
-    private UserResponse.IdObject id;
+    private String id;
 
     @SerializedName("username")
     private String username;
@@ -32,7 +32,7 @@ public class User {
     private String accountStatus;
 
     @SerializedName("profileId")
-    private UserResponse.IdObject profileId;
+    private String profileId;
 
     @SerializedName("provider")
     private String provider;

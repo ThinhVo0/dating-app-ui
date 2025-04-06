@@ -65,4 +65,12 @@ public enum Hobbies {
     public String toString() {
         return displayName;
     }
+    public static Hobbies fromDisplayName(String displayName) {
+        for (Hobbies hobby : values()) {
+            if (hobby.getDisplayName().equals(displayName)) {
+                return hobby;
+            }
+        }
+        throw new IllegalArgumentException("No Hobbies enum constant with display name: " + displayName);
+    }
 }

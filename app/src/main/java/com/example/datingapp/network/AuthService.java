@@ -100,4 +100,7 @@ public interface AuthService {
             @Part MultipartBody.Part file,
             @Part("position") RequestBody position
     );
+
+    @GET("api/profiles/{userId}")
+    Call<ApiResponse<ProfileResponse>> getUserProfile(@Header("Authorization") String token, @Path("userId") String userId);
 }

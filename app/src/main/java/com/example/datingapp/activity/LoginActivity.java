@@ -112,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.remove("authToken");
+                    editor.remove("userId");
                     editor.apply();
                     Toast.makeText(LoginActivity.this, "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
                 }
@@ -148,13 +149,15 @@ public class LoginActivity extends AppCompatActivity {
                     if (apiResponse.getStatus() == 200) {
                         UserResponse userResponse = apiResponse.getData();
                         String token = userResponse.getToken();
+                        String userId = userResponse.getId();
 
-                        // Lưu token vào SharedPreferences
+                        // Lưu token và userId vào SharedPreferences
                         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("authToken", token);
+                        editor.putString("userId", userId);
                         editor.apply();
-                        Log.d("LoginActivity", "Saved token: " + token);
+                        Log.d("LoginActivity", "Saved token: " + token + ", userId: " + userId);
 
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
