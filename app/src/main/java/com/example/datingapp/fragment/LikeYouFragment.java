@@ -68,10 +68,13 @@ public class LikeYouFragment extends Fragment {
                     List<String> imageUrls = new ArrayList<>();
                     List<Integer> ageList = new ArrayList<>();
                     for (ProfileResponse profile : likedUsers) {
-                        // Lấy ảnh đầu tiên (pic1) nếu có, nếu không thì để trống
-                        String pic = profile.getPic1() != null && !profile.getPic1().isEmpty() ? profile.getPic1() : "";
+                        // Lấy ảnh đầu tiên (pic1) nếu có, nếu không thì dùng ảnh mặc định
+                        String pic = profile.getPic1() != null && !profile.getPic1().isEmpty()
+                                ? profile.getPic1()
+                                : "https://via.placeholder.com/150"; // URL ảnh mặc định
                         imageUrls.add(pic);
                         ageList.add(profile.getAge());
+                        Log.d(TAG, "Added profile: " + profile.getFirstName() + " - " + pic);
                     }
 
                     // Cập nhật adapter với dữ liệu từ API
