@@ -6,11 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.GridLayout;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -71,13 +69,12 @@ public class ProfileUpdateFragment extends Fragment {
     private FlexboxLayout flHobbies;
     private Spinner spZodiac, spPersonality, spCommunication, spLoveLanguage,
             spPetPreference, spDrinking, spSmoking, spSleeping;
-    private Button btnSave, btnUploadImages;
-    private GridLayout glProfileImages;
+    private Button btnSave;
     private List<Hobbies> selectedHobbies = new ArrayList<>();
     private AuthService authService;
     private String authToken;
-    private List<Uri> selectedImageUris = new ArrayList<>();
     private static final int STORAGE_PERMISSION_CODE = 100;
+    private int currentImagePosition = -1;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -85,21 +82,11 @@ public class ProfileUpdateFragment extends Fragment {
                 Log.d(TAG, "imagePickerLauncher: Result received, resultCode = " + result.getResultCode());
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Intent data = result.getData();
-                    selectedImageUris.clear();
-                    if (data.getClipData() != null) {
-                        int count = Math.min(data.getClipData().getItemCount(), 9);
-                        Log.d(TAG, "imagePickerLauncher: Multiple images selected, count = " + count);
-                        for (int i = 0; i < count; i++) {
-                            Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                            selectedImageUris.add(imageUri);
-                            Log.d(TAG, "imagePickerLauncher: Added image URI = " + imageUri);
-                        }
-                    } else if (data.getData() != null) {
-                        selectedImageUris.add(data.getData());
-                        Log.d(TAG, "imagePickerLauncher: Single image selected, URI = " + data.getData());
+                    Uri imageUri = data.getData();
+                    if (imageUri != null) {
+                        uploadImageToServer(imageUri, "pic" + currentImagePosition);
+                        updateImageView(imageUri);
                     }
-                    displaySelectedImages();
-                    uploadImagesToServer();
                 } else {
                     Log.d(TAG, "imagePickerLauncher: Image selection failed or cancelled");
                 }
@@ -131,8 +118,6 @@ public class ProfileUpdateFragment extends Fragment {
         spSmoking = view.findViewById(R.id.spSmoking);
         spSleeping = view.findViewById(R.id.spSleeping);
         btnSave = view.findViewById(R.id.btnSave);
-        btnUploadImages = view.findViewById(R.id.btnUploadImages);
-        glProfileImages = view.findViewById(R.id.glProfileImages);
         Log.d(TAG, "onCreateView: Views initialized");
 
         // Initialize Retrofit service
@@ -142,16 +127,13 @@ public class ProfileUpdateFragment extends Fragment {
         // Setup adapters
         setupHobbiesFlexbox();
         setupSpinners();
-        Log.d(TAG, "onCreateView: Adapters set up");
+        setupImageClickListeners(view);  // Pass the inflated view here
+        Log.d(TAG, "onCreateView: Adapters and listeners set up");
 
-        // Setup listeners
+        // Setup save button listener
         btnSave.setOnClickListener(v -> {
             Log.d(TAG, "btnSave: Clicked");
             saveProfile();
-        });
-        btnUploadImages.setOnClickListener(v -> {
-            Log.d(TAG, "btnUploadImages: Clicked");
-            checkStoragePermissionAndOpenPicker();
         });
 
         Log.d(TAG, "onCreateView: Completed");
@@ -200,75 +182,71 @@ public class ProfileUpdateFragment extends Fragment {
         Log.d(TAG, "openImagePicker: Starting");
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         imagePickerLauncher.launch(Intent.createChooser(intent, "Chọn ảnh"));
         Log.d(TAG, "openImagePicker: Intent launched");
     }
 
-    private void displaySelectedImages() {
-        Log.d(TAG, "displaySelectedImages: Starting, selectedImageUris size = " + selectedImageUris.size());
-        for (int i = 0; i < glProfileImages.getChildCount(); i++) {
-            ImageView imageView = (ImageView) glProfileImages.getChildAt(i);
-            if (i < selectedImageUris.size()) {
-                imageView.setImageURI(selectedImageUris.get(i));
-                imageView.setVisibility(View.VISIBLE);
-                Log.d(TAG, "displaySelectedImages: Set image at index " + i + " with URI = " + selectedImageUris.get(i));
+    private void setupImageClickListeners(View view) {
+        Log.d(TAG, "setupImageClickListeners: Starting");
+        for (int i = 1; i <= 9; i++) {
+            int frameLayoutId = getResources().getIdentifier("flImg" + i, "id", requireContext().getPackageName());
+            FrameLayout frameLayout = view.findViewById(frameLayoutId);
+            final int position = i;
+            if (frameLayout != null) {
+                frameLayout.setOnClickListener(v -> {
+                    Log.d(TAG, "setupImageClickListeners: Image position " + position + " clicked");
+                    currentImagePosition = position;
+                    checkStoragePermissionAndOpenPicker();
+                });
             } else {
-                imageView.setVisibility(View.GONE);
-                Log.d(TAG, "displaySelectedImages: Hid image at index " + i);
+                Log.e(TAG, "setupImageClickListeners: FrameLayout flImg" + i + " not found");
             }
         }
-        Log.d(TAG, "displaySelectedImages: Completed");
+        Log.d(TAG, "setupImageClickListeners: Completed");
     }
 
-    private void uploadImagesToServer() {
-        Log.d(TAG, "uploadImagesToServer: Starting");
-        if (selectedImageUris.isEmpty()) {
-            Log.d(TAG, "uploadImagesToServer: No images selected");
-            Toast.makeText(getContext(), "Vui lòng chọn ít nhất một ảnh", Toast.LENGTH_SHORT).show();
+    private void updateImageView(Uri imageUri) {
+        Log.d(TAG, "updateImageView: Updating image at position " + currentImagePosition);
+        int imageViewId = getResources().getIdentifier("img" + currentImagePosition, "id", requireContext().getPackageName());
+        ImageView imageView = getView().findViewById(imageViewId);
+        if (imageView != null) {
+            imageView.setImageURI(imageUri);
+            Log.d(TAG, "updateImageView: Image set successfully");
+        }
+    }
+
+    private void uploadImageToServer(Uri imageUri, String position) {
+        Log.d(TAG, "uploadImageToServer: Starting upload for position " + position);
+        String filePath = RealPathUtil.getRealPath(requireContext(), imageUri);
+        if (filePath == null) {
+            Log.e(TAG, "uploadImageToServer: Failed to get file path for URI = " + imageUri);
+            Toast.makeText(getContext(), "Không thể lấy đường dẫn ảnh", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        List<MultipartBody.Part> parts = new ArrayList<>();
-        for (Uri uri : selectedImageUris) {
-            try {
-                String filePath = RealPathUtil.getRealPath(requireContext(), uri);
-                if (filePath == null) {
-                    Log.e(TAG, "uploadImagesToServer: Failed to get file path for URI = " + uri);
-                    Toast.makeText(getContext(), "Không thể lấy đường dẫn ảnh", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                File file = new File(filePath);
-                Log.d(TAG, "uploadImagesToServer: Preparing file = " + file.getAbsolutePath());
-                RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
-                MultipartBody.Part body = MultipartBody.Part.createFormData("files", file.getName(), requestFile);
-                parts.add(body);
-                Log.d(TAG, "uploadImagesToServer: Added file part = " + file.getName());
-            } catch (Exception e) {
-                Log.e(TAG, "uploadImagesToServer: Error preparing file, " + e.getMessage());
-                Toast.makeText(getContext(), "Lỗi khi chuẩn bị ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
+        File file = new File(filePath);
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        RequestBody positionPart = RequestBody.create(MediaType.parse("text/plain"), position);
 
-        Log.d(TAG, "uploadImagesToServer: Sending request with " + parts.size() + " parts");
-        Call<ApiResponse<Album>> call = authService.uploadImages("Bearer " + authToken, parts);
+        Log.d(TAG, "uploadImageToServer: Sending request for file " + file.getName());
+        Call<ApiResponse<Album>> call = authService.uploadImage("Bearer " + authToken, filePart, positionPart);
         call.enqueue(new Callback<ApiResponse<Album>>() {
             @Override
             public void onResponse(Call<ApiResponse<Album>> call, Response<ApiResponse<Album>> response) {
-                Log.d(TAG, "uploadImagesToServer: Response received, code = " + response.code());
+                Log.d(TAG, "uploadImageToServer: Response received, code = " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "uploadImagesToServer: Upload successful");
+                    Log.d(TAG, "uploadImageToServer: Upload successful");
                     Toast.makeText(getContext(), "Upload ảnh thành công", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.d(TAG, "uploadImagesToServer: Upload failed, message = " + response.message());
+                    Log.d(TAG, "uploadImageToServer: Upload failed, message = " + response.message());
                     Toast.makeText(getContext(), "Upload thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Album>> call, Throwable t) {
-                Log.e(TAG, "uploadImagesToServer: Network error, " + t.getMessage());
+                Log.e(TAG, "uploadImageToServer: Network error, " + t.getMessage());
                 Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

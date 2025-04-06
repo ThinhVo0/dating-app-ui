@@ -21,6 +21,7 @@ import com.example.datingapp.model.User;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 
@@ -94,8 +95,9 @@ public interface AuthService {
 
     @Multipart
     @POST("api/profiles/images/upload")
-    Call<ApiResponse<Album>> uploadImages(
-            @Header("Authorization") String authToken,
-            @Part List<MultipartBody.Part> files
+    Call<ApiResponse<Album>> uploadImage(
+            @Header("Authorization") String token,
+            @Part MultipartBody.Part file,
+            @Part("position") RequestBody position
     );
 }
