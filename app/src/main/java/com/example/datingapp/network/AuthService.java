@@ -3,6 +3,7 @@ package com.example.datingapp.network;
 import android.provider.ContactsContract;
 
 import com.example.datingapp.dto.MessageDTO;
+import com.example.datingapp.dto.Notification;
 import com.example.datingapp.dto.request.AccessTokenDto;
 import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.request.ForgotPassWordDto;
@@ -116,5 +117,12 @@ public interface AuthService {
             @Header("Authorization") String authToken,
             @Query("userId1") String userId1,
             @Query("userId2") String userId2
+    );
+
+
+    @GET("api/notifications/user/{userId}")
+    Call<List<Notification>> getNotifications(
+            @Header("Authorization") String authToken,
+            @Path("userId") String userId
     );
 }
