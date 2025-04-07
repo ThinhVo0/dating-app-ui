@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:padding="8dp">
 
+    <!-- Tin nhắn của bản thân -->
     <LinearLayout
         android:id="@+id/selfMessageLayout"
         android:layout_width="match_parent"
@@ -18,10 +19,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:background="#00BCD4"
-            android:padding="8dp"
-            android:textColor="#000000"
-            android:textSize="16sp" />
+            android:background="@drawable/self_message_background"
+            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:maxWidth="280dp" />
 
         <TextView
             android:id="@+id/tvTimeSelf"
@@ -30,9 +32,10 @@
             android:layout_gravity="end"
             android:textSize="12sp"
             android:textColor="#757575"
-            android:paddingTop="2dp" />
+            android:paddingTop="4dp" />
     </LinearLayout>
 
+    <!-- Tin nhắn của người khác -->
     <LinearLayout
         android:id="@+id/otherMessageLayout"
         android:layout_width="match_parent"
@@ -46,10 +49,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:background="#E0E0E0"
-            android:padding="8dp"
+            android:background="@drawable/other_message_background"
+            android:padding="12dp"
             android:textColor="#000000"
-            android:textSize="16sp" />
+            android:textSize="18sp"
+            android:maxWidth="280dp" />
 
         <TextView
             android:id="@+id/tvTimeOther"
@@ -58,6 +62,6 @@
             android:layout_gravity="start"
             android:textSize="12sp"
             android:textColor="#757575"
-            android:paddingTop="2dp" />
+            android:paddingTop="4dp" />
     </LinearLayout>
 </LinearLayout>
