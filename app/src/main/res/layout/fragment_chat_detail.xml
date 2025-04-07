@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#F5F5F5">
 
-    <!-- Thanh tiêu đề -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -27,7 +26,6 @@
             android:layout_gravity="center" />
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- RecyclerView để hiển thị danh sách tin nhắn -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMessages"
         android:layout_width="0dp"
@@ -40,7 +38,6 @@
         android:clipToPadding="false"
         tools:listitem="@layout/item_message" />
 
-    <!-- Khu vực nhập tin nhắn -->
     <LinearLayout
         android:id="@+id/messageInputLayout"
         android:layout_width="0dp"

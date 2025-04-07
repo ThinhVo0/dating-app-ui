@@ -14,9 +14,10 @@ import androidx.fragment.app.Fragment;
 import com.example.datingapp.R;
 import com.example.datingapp.adapter.ImageGridAdapter;
 import com.example.datingapp.dto.response.ApiResponse;
-import com.example.datingapp.dto.response.ProfileResponse;
+import com.example.datingapp.dto.response.UserInfoResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +53,13 @@ public class LikeYouFragment extends Fragment {
 
         // Gọi API để lấy danh sách người thích bạn
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-        Call<ApiResponse<List<ProfileResponse>>> call = authService.getLikedUsers("Bearer " + authToken);
+        Call<ApiResponse<List<UserInfoResponse>>> call = authService.getLikedUsers("Bearer " + authToken);
 
-        call.enqueue(new Callback<ApiResponse<List<ProfileResponse>>>() {
+        call.enqueue(new Callback<ApiResponse<List<UserInfoResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<ProfileResponse>>> call, Response<ApiResponse<List<ProfileResponse>>> response) {
+            public void onResponse(Call<ApiResponse<List<UserInfoResponse>>> call, Response<ApiResponse<List<UserInfoResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                    List<ProfileResponse> likedUsers = response.body().getData();
+                    List<UserInfoResponse> likedUsers = response.body().getData();
                     if (likedUsers.isEmpty()) {
                         Toast.makeText(requireContext(), "Chưa có ai thích bạn!", Toast.LENGTH_SHORT).show();
                         return;
@@ -67,14 +68,14 @@ public class LikeYouFragment extends Fragment {
                     // Tạo danh sách ảnh và tuổi từ dữ liệu API
                     List<String> imageUrls = new ArrayList<>();
                     List<Integer> ageList = new ArrayList<>();
-                    for (ProfileResponse profile : likedUsers) {
+                    for (UserInfoResponse user : likedUsers) {
                         // Lấy ảnh đầu tiên (pic1) nếu có, nếu không thì dùng ảnh mặc định
-                        String pic = profile.getPic1() != null && !profile.getPic1().isEmpty()
-                                ? profile.getPic1()
+                        String pic = user.getPic1() != null && !user.getPic1().isEmpty()
+                                ? user.getPic1()
                                 : "https://via.placeholder.com/150"; // URL ảnh mặc định
                         imageUrls.add(pic);
-                        ageList.add(profile.getAge());
-                        Log.d(TAG, "Added profile: " + profile.getFirstName() + " - " + pic);
+                        ageList.add(user.getAge());
+                        Log.d(TAG, "Added user: " + user.getFirstName() + " - " + pic);
                     }
 
                     // Cập nhật adapter với dữ liệu từ API
@@ -93,7 +94,7 @@ public class LikeYouFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<ProfileResponse>>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<List<UserInfoResponse>>> call, Throwable t) {
                 Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "API call failed: " + t.getMessage());
             }

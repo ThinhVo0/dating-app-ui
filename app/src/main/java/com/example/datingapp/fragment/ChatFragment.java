@@ -1,26 +1,39 @@
 package com.example.datingapp.fragment;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
+import com.example.datingapp.dto.response.ApiResponse;
+import com.example.datingapp.dto.response.UserInfoResponse;
+import com.example.datingapp.network.AuthService;
+import com.example.datingapp.network.RetrofitClient;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+
 public class ChatFragment extends Fragment {
 
+    private static final String TAG = "ChatFragment";
     private RecyclerView rvChatList;
     private ChatAdapter chatAdapter;
-    private List<Chat> chatList;
+    private List<UserInfoResponse> matchedUsers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -31,97 +44,103 @@ public class ChatFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Ánh xạ RecyclerView
         rvChatList = view.findViewById(R.id.rvChatList);
 
-        // Khởi tạo danh sách chat giả lập
-        initializeChatList();
+        // Thiết lập RecyclerView cuộn ngang
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
+        rvChatList.setLayoutManager(layoutManager);
 
-        // Cài đặt RecyclerView
-        rvChatList.setLayoutManager(new LinearLayoutManager(requireContext()));
-        chatAdapter = new ChatAdapter(chatList);
+        // Khởi tạo danh sách rỗng
+        matchedUsers = new ArrayList<>();
+        chatAdapter = new ChatAdapter(matchedUsers);
         rvChatList.setAdapter(chatAdapter);
+
+        // Load dữ liệu từ API
+        loadMatchedUsers();
     }
 
-    private void initializeChatList() {
-        chatList = new ArrayList<>();
-        chatList.add(new Chat("Phi Thắng", "Xin chào, bạn khỏe không?", "10:30 AM", 2));
-        chatList.add(new Chat("Thịnh Xuân", "Hôm nay gặp nhau nhé!", "9:15 AM", 0));
-        chatList.add(new Chat("Lan Anh", "Cảm ơn bạn đã thích mình.", "Hôm qua", 1));
-        // Thêm dữ liệu thực tế từ API hoặc nguồn khác nếu cần
-    }
+    private void loadMatchedUsers() {
+        // Lấy token từ SharedPreferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("authToken", null);
 
-    // Model cho chat
-    private static class Chat {
-        String userName;
-        String lastMessage;
-        String messageTime;
-        int unreadCount;
-
-        Chat(String userName, String lastMessage, String messageTime, int unreadCount) {
-            this.userName = userName;
-            this.lastMessage = lastMessage;
-            this.messageTime = messageTime;
-            this.unreadCount = unreadCount;
+        if (authToken == null) {
+            Toast.makeText(requireContext(), "Vui lòng đăng nhập để xem danh sách", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        Call<ApiResponse<List<UserInfoResponse>>> call = authService.getMatchedUsers("Bearer " + authToken);
+
+        call.enqueue(new Callback<ApiResponse<List<UserInfoResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<UserInfoResponse>>> call, retrofit2.Response<ApiResponse<List<UserInfoResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                    matchedUsers.clear();
+                    matchedUsers.addAll(response.body().getData());
+                    chatAdapter.notifyDataSetChanged();
+
+                    if (matchedUsers.isEmpty()) {
+                        Toast.makeText(requireContext(), "Chưa có ai match với bạn!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "Không thể tải danh sách", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Response code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<UserInfoResponse>>> call, Throwable t) {
+                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "API call failed: " + t.getMessage());
+            }
+        });
     }
 
     // Adapter cho RecyclerView
-    private static class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
-        private static List<Chat> chats;
+    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
+        private List<UserInfoResponse> users;
 
-        ChatAdapter(List<Chat> chats) {
-            this.chats = chats;
+        ChatAdapter(List<UserInfoResponse> users) {
+            this.users = users;
         }
 
         @Override
         public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat, parent, false);
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_icon, parent, false);
             return new ChatViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(ChatViewHolder holder, int position) {
-            Chat chat = chats.get(position);
-            holder.tvUserName.setText(chat.userName);
-            holder.tvLastMessage.setText(chat.lastMessage);
-            holder.tvMessageTime.setText(chat.messageTime);
+            UserInfoResponse user = users.get(position);
+            String fullName = user.getFirstName() + " " + user.getLastName();
 
-            // Hiển thị badge nếu có tin nhắn chưa đọc
-            if (chat.unreadCount > 0) {
-                holder.tvUnreadCount.setText(String.valueOf(chat.unreadCount));
-                holder.tvUnreadCount.setVisibility(View.VISIBLE);
-            } else {
-                holder.tvUnreadCount.setVisibility(View.GONE);
-            }
-
-            // TODO: Load avatar từ URL nếu có (dùng Glide hoặc Picasso)
+            // Load ảnh đại diện bằng Glide
+            Glide.with(requireContext())
+                    .load(user.getPic1() != null && !user.getPic1().isEmpty() ? user.getPic1() : "https://via.placeholder.com/150")
+                    .circleCrop()
+                    .into(holder.ivUserAvatar);
         }
 
         @Override
         public int getItemCount() {
-            return chats.size();
+            return users.size();
         }
 
-        static class ChatViewHolder extends RecyclerView.ViewHolder {
-            TextView tvUserName, tvLastMessage, tvMessageTime, tvUnreadCount;
+        class ChatViewHolder extends RecyclerView.ViewHolder {
             ImageView ivUserAvatar;
 
             ChatViewHolder(View itemView) {
                 super(itemView);
-                tvUserName = itemView.findViewById(R.id.tvUserName);
-                tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
-                tvMessageTime = itemView.findViewById(R.id.tvMessageTime);
-                tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
                 ivUserAvatar = itemView.findViewById(R.id.ivUserAvatar);
 
-                // Sự kiện click để mở cuộc trò chuyện
                 itemView.setOnClickListener(v -> {
-                    // Tạo Bundle để gửi dữ liệu
+                    UserInfoResponse user = users.get(getAdapterPosition());
                     Bundle bundle = new Bundle();
-                    bundle.putString("userName", chats.get(getAdapterPosition()).userName);
+                    bundle.putString("userName", user.getFirstName() + " " + user.getLastName());
+                    bundle.putString("userId", user.getUserId());
 
-                    // Điều hướng bằng NavController
                     NavController navController = Navigation.findNavController(v);
                     navController.navigate(R.id.action_chat_to_chat_detail, bundle);
                 });

@@ -2,6 +2,7 @@ package com.example.datingapp.network;
 
 import android.provider.ContactsContract;
 
+import com.example.datingapp.dto.MessageDTO;
 import com.example.datingapp.dto.request.AccessTokenDto;
 import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.request.ForgotPassWordDto;
@@ -11,6 +12,7 @@ import com.example.datingapp.dto.request.ResetPasswordDto;
 import com.example.datingapp.dto.request.SignUpDto;
 import com.example.datingapp.dto.request.VerifySignUpDto;
 import com.example.datingapp.dto.response.ApiResponse;
+import com.example.datingapp.dto.response.UserInfoResponse;
 import com.example.datingapp.dto.response.UserResponse;
 import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileDetailResponse;
@@ -83,7 +85,7 @@ public interface AuthService {
     );
 
     @GET("api/relationships/liked-users")
-    Call<ApiResponse<List<ProfileResponse>>> getLikedUsers(
+    Call<ApiResponse<List<UserInfoResponse>>> getLikedUsers(
             @Header("Authorization") String authToken
     );
 
@@ -103,4 +105,16 @@ public interface AuthService {
 
     @GET("api/profiles/{userId}")
     Call<ApiResponse<ProfileResponse>> getUserProfile(@Header("Authorization") String token, @Path("userId") String userId);
+
+    @GET("api/relationships/matched-users")
+    Call<ApiResponse<List<UserInfoResponse>>> getMatchedUsers(
+            @Header("Authorization") String authToken
+    );
+
+    @GET("api/messages/conversation")
+    Call<List<MessageDTO>> getConversation(
+            @Header("Authorization") String authToken,
+            @Query("userId1") String userId1,
+            @Query("userId2") String userId2
+    );
 }

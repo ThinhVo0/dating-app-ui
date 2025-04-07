@@ -1,37 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="4dp">
+    android:orientation="vertical"
+    android:padding="8dp">
 
-    <!-- Tin nhắn của người khác (bên trái) -->
-    <TextView
-        android:id="@+id/tvMessageOther"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/selfMessageLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xin chào!"
-        android:textColor="#212121"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:background="@drawable/message_bubble_other"
-        android:maxWidth="250dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone" />
+        android:orientation="vertical"
+        android:layout_gravity="end"
+        android:visibility="gone">
 
-    <!-- Tin nhắn của mình (bên phải) -->
-    <TextView
-        android:id="@+id/tvMessageSelf"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/tvMessageSelf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="#00BCD4"
+            android:padding="8dp"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTimeSelf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:paddingTop="2dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/otherMessageLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chào bạn!"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:background="@drawable/message_bubble_self"
-        android:maxWidth="250dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:visibility="gone" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical"
+        android:layout_gravity="start"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvMessageOther"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:background="#E0E0E0"
+            android:padding="8dp"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvTimeOther"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:textSize="12sp"
+            android:textColor="#757575"
+            android:paddingTop="2dp" />
+    </LinearLayout>
+</LinearLayout>
