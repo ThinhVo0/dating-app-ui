@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary_blue">#03A9F4</color>
     <color name="thunder">#00BCD4</color>
+    <color name="transparent">#00000000</color>
 </resources>

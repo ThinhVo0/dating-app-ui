@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/bottom_navigation"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:background="@drawable/gradient_overlay"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/nav_liked"
         android:icon="@drawable/btn_liked"
@@ -19,20 +14,22 @@
         android:title=""
         app:showAsAction="ifRoom"/>
 
+    <!-- Placeholder item - không cần icon -->
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/thunder"
         android:title=""
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/nav_notify"
         android:icon="@drawable/btn_notify"
         android:title=""
         app:showAsAction="ifRoom"/>
+
     <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/btn_setting"
         android:title=""
         app:showAsAction="ifRoom"/>
+
 </menu>

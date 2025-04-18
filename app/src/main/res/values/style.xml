@@ -1,0 +1,11 @@
+
+<resources>
+    <style name="CircularFab" parent="Widget.MaterialComponents.FloatingActionButton">
+    <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.Circular</item>
+</style>
+
+<style name="ShapeAppearanceOverlay.Circular" parent="">
+<item name="cornerFamily">rounded</item>
+<item name="cornerSize">50%</item>
+</style>
+</resources>

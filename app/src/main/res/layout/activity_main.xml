@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="#F5F5F5">
 
     <!-- Thanh tiêu đề -->
@@ -28,22 +29,27 @@
             android:layout_marginStart="8dp"/>
 
         <!-- Tên Ứng Dụng -->
+
+        <!-- Nút Bộ Lọc -->
+
         <TextView
             android:id="@+id/app_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
+            android:layout_marginStart="76dp"
             android:fontFamily="@font/roboto"
             android:gravity="center"
-            android:text="Thunder"
+            android:text=""
             android:textColor="#000000"
             android:textSize="40sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/filter_icon"
+            app:layout_constraintHorizontal_bias="0.022"
             app:layout_constraintStart_toEndOf="@id/thunder_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.666" />
 
-        <!-- Nút Bộ Lọc -->
         <ImageView
             android:id="@+id/filter_icon"
             android:layout_width="32dp"
@@ -77,13 +83,33 @@
         android:id="@+id/menu_navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
+        android:background="@color/white"
         app:itemIconTint="@drawable/bottom_nav_icon_tint"
+        app:itemBackground="@null"
         app:labelVisibilityMode="unlabeled"
         app:itemIconSize="35dp"
         app:menu="@menu/menu_navigation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Center Floating Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/nav_profile_fab"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/thunder"
+        android:contentDescription="Profile"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Circular"
+        android:scaleType="centerInside"
+        app:backgroundTint="#00BCD4"
+        app:tint="@android:color/white"
+        app:fabCustomSize="80dp"
+        app:maxImageSize="50dp"
+        app:layout_constraintBottom_toBottomOf="@id/menu_navigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="8dp"
+        android:layout_marginBottom="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
