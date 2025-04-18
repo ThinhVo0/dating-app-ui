@@ -16,6 +16,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivZodiacIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -40,6 +41,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivPersonalityIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -64,6 +66,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivCommunicationIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -88,6 +91,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivLoveLanguageIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -112,6 +116,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivPetPreferenceIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -136,6 +141,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivDrinkingIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -160,6 +166,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivSmokingIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -184,6 +191,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivSleepingIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"

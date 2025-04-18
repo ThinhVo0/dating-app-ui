@@ -40,13 +40,13 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
             Glide.with(holder.itemView.getContext())
                     .load(imageUrl)
-                    .placeholder(R.drawable.load) // Hình chờ
-                    .error(R.drawable.ic_dislike) // Thử dùng hình error khác để kiểm tra
-                    .fallback(R.drawable.ic_chat) // Khi URL null hoặc rỗng
+                    .placeholder(R.drawable.placeholder) // Hình chờ
+                    .error(R.drawable.error_image) // Thử dùng hình error khác để kiểm tra
+                    .fallback(R.drawable.fallback_image) // Khi URL null hoặc rỗng
                     .into(holder.imageView);
 
         } else {
-            holder.imageView.setImageResource(R.drawable.btn_arraw1); // Sao lưu nếu URL null/rỗng
+            holder.imageView.setImageResource(R.drawable.fallback_image); // Sao lưu nếu URL null/rỗng
         }
     }
 

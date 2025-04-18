@@ -12,7 +12,21 @@
         android:orientation="vertical"
         android:padding="8dp"
         android:gravity="center_horizontal">
+        <!-- Images Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="8dp"
+            android:padding="8dp">
 
+            <include
+                layout="@layout/section_images"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </androidx.cardview.widget.CardView>
         <!-- Personal Info Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -77,21 +91,7 @@
                 android:layout_height="wrap_content" />
         </androidx.cardview.widget.CardView>
 
-        <!-- Images Card -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="#FFFFFF"
-            android:layout_marginBottom="8dp"
-            android:padding="8dp">
 
-            <include
-                layout="@layout/section_images"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </androidx.cardview.widget.CardView>
 
         <!-- Address Card -->
         <androidx.cardview.widget.CardView

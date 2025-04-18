@@ -14,10 +14,12 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="#00BCD4"
             android:id="@+id/ivImagesIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_infoplus" />
+            android:src="@drawable/ic_infoplus"
+            />
 
         <TextView
             android:id="@+id/tvImagesLabel"

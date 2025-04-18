@@ -2,22 +2,25 @@ package com.example.datingapp.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.datingapp.R;
 import com.example.datingapp.dto.response.ApiResponse;
-import com.example.datingapp.dto.response.ProfileResponse; // You'll need to create this class
+import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,11 +50,23 @@ public class MainActivity extends AppCompatActivity {
 
             // Liên kết NavController với BottomNavigationView
             BottomNavigationView bottomNavigationView = findViewById(R.id.menu_navigation);
-            NavigationUI.setupWithNavController(bottomNavigationView, navController);
 
             // Xử lý click vào filter_icon để mở FilterFragment
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
             ImageView filterIcon = findViewById(R.id.filter_icon);
             filterIcon.setOnClickListener(v -> navController.navigate(R.id.nav_filter));
+
+            // Xử lý click vào FloatingActionButton
+            FloatingActionButton fab = findViewById(R.id.fab_center);
+            fab.setOnClickListener(v -> {
+                try {
+                    navController.navigate(R.id.nav_profile);
+                    Toast.makeText(MainActivity.this, "Navigating to Profile!", Toast.LENGTH_SHORT).show();
+                } catch (IllegalArgumentException e) {
+                    Log.e(TAG, "Navigation error: " + e.getMessage());
+                    Toast.makeText(MainActivity.this, "Không thể mở trang hồ sơ", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         // Fetch user profile on every launch
@@ -95,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString("drinkingHabit", profile.getDrinkingHabit());
                     editor.putString("smokingHabit", profile.getSmokingHabit());
                     editor.putString("sleepingHabit", profile.getSleepingHabit());
-                    editor.putString("hobbies", String.join(",", profile.getHobbies())); // Convert List to comma-separated string
+                    editor.putString("hobbies", String.join(",", profile.getHobbies()));
                     editor.putString("pic1", profile.getPic1());
                     editor.putString("pic2", profile.getPic2());
                     editor.putString("pic3", profile.getPic3());

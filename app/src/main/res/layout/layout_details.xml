@@ -1,491 +1,615 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#EDF7FA"
-    android:padding="8dp">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:clipToPadding="false"
+    android:padding="16dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <!-- Tiêu đề hồ sơ -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bio_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_background"
-            android:gravity="center_vertical"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:background="@drawable/modern_rounded_background"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:elevation="4dp">
 
             <TextView
+                android:id="@+id/bio_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tiểu sử"
-                android:textColor="#666666"
+                android:textColor="#333333"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:fontFamily="@font/roboto"
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/bio_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingVertical="4dp"
-                android:textColor="#666666"
-                android:textSize="16sp"
-                android:textStyle="italic" />
-        </LinearLayout>
-
-        <!-- Chủ đề 2: Thông tin chính -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rounded_background"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/rounded_background"
+                android:textColor="#666666"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto"
+                android:textStyle="italic"
+                app:layout_constraintTop_toBottomOf="@id/bio_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Chủ đề 2: Thông tin chính -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/personal_info_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/modern_rounded_background"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/bio_section"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:elevation="4dp">
+
+            <LinearLayout
+                android:id="@+id/personal_info_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_account" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_account"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin chính"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="18sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Nhóm: Giới tính -->
+            <!-- Giới tính -->
             <LinearLayout
+                android:id="@+id/gender_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/personal_info_header"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_gender" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_gender"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Giới tính"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/gender_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Chiều cao -->
+            <!-- Chiều cao -->
             <LinearLayout
+                android:id="@+id/height_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/gender_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_height" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_height"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chiều cao"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/height_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Cung hoàng đạo -->
+            <!-- Cung hoàng đạo -->
             <LinearLayout
+                android:id="@+id/zodiac_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/height_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_zodiacsign" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_zodiacsign"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cung hoàng đạo"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/zodiac_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Kiểu tính cách -->
+            <!-- Kiểu tính cách -->
             <LinearLayout
+                android:id="@+id/personality_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/zodiac_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_mind" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_mind"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Kiểu tính cách"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/personality_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Chủ đề 3: Thông tin thêm về tôi -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/additional_info_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rounded_background"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:layout_marginTop="16dp"
+            android:background="@drawable/modern_rounded_background"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/personal_info_section"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:elevation="4dp">
 
             <LinearLayout
+                android:id="@+id/additional_info_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/rounded_background"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_infoplus" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_infoplus"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin thêm về tôi"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="18sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Nhóm: Phong cách giao tiếp -->
+            <!-- Phong cách giao tiếp -->
             <LinearLayout
+                android:id="@+id/communication_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/additional_info_header"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_comunicate" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_comunicate"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phong cách giao tiếp"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/communication_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Ngôn ngữ tình yêu -->
+            <!-- Ngôn ngữ tình yêu -->
             <LinearLayout
+                android:id="@+id/love_language_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/communication_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_romance" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_romance"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ngôn ngữ tình yêu"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/love_language_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Thú cưng -->
+            <!-- Thú cưng -->
             <LinearLayout
+                android:id="@+id/pet_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/love_language_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_pet" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_pet"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thú cưng"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/pet_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Sở thích -->
+            <!-- Sở thích -->
             <LinearLayout
+                android:id="@+id/hobbies_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/pet_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/hobby" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_hobby"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sở thích"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/hobbies_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Chủ đề 4: Phong cách sống -->
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/lifestyle_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/rounded_background"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/modern_rounded_background"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/additional_info_section"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:elevation="4dp">
 
             <LinearLayout
+                android:id="@+id/lifestyle_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/rounded_background"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_lifestyle" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_lifestyle"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phong cách sống"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="18sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Nhóm: Uống rượu -->
+            <!-- Uống rượu -->
             <LinearLayout
+                android:id="@+id/drinking_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/lifestyle_header"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_drink" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_drink"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Uống rượu"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/drinking_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Hút thuốc -->
+            <!-- Hút thuốc -->
             <LinearLayout
+                android:id="@+id/smoking_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/drinking_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_smoking" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_smoking"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hút thuốc"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/smoking_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
 
-            <!-- Nhóm: Thói quen ngủ -->
+            <!-- Thói quen ngủ -->
             <LinearLayout
+                android:id="@+id/sleep_row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp">
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@id/smoking_row"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
-                    android:src="@drawable/ic_sleep" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_sleep"
+                    app:tint="#00BCD4" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thói quen ngủ"
-                    android:textColor="#666666"
+                    android:textColor="#333333"
                     android:textSize="16sp"
+                    android:fontFamily="@font/roboto"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/sleep_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bubble_background"
+                    android:layout_marginStart="12dp"
+                    android:background="@drawable/modern_bubble_background"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
                     android:textColor="#666666"
-                    android:textSize="16sp" />
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto" />
             </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
-</ScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

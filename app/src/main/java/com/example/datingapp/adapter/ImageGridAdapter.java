@@ -61,8 +61,8 @@ public class ImageGridAdapter extends BaseAdapter {
         Log.d("ImageGridAdapter", "Loading image at position " + position + ": " + imageUrl);
         Glide.with(context)
                 .load(imageUrl)
-                .placeholder(R.drawable.load) // Ảnh placeholder khi đang tải
-                .error(R.drawable.ic_dislike) // Ảnh hiển thị khi load thất bại
+                .placeholder(R.drawable.placeholder) // Ảnh placeholder khi đang tải
+                .error(R.drawable.error_image) // Ảnh hiển thị khi load thất bại
                 .into(holder.imageView);
 
         // Hiển thị tuổi

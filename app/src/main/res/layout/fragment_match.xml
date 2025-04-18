@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"
@@ -15,10 +14,13 @@
         android:padding="0dp"
         android:background="@drawable/rounded_background"
         android:clipToOutline="true"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
 
     <View
         android:id="@+id/backgroundOverlay"
@@ -26,12 +28,12 @@
         android:layout_height="0dp"
         android:background="@drawable/gradient_overlay"
         android:clickable="false"
-        app:layout_constraintTop_toTopOf="@id/basicInfoLayout"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/basicInfoLayout" />
 
-    <!-- Thông tin cơ bản -->
+    <!-- Thông tin cơ bản hiển thị trên ảnh -->
     <LinearLayout
         android:id="@+id/basicInfoLayout"
         android:layout_width="match_parent"
@@ -39,14 +41,14 @@
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@id/buttonLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/tvNameAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=", 0"
+            android:text="Phi Thắng, 20"
             android:textColor="@android:color/white"
             android:textSize="35sp"
             android:textStyle="bold" />
@@ -56,89 +58,54 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text=""
+            android:text="TP. Hồ Chí Minh"
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </LinearLayout>
 
-    <!-- Nút tương tác nằm ngang -->
+    <!-- Nút tương tác -->
     <LinearLayout
         android:id="@+id/buttonLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_width="419dp"
+        android:layout_height="72dp"
         android:gravity="center"
-        android:layout_marginBottom="16dp"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
+        android:orientation="horizontal"
+        android:layout_margin="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Nút Chat (với hình tròn bao ngoài) -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:background="@drawable/rounded_button">
-            <ImageButton
-                android:id="@+id/btnChat"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:src="@drawable/btn_send" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btnChat"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_send" />
 
-        <!-- Nút Dislike (với hình tròn bao ngoài) -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:background="@drawable/rounded_button">
-            <ImageButton
-                android:id="@+id/btnDislike"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:src="@drawable/btn_skip" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btnDislike"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_skip"
+            />
 
-        <!-- Nút Like (với hình tròn bao ngoài) -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:background="@drawable/rounded_button">
-            <ImageButton
-                android:id="@+id/btnLike"
-                android:layout_width="40dp"
-                android:layout_gravity="center"
-                android:layout_height="40dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/btn_like" />
-        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_like" />
 
-        <!-- Nút ViewDetails (với hình tròn bao ngoài) -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="8dp"
-            android:gravity="center"
-            android:background="@drawable/rounded_button">
-            <ImageButton
-                android:id="@+id/btnViewDetails"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:background="@android:color/transparent"
-                android:src="@drawable/btn_info" />
-        </FrameLayout>
 
+        <ImageButton
+            android:id="@+id/btnViewDetails"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/btn_info" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

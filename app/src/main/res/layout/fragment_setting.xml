@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:text="Đăng xuất"
                 android:textColor="@android:color/white"
-                android:backgroundTint="#A20C02"
+                android:backgroundTint="#DB0C00"
                 android:layout_marginTop="24dp"
                 android:padding="12dp" />
         </LinearLayout>

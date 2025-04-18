@@ -41,6 +41,9 @@ android {
             }
         }
     }
+    buildFeatures {
+        viewBinding = true
+    }
 
 }
 
@@ -89,4 +92,6 @@ dependencies {
     implementation ("javax.websocket:javax.websocket-api:1.1")
 
     implementation ("javax.xml.stream:stax-api:1.0-2")
+
+    implementation ("com.google.android.material:material:1.10.0")
 }
