@@ -12,9 +12,11 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -371,6 +373,7 @@ public class ProfileFragment extends Fragment {
 
         ProfileData data = profileDataList.get(currentProfileIndex);
 
+        // Cài đặt các trường khác
         TextView bioText = view.findViewById(R.id.bio_text);
         bioText.setText(data.getBio() != null ? data.getBio() : "Chưa có tiểu sử");
 
@@ -383,8 +386,56 @@ public class ProfileFragment extends Fragment {
         ((TextView) view.findViewById(R.id.love_language_text)).setText(data.getLoveLanguage() != null ? data.getLoveLanguage() : "Không xác định");
         ((TextView) view.findViewById(R.id.pet_text)).setText(data.getPetPreference() != null ? data.getPetPreference() : "Không xác định");
 
-        String hobbies = data.getHobbies() != null ? String.join(", ", data.getHobbies()) : "Không có sở thích";
-        ((TextView) view.findViewById(R.id.hobbies_text)).setText(hobbies);
+        // Xử lý sở thích động với FlexboxLayout
+        com.google.android.flexbox.FlexboxLayout hobbiesContainer = view.findViewById(R.id.hobbies_container);
+        List<String> hobbies = data.getHobbies();
+        float density = getResources().getDisplayMetrics().density;
+        if (hobbies != null && !hobbies.isEmpty()) {
+            for (String hobby : hobbies) {
+                TextView hobbyTextView = new TextView(requireContext());
+                hobbyTextView.setText(hobby);
+                hobbyTextView.setTextSize(14);
+                hobbyTextView.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.roboto));
+                hobbyTextView.setBackgroundResource(R.drawable.modern_bubble_background);
+
+                // Chuyển đổi padding từ dp sang pixel
+                int paddingHorizontal = (int) (8 * density);
+                int paddingVertical = (int) (4 * density);
+                hobbyTextView.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+
+                // Thiết lập layout params cho Flexbox
+                com.google.android.flexbox.FlexboxLayout.LayoutParams params =
+                        new com.google.android.flexbox.FlexboxLayout.LayoutParams(
+                                ViewGroup.LayoutParams.WRAP_CONTENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                        );
+                params.setMargins(0, 0, (int) (12 * density), (int) (12 * density)); // Margin phải 12dp, dưới 12dp
+                hobbyTextView.setLayoutParams(params);
+
+                hobbiesContainer.addView(hobbyTextView);
+            }
+        } else {
+            TextView noHobbiesText = new TextView(requireContext());
+            noHobbiesText.setText("Không có sở thích");
+            noHobbiesText.setTextSize(14);
+            noHobbiesText.setTypeface(ResourcesCompat.getFont(requireContext(), R.font.roboto));
+            noHobbiesText.setBackgroundResource(R.drawable.modern_bubble_background);
+
+            // Chuyển đổi padding từ dp sang pixel
+            int paddingHorizontal = (int) (8 * density);
+            int paddingVertical = (int) (4 * density);
+            noHobbiesText.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+
+            com.google.android.flexbox.FlexboxLayout.LayoutParams params =
+                    new com.google.android.flexbox.FlexboxLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+            params.setMargins(0, 0, (int) (12 * density), (int) (12 * density)); // Margin phải 12dp, dưới 12dp
+            noHobbiesText.setLayoutParams(params);
+
+            hobbiesContainer.addView(noHobbiesText);
+        }
 
         ((TextView) view.findViewById(R.id.drinking_text)).setText(data.getDrinkingHabit() != null ? data.getDrinkingHabit() : "Không xác định");
         ((TextView) view.findViewById(R.id.smoking_text)).setText(data.getSmokingHabit() != null ? data.getSmokingHabit() : "Không xác định");
