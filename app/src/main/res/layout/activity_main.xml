@@ -52,15 +52,17 @@
         <!-- Nút Bộ Lọc -->
         <ImageView
             android:id="@+id/filter_icon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="16dp"
             android:contentDescription="Bộ Lọc"
             android:padding="4dp"
             android:src="@drawable/btn_filter"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/selector_nav_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
