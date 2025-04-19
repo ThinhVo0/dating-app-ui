@@ -8,7 +8,7 @@
     android:clipChildren="true"
     android:clipToPadding="true">
 
-    <!-- CardView chứa ViewPager2 -->
+    <!-- CardView chứa ViewPager2 và thông tin -->
     <androidx.cardview.widget.CardView
         android:id="@+id/profileCard"
         android:layout_width="0dp"
@@ -27,43 +27,54 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- ViewPager2 -->
+            <!-- ViewPager2 cho ảnh -->
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:clipToPadding="false"
-                android:clipChildren="false"
                 android:background="@drawable/rounded_background"
+                android:clipChildren="false"
+                android:clipToPadding="false"
                 android:overScrollMode="always"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/extendedBlackArea"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Gradient overlay (includes black strip) -->
+            <!-- Gradient overlay trên ảnh -->
             <View
                 android:id="@+id/cardGradientOverlay"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@drawable/gradient_fade_to_black"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/extendedBlackArea"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Thông tin cơ bản (overlay on black strip) -->
+            <!-- Phần màu đen kéo dài -->
+            <View
+                android:id="@+id/extendedBlackArea"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+            android:background="#000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Thông tin cơ bản (đè lên cả ảnh và phần màu đen) -->
             <LinearLayout
                 android:id="@+id/basicInfoLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="35dp"
+                android:background="@android:color/transparent"
                 android:orientation="vertical"
                 android:padding="16dp"
-                android:background="@android:color/transparent"
-                android:layout_marginBottom="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <TextView
                     android:id="@+id/tvNameAge"
@@ -86,6 +97,7 @@
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.cardview.widget.CardView>
 
     <!-- Button Layout -->
