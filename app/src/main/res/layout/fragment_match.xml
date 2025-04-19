@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:layout_height="match_parent">
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"
@@ -21,7 +21,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-
     <View
         android:id="@+id/backgroundOverlay"
         android:layout_width="0dp"
@@ -33,7 +32,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/basicInfoLayout" />
 
-    <!-- Thông tin cơ bản hiển thị trên ảnh -->
     <LinearLayout
         android:id="@+id/basicInfoLayout"
         android:layout_width="match_parent"
@@ -74,29 +72,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Chat Button -->
         <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background_red"
+            android:background="@drawable/circle_background"
             android:elevation="6dp">
             <ImageButton
                 android:id="@+id/btnChat"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="12dp"
+
                 android:background="@android:color/transparent"
                 android:src="@drawable/btn_send"
                 android:scaleType="centerInside"/>
         </FrameLayout>
 
-        <!-- Dislike Button -->
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background_red"
+            android:background="@drawable/circle_background"
             android:elevation="6dp">
             <ImageButton
                 android:id="@+id/btnDislike"
@@ -108,12 +105,11 @@
                 android:scaleType="centerInside"/>
         </FrameLayout>
 
-        <!-- Like Button -->
         <FrameLayout
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background_red"
+            android:background="@drawable/circle_background"
             android:elevation="6dp">
             <ImageButton
                 android:id="@+id/btnLike"
@@ -125,11 +121,10 @@
                 android:scaleType="centerInside"/>
         </FrameLayout>
 
-        <!-- View Details Button -->
         <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/circle_background_red"
+            android:background="@drawable/circle_background"
             android:elevation="6dp">
             <ImageButton
                 android:id="@+id/btnViewDetails"
@@ -140,7 +135,6 @@
                 android:src="@drawable/btn_info"
                 android:scaleType="centerInside"/>
         </FrameLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

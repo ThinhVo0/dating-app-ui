@@ -76,7 +76,6 @@
         app:layout_constraintBottom_toTopOf="@id/menu_navigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:navGraph="@navigation/nav_graph"
         app:defaultNavHost="true"
         android:background="@android:color/white" />
 

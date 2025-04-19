@@ -14,8 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.datingapp.R;
 import com.example.datingapp.activity.LoginActivity;
@@ -50,18 +50,24 @@ public class SettingsFragment extends Fragment {
         switchNotifications = view.findViewById(R.id.switchNotifications);
         btnLogout = view.findViewById(R.id.btnLogout);
 
+        // Xử lý click vào tvEditProfile
         tvEditProfile.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
-            NavController navController = Navigation.findNavController(v);
-            navController.navigate(R.id.action_setting_to_profile_update);
+            openFragment(new ProfileUpdateFragment());
         });
 
+        // Xử lý click vào tvEditAccount
         tvEditAccount.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa tài khoản", Toast.LENGTH_SHORT).show();
+            // Tạo và mở fragment EditAccount (nếu có)
+            // openFragment(new EditAccountFragment());
         });
 
+        // Xử lý click vào tvPrivacy
         tvPrivacy.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Chuyển đến màn hình quyền riêng tư", Toast.LENGTH_SHORT).show();
+            // Tạo và mở fragment Privacy (nếu có)
+            // openFragment(new PrivacyFragment());
         });
 
         switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -73,6 +79,15 @@ public class SettingsFragment extends Fragment {
         });
 
         btnLogout.setOnClickListener(v -> logout());
+    }
+
+    // Phương thức mở fragment mới
+    private void openFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.nav_host_fragment, fragment); // Thay R.id.fragment_container bằng ID của container trong activity_main.xml
+        transaction.addToBackStack(null); // Thêm vào back stack để quay lại
+        transaction.commit();
     }
 
     private void logout() {

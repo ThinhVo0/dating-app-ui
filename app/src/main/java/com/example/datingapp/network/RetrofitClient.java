@@ -37,7 +37,7 @@ public class RetrofitClient {
             // Tạo OkHttpClient
             OkHttpClient client = httpClientBuilder.build();
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080/") // Dùng 10.0.2.2 nếu chạy trên emulator
+                    .baseUrl("http://172.20.10.6:8080/") // Dùng 10.0.2.2 nếu chạy trên emulator
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .client(client)
                     .build();

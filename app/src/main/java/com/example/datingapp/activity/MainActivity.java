@@ -2,21 +2,25 @@ package com.example.datingapp.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.datingapp.R;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
+import com.example.datingapp.fragment.ChatFragment;
+import com.example.datingapp.fragment.FilterFragment;
+import com.example.datingapp.fragment.LikeYouFragment;
+import com.example.datingapp.fragment.NotificationsFragment;
+import com.example.datingapp.fragment.ProfileFragment;
+import com.example.datingapp.fragment.SettingsFragment;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -42,35 +46,58 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Retrofit service
         authService = RetrofitClient.getClient().create(AuthService.class);
 
-        // Tìm NavHostFragment và thiết lập NavController
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment);
-        if (navHostFragment != null) {
-            NavController navController = navHostFragment.getNavController();
+        // Thiết lập BottomNavigationView
+        BottomNavigationView bottomNavigationView = findViewById(R.id.menu_navigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_liked) {
+                selectedFragment = new LikeYouFragment();
+            } else if (itemId == R.id.nav_chat) {
+                selectedFragment = new ChatFragment();
+            } else if (itemId == R.id.nav_profile) {
+                selectedFragment = new ProfileFragment();
+            } else if (itemId == R.id.nav_notify) {
+                selectedFragment = new NotificationsFragment();
+            } else if (itemId == R.id.nav_setting) {
+                selectedFragment = new SettingsFragment();
+            }
 
-            // Liên kết NavController với BottomNavigationView
-            BottomNavigationView bottomNavigationView = findViewById(R.id.menu_navigation);
+            if (selectedFragment != null) {
+                openFragment(selectedFragment);
+            }
+            return true;
+        });
 
-            // Xử lý click vào filter_icon để mở FilterFragment
-            NavigationUI.setupWithNavController(bottomNavigationView, navController);
-            ImageView filterIcon = findViewById(R.id.filter_icon);
-            filterIcon.setOnClickListener(v -> navController.navigate(R.id.nav_filter));
-
-            // Xử lý click vào FloatingActionButton
-            FloatingActionButton fab = findViewById(R.id.fab_center);
-            fab.setOnClickListener(v -> {
-                try {
-                    navController.navigate(R.id.nav_profile);
-                    Toast.makeText(MainActivity.this, "Navigating to Profile!", Toast.LENGTH_SHORT).show();
-                } catch (IllegalArgumentException e) {
-                    Log.e(TAG, "Navigation error: " + e.getMessage());
-                    Toast.makeText(MainActivity.this, "Không thể mở trang hồ sơ", Toast.LENGTH_SHORT).show();
-                }
-            });
+        // Mở fragment mặc định (ví dụ: ProfileFragment)
+        if (savedInstanceState == null) {
+            openFragment(new ProfileFragment());
         }
 
-        // Fetch user profile on every launch
+        // Xử lý click vào filter_icon
+        ImageView filterIcon = findViewById(R.id.filter_icon);
+        filterIcon.setOnClickListener(v -> {
+            openFragment(new FilterFragment());
+        });
+
+        // Xử lý click vào FloatingActionButton
+        FloatingActionButton fab = findViewById(R.id.fab_center);
+        fab.setOnClickListener(v -> {
+            openFragment(new ProfileFragment());
+            Toast.makeText(MainActivity.this, "Chuyển đến trang hồ sơ!", Toast.LENGTH_SHORT).show();
+        });
+
+        // Lấy thông tin hồ sơ người dùng
         fetchUserProfile();
+    }
+
+    // Phương thức mở fragment
+    private void openFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.nav_host_fragment, fragment);
+        transaction.addToBackStack(null); // Thêm vào back stack để quay lại
+        transaction.commit();
     }
 
     private void fetchUserProfile() {
@@ -94,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                     ProfileResponse profile = response.body().getData();
                     Log.d(TAG, "Profile fetched successfully: " + profile.getFirstName());
 
-                    // Store profile data in SharedPreferences
+                    // Lưu dữ liệu hồ sơ vào SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("firstName", profile.getFirstName());
                     editor.putString("lastName", profile.getLastName());

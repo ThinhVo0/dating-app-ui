@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +27,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ChatFragment extends Fragment {
 
@@ -74,7 +75,7 @@ public class ChatFragment extends Fragment {
 
         call.enqueue(new Callback<ApiResponse<List<UserInfoResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<List<UserInfoResponse>>> call, retrofit2.Response<ApiResponse<List<UserInfoResponse>>> response) {
+            public void onResponse(Call<ApiResponse<List<UserInfoResponse>>> call, Response<ApiResponse<List<UserInfoResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
                     matchedUsers.clear();
                     matchedUsers.addAll(response.body().getData());
@@ -95,6 +96,21 @@ public class ChatFragment extends Fragment {
                 Log.e(TAG, "API call failed: " + t.getMessage());
             }
         });
+    }
+
+    // Phương thức mở ChatDetailFragment
+    private void openChatDetailFragment(String userName, String userId) {
+        ChatDetailFragment chatDetailFragment = new ChatDetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("userName", userName);
+        bundle.putString("userId", userId);
+        chatDetailFragment.setArguments(bundle);
+
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.nav_host_fragment, chatDetailFragment); // Thay bằng ID container trong activity_main.xml
+        transaction.addToBackStack(null); // Thêm vào back stack để quay lại
+        transaction.commit();
     }
 
     // Adapter cho RecyclerView
@@ -137,12 +153,9 @@ public class ChatFragment extends Fragment {
 
                 itemView.setOnClickListener(v -> {
                     UserInfoResponse user = users.get(getAdapterPosition());
-                    Bundle bundle = new Bundle();
-                    bundle.putString("userName", user.getFirstName() + " " + user.getLastName());
-                    bundle.putString("userId", user.getUserId());
-
-                    NavController navController = Navigation.findNavController(v);
-                    navController.navigate(R.id.action_chat_to_chat_detail, bundle);
+                    String fullName = user.getFirstName() + " " + user.getLastName();
+                    String userId = user.getUserId();
+                    openChatDetailFragment(fullName, userId);
                 });
             }
         }
