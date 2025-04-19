@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<TextView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:id="@+id/tvHobby"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
-
-    <CheckBox
-        android:id="@+id/cbHobby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@color/thunder" />
-
-</LinearLayout>
+    android:background="@drawable/rounded_checkbox"
+    android:padding="8dp"
+    android:layout_margin="4dp"
+    android:textSize="16sp"
+    android:textColor="@android:color/black"
+    android:gravity="center" />

@@ -15,12 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -77,6 +77,7 @@ public class ProfileUpdateFragment extends Fragment {
     private String authToken;
     private static final int STORAGE_PERMISSION_CODE = 100;
     private int currentImagePosition = -1;
+    private SharedPreferences sharedPreferences; // Thêm biến SharedPreferences
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -99,7 +100,7 @@ public class ProfileUpdateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Starting");
         View view = inflater.inflate(R.layout.fragment_profile_update, container, false);
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE); // Khởi tạo SharedPreferences
         authToken = sharedPreferences.getString("authToken", null);
         Log.d(TAG, "onCreateView: authToken = " + authToken);
 
@@ -166,10 +167,10 @@ public class ProfileUpdateFragment extends Fragment {
         if (!hobbiesStr.isEmpty()) {
             List<String> hobbiesList = Arrays.asList(hobbiesStr.split(","));
             for (int i = 0; i < flHobbies.getChildCount(); i++) {
-                CheckBox checkBox = (CheckBox) flHobbies.getChildAt(i);
-                String hobbyText = checkBox.getText().toString();
+                TextView hobbyView = (TextView) flHobbies.getChildAt(i);
+                String hobbyText = hobbyView.getText().toString();
                 if (hobbiesList.contains(hobbyText)) {
-                    checkBox.setChecked(true);
+                    hobbyView.setSelected(true);
                     selectedHobbies.add(Hobbies.fromDisplayName(hobbyText));
                 }
             }
@@ -329,11 +330,12 @@ public class ProfileUpdateFragment extends Fragment {
         Log.d(TAG, "setupHobbiesFlexbox: Starting");
         Hobbies[] hobbiesValues = Hobbies.values();
         for (Hobbies hobby : hobbiesValues) {
-            CheckBox checkBox = new CheckBox(getContext());
-            checkBox.setText(hobby.getDisplayName());
-            checkBox.setPadding(8, 8, 8, 8);
-            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
+            TextView hobbyView = (TextView) LayoutInflater.from(getContext())
+                    .inflate(R.layout.hobby_item, flHobbies, false);
+            hobbyView.setText(hobby.getDisplayName());
+            hobbyView.setOnClickListener(v -> {
+                hobbyView.setSelected(!hobbyView.isSelected());
+                if (hobbyView.isSelected()) {
                     selectedHobbies.add(hobby);
                     Log.d(TAG, "setupHobbiesFlexbox: Added hobby = " + hobby.getDisplayName());
                 } else {
@@ -341,13 +343,7 @@ public class ProfileUpdateFragment extends Fragment {
                     Log.d(TAG, "setupHobbiesFlexbox: Removed hobby = " + hobby.getDisplayName());
                 }
             });
-            FlexboxLayout.LayoutParams params = new FlexboxLayout.LayoutParams(
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT,
-                    FlexboxLayout.LayoutParams.WRAP_CONTENT
-            );
-            params.setMargins(8, 8, 8, 8);
-            checkBox.setLayoutParams(params);
-            flHobbies.addView(checkBox);
+            flHobbies.addView(hobbyView);
         }
         Log.d(TAG, "setupHobbiesFlexbox: Completed");
     }
@@ -483,6 +479,32 @@ public class ProfileUpdateFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "saveProfile: Update successful");
                     Toast.makeText(getContext(), "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
+
+                    // Cập nhật SharedPreferences với dữ liệu mới
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("firstName", profile.getFirstName());
+                    editor.putString("lastName", profile.getLastName());
+                    editor.putInt("age", profile.getAge());
+                    editor.putInt("height", profile.getHeight());
+                    editor.putString("bio", profile.getBio());
+                    editor.putString("gender", profile.getGender() != null ? (profile.getGender().equals(Gender.MALE.name()) ? "Nam" : "Nữ") : "");
+                    // Lưu danh sách hobbies
+                    String hobbiesStr = selectedHobbies.stream()
+                            .map(Hobbies::getDisplayName)
+                            .collect(Collectors.joining(","));
+                    editor.putString("hobbies", hobbiesStr);
+                    editor.putString("zodiacSign", ((ZodiacSign) spZodiac.getSelectedItem()).getDisplayName());
+                    editor.putString("personalityType", ((PersonalityType) spPersonality.getSelectedItem()).toString());
+                    editor.putString("communicationStyle", ((CommunicationStyle) spCommunication.getSelectedItem()).getDisplayName());
+                    editor.putString("loveLanguage", ((LoveLanguage) spLoveLanguage.getSelectedItem()).getDisplayName());
+                    editor.putString("petPreference", ((PetPreference) spPetPreference.getSelectedItem()).getDisplayName());
+                    editor.putString("drinkingHabit", ((DrinkingHabit) spDrinking.getSelectedItem()).getDisplayName());
+                    editor.putString("smokingHabit", ((SmokingHabit) spSmoking.getSelectedItem()).getDisplayName());
+                    editor.putString("sleepingHabit", ((SleepingHabit) spSleeping.getSelectedItem()).getDisplayName());
+                    editor.apply();
+
+                    // Tải lại dữ liệu để cập nhật giao diện
+                    loadProfileData(sharedPreferences, getView());
                 } else {
                     Log.d(TAG, "saveProfile: Update failed, message = " + response.message());
                     Toast.makeText(getContext(), "Cập nhật thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
