@@ -11,8 +11,8 @@
         android:title="" />
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/thunder"
-        android:title="" />
+        android:title=""
+        android:enabled="false"/>
     <item
         android:id="@+id/nav_notify"
         android:icon="@drawable/btn_notify"

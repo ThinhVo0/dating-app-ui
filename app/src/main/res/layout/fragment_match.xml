@@ -48,7 +48,7 @@
             android:id="@+id/tvNameAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phi Thắng, 20"
+            android:text="User not found"
             android:textColor="@android:color/white"
             android:textSize="35sp"
             android:textStyle="bold" />
@@ -58,54 +58,89 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="TP. Hồ Chí Minh"
+            android:text=""
             android:textColor="@android:color/white"
             android:textSize="20sp" />
     </LinearLayout>
 
-    <!-- Nút tương tác -->
     <LinearLayout
         android:id="@+id/buttonLayout"
-        android:layout_width="419dp"
-        android:layout_height="72dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_margin="8dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnChat"
+        <!-- Chat Button -->
+        <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/btn_send" />
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/circle_background_red"
+            android:elevation="6dp">
+            <ImageButton
+                android:id="@+id/btnChat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_send"
+                android:scaleType="centerInside"/>
+        </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/btnDislike"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/btn_skip"
-            />
+        <!-- Dislike Button -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/circle_background_red"
+            android:elevation="6dp">
+            <ImageButton
+                android:id="@+id/btnDislike"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_dislike"
+                android:scaleType="centerInside"/>
+        </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/btnLike"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/btn_like" />
+        <!-- Like Button -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/circle_background_red"
+            android:elevation="6dp">
+            <ImageButton
+                android:id="@+id/btnLike"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_like"
+                android:scaleType="centerInside"/>
+        </FrameLayout>
 
-
-        <ImageButton
-            android:id="@+id/btnViewDetails"
+        <!-- View Details Button -->
+        <FrameLayout
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/btn_info" />
+            android:background="@drawable/circle_background_red"
+            android:elevation="6dp">
+            <ImageButton
+                android:id="@+id/btnViewDetails"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_info"
+                android:scaleType="centerInside"/>
+        </FrameLayout>
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -81,10 +81,12 @@
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/menu_navigation"
+        app:itemIconSize="36dp"
         android:layout_width="match_parent"
+        app:itemIconTint="@drawable/bottom_nav_icon_tint"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-
+        app:itemActiveIndicatorStyle="@style/NoActiveIndicator"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +97,7 @@
         android:id="@+id/fab_center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="15dp"
         android:src="@drawable/thunder"
         app:backgroundTint="#FFFFFF"
         app:tint="@color/thunder"

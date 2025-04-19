@@ -19,7 +19,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_hobby"
-            app:tint="#00BCD4"/>
+             />
 
         <TextView
             android:id="@+id/tvHobbiesLabel"
