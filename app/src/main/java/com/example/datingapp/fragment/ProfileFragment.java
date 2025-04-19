@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -45,10 +45,12 @@ public class ProfileFragment extends Fragment {
     private ImageButton btnDislike;
     private ImageButton btnLike;
     private String authToken;
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+    private float initialX, initialY;
+    private boolean isDragging = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Use the updated layout
         return inflater.inflate(R.layout.fragment_match, container, false);
     }
 
@@ -60,7 +62,7 @@ public class ProfileFragment extends Fragment {
         authToken = sharedPreferences.getString("authToken", null);
 
         viewPager = view.findViewById(R.id.viewPager);
-        viewPager.setUserInputEnabled(false);
+        viewPager.setUserInputEnabled(false); // Disable default swipe
 
         btnDislike = view.findViewById(R.id.btnDislike);
         btnLike = view.findViewById(R.id.btnLike);
@@ -72,41 +74,109 @@ public class ProfileFragment extends Fragment {
         btnChat.setOnClickListener(v -> Toast.makeText(requireContext(), "Chat clicked!", Toast.LENGTH_SHORT).show());
         btnViewDetails.setOnClickListener(v -> showDetailsBottomSheet());
 
-        initializeProfileList(view);
-        GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                float diffX = e2.getX() - e1.getX();
-                float diffY = e2.getY() - e1.getY();
+        // Handle touch for swipe and image navigation on the entire profile card
+        View profileCard = view.findViewById(R.id.profileCard);
+        profileCard.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = event.getRawX();
+                    initialY = event.getRawY();
+                    isDragging = true;
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    return true;
 
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        performSwipe(view, diffX > 0);
-                        return true;
+                case MotionEvent.ACTION_MOVE:
+                    if (isDragging) {
+                        float deltaX = event.getRawX() - initialX;
+                        float deltaY = event.getRawY() - initialY;
+
+                        // Move card
+                        profileCard.setTranslationX(deltaX);
+                        profileCard.setTranslationY(deltaY);
+
+                        // Rotate card
+                        float rotation = deltaX / profileCard.getWidth() * 30; // Max 30 degrees
+                        profileCard.setRotation(rotation);
+
+                        // Fade card
+                        float alpha = 1.0f - Math.abs(deltaX) / (profileCard.getWidth() * 0.7f);
+                        profileCard.setAlpha(Math.max(0.4f, Math.min(1.0f, alpha)));
+
+                        // Scale buttons
+                        float scale = 1.0f + Math.min(Math.abs(deltaX) / profileCard.getWidth(), 0.3f);
+                        if (deltaX < 0) {
+                            btnDislike.setScaleX(scale);
+                            btnDislike.setScaleY(scale);
+                            btnLike.setScaleX(1.0f);
+                            btnLike.setScaleY(1.0f);
+                        } else if (deltaX > 0) {
+                            btnLike.setScaleX(scale);
+                            btnLike.setScaleY(scale);
+                            btnDislike.setScaleX(1.0f);
+                            btnDislike.setScaleY(1.0f);
+                        }
                     }
-                }
-                return false;
-            }
+                    return true;
 
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                float x = e.getX();
-                int currentItem = viewPager.getCurrentItem();
-                float screenWidth = viewPager.getWidth();
+                case MotionEvent.ACTION_UP:
+                    if (isDragging) {
+                        isDragging = false;
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
 
-                if (x < screenWidth / 2 && currentItem > 0) {
-                    viewPager.setCurrentItem(currentItem - 1, true);
-                } else if (x >= screenWidth / 2 && currentItem < adapter.getItemCount() - 1) {
-                    viewPager.setCurrentItem(currentItem + 1, true);
-                }
-                return true;
+                        float translationX = profileCard.getTranslationX();
+                        float viewWidth = profileCard.getWidth();
+                        float threshold = viewWidth * 0.5f; // 50% threshold
+
+                        // Reset button scales
+                        btnDislike.setScaleX(1.0f);
+                        btnDislike.setScaleY(1.0f);
+                        btnLike.setScaleX(1.0f);
+                        btnLike.setScaleY(1.0f);
+
+                        // Check if it's a swipe or a tap
+                        float deltaX = event.getRawX() - initialX;
+                        float deltaY = event.getRawY() - initialY;
+                        if (Math.abs(deltaX) < 20 && Math.abs(deltaY) < 20) {
+                            // Handle tap for image navigation
+                            handleImageNavigation(event.getX(), viewWidth);
+                        } else if (Math.abs(translationX) > threshold) {
+                            // Perform swipe if dragged beyond threshold
+                            boolean isSwipeRight = translationX > 0;
+                            performSwipe(view, isSwipeRight);
+                        } else {
+                            // Animate back to original position
+                            profileCard.animate()
+                                    .translationX(0)
+                                    .translationY(0)
+                                    .rotation(0)
+                                    .alpha(1.0f)
+                                    .setDuration(300)
+                                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                                    .start();
+                        }
+                    }
+                    return true;
             }
+            return false;
         });
 
-        viewPager.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return true;
-        });
+        initializeProfileList(view);
+    }
+
+    private void handleImageNavigation(float touchX, float viewWidth) {
+        int currentItem = viewPager.getCurrentItem();
+        int itemCount = adapter.getItemCount();
+
+        // Left half: previous image, right half: next image
+        if (touchX < viewWidth / 2) {
+            if (currentItem > 0) {
+                viewPager.setCurrentItem(currentItem - 1, true);
+            }
+        } else {
+            if (currentItem < itemCount - 1) {
+                viewPager.setCurrentItem(currentItem + 1, true);
+            }
+        }
     }
 
     private void initializeProfileList(View view) {
@@ -178,9 +248,10 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-        String profileId = profileIds.get(currentProfileIndex); // Lấy profileId từ danh sách profileIds
-
+        String profileId = profileIds.get(currentProfileIndex);
+        View profileCard = view.findViewById(R.id.profileCard);
         ImageButton button = isSwipeRight ? btnLike : btnDislike;
+
         Animation scaleUp = AnimationUtils.loadAnimation(getContext(), R.anim.scale_up);
         scaleUp.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -188,45 +259,51 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Animation swipeAnimation = AnimationUtils.loadAnimation(getContext(),
-                        isSwipeRight ? R.anim.swipe_right : R.anim.swipe_left);
-                swipeAnimation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        // Gọi API khi bắt đầu swipe
-                        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-                        Call<ProfileActionResponse> call = isSwipeRight
-                                ? authService.likeProfile("Bearer " + authToken, profileId)
-                                : authService.skipProfile("Bearer " + authToken, profileId);
+                // Swipe animation
+                profileCard.animate()
+                        .translationX(isSwipeRight ? profileCard.getWidth() : -profileCard.getWidth())
+                        .translationY(0)
+                        .rotation(isSwipeRight ? 30 : -30)
+                        .alpha(0)
+                        .setDuration(400)
+                        .setInterpolator(new AccelerateDecelerateInterpolator())
+                        .withEndAction(() -> {
+                            // Call API
+                            AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+                            Call<ProfileActionResponse> call = isSwipeRight
+                                    ? authService.likeProfile("Bearer " + authToken, profileId)
+                                    : authService.skipProfile("Bearer " + authToken, profileId);
 
-                        call.enqueue(new Callback<ProfileActionResponse>() {
-                            @Override
-                            public void onResponse(Call<ProfileActionResponse> call, Response<ProfileActionResponse> response) {
-                                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                                    Toast.makeText(requireContext(), response.body().getData(), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(requireContext(), "Lỗi khi thực hiện hành động", Toast.LENGTH_SHORT).show();
+                            call.enqueue(new Callback<ProfileActionResponse>() {
+                                @Override
+                                public void onResponse(Call<ProfileActionResponse> call, Response<ProfileActionResponse> response) {
+                                    if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                                        Toast.makeText(requireContext(), response.body().getData(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(requireContext(), "Lỗi khi thực hiện hành động", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(Call<ProfileActionResponse> call, Throwable t) {
-                                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                                @Override
+                                public void onFailure(Call<ProfileActionResponse> call, Throwable t) {
+                                    Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        nextProfile(view); // Chuyển sang profile tiếp theo sau khi swipe
-                        button.setScaleX(1.0f);
-                        button.setScaleY(1.0f);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {}
-                });
-                viewPager.startAnimation(swipeAnimation);
+                            // Reset position and load next profile
+                            profileCard.setTranslationX(0);
+                            profileCard.setTranslationY(0);
+                            profileCard.setRotation(0);
+                            profileCard.setAlpha(1.0f);
+                            btnDislike.setScaleX(1.0f);
+                            btnDislike.setScaleY(1.0f);
+                            btnLike.setScaleX(1.0f);
+                            btnLike.setScaleY(1.0f);
+                            nextProfile(view);
+                            button.setScaleX(1.0f);
+                            button.setScaleY(1.0f);
+                        })
+                        .start();
             }
 
             @Override
@@ -239,34 +316,25 @@ public class ProfileFragment extends Fragment {
         currentProfileIndex++;
         if (currentProfileIndex >= profileDataList.size()) {
             Toast.makeText(requireContext(), "Đã hết profile!", Toast.LENGTH_SHORT).show();
-
-            // Reset lại trạng thái ban đầu
-            profileDataList.clear(); // Xóa danh sách profile đã load
-            currentProfileIndex = 0; // Đặt lại chỉ số về 0
-
-            // Quay lại trạng thái mặc định, chưa load data
+            profileDataList.clear();
+            currentProfileIndex = 0;
             resetUI(view);
-
             return;
         }
         loadProfile(view, profileDataList.get(currentProfileIndex));
     }
 
     private void resetUI(View view) {
-        // Đặt các giá trị về trạng thái mặc định
         TextView tvNameAge = view.findViewById(R.id.tvNameAge);
         TextView tvAddress = view.findViewById(R.id.tvAddress);
-        tvNameAge.setText(",0");
+        tvNameAge.setText("User not found");
         tvAddress.setText("");
 
-        // Reset lại ViewPager
         if (viewPager != null) {
             viewPager.setAdapter(null);
         }
-
-        // Cập nhật giao diện với dữ liệu mặc định (nếu có)
-        // Ví dụ: bạn có thể đặt background hoặc hiển thị thông báo nếu cần.
     }
+
     private void loadProfile(View view, ProfileData data) {
         List<String> imageUrls = new ArrayList<>();
         String[] pics = {data.getPic1(), data.getPic2(), data.getPic3(), data.getPic4(),
@@ -279,7 +347,7 @@ public class ProfileFragment extends Fragment {
         }
 
         if (imageUrls.isEmpty()) {
-            imageUrls.add("");
+            imageUrls.add(""); // Placeholder for empty images
         }
 
         adapter = new ImageAdapter(requireContext(), imageUrls);

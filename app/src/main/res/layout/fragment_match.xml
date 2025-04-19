@@ -3,138 +3,180 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:clipChildren="true"
+    android:clipToPadding="true">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
+    <!-- CardView chứa ViewPager2 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:padding="0dp"
-        android:background="@drawable/rounded_background"
-        android:clipToOutline="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        android:layout_marginTop="25dp"
+        app:cardBackgroundColor="@android:color/white"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <View
-        android:id="@+id/backgroundOverlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/gradient_overlay"
-        android:clickable="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/basicInfoLayout" />
-
-    <LinearLayout
-        android:id="@+id/basicInfoLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
+        app:layout_constraintHeight_percent="0.90">
 
-        <TextView
-            android:id="@+id/tvNameAge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="User not found"
-            android:textColor="@android:color/white"
-            android:textSize="35sp"
-            android:textStyle="bold" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text=""
-            android:textColor="@android:color/white"
-            android:textSize="20sp" />
-    </LinearLayout>
+            <!-- ViewPager2 -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:background="@drawable/rounded_background"
+                android:overScrollMode="always"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Gradient overlay (includes black strip) -->
+            <View
+                android:id="@+id/cardGradientOverlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/gradient_fade_to_black"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <!-- Thông tin cơ bản (overlay on black strip) -->
+            <LinearLayout
+                android:id="@+id/basicInfoLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@android:color/transparent"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvNameAge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Không tìm thấy hồ sơ"
+                    android:textColor="@android:color/white"
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Vui lòng thay đổi bộ lọc"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Button Layout -->
     <LinearLayout
         android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="10dp"
+        android:paddingBottom="10dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <FrameLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+        <!-- Chat -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background"
-            android:elevation="6dp">
+            app:cardCornerRadius="35dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="@color/white">
             <ImageButton
                 android:id="@+id/btnChat"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="12dp"
-
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="8dp"
                 android:src="@drawable/btn_send"
                 android:scaleType="centerInside"/>
-        </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
-        <FrameLayout
+        <!-- Dislike -->
+        <androidx.cardview.widget.CardView
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background"
-            android:elevation="6dp">
+            app:cardCornerRadius="40dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="@color/white">
             <ImageButton
                 android:id="@+id/btnDislike"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="8dp"
                 android:src="@drawable/btn_dislike"
                 android:scaleType="centerInside"/>
-        </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
-        <FrameLayout
+        <!-- Like -->
+        <androidx.cardview.widget.CardView
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background"
-            android:elevation="6dp">
+            app:cardCornerRadius="40dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="@color/white">
             <ImageButton
                 android:id="@+id/btnLike"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="12dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="8dp"
                 android:src="@drawable/btn_like"
                 android:scaleType="centerInside"/>
-        </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
-        <FrameLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/circle_background"
-            android:elevation="6dp">
+        <!-- View Details -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            app:cardCornerRadius="35dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="@color/white">
             <ImageButton
                 android:id="@+id/btnViewDetails"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="12dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="8dp"
                 android:src="@drawable/btn_info"
                 android:scaleType="centerInside"/>
-        </FrameLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Layer 1: Transparent to keep the image bright -->
+    <item>
+        <shape>
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+    <!-- Layer 2: Gradient in the bottom ~15% -->
+    <item android:top="446dp"> <!-- Start gradient at ~85% (525dp * 0.85) -->
+        <shape>
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#00000000"
+            android:endColor="#FF000000"
+            android:centerColor="#4D000000"
+            android:centerY="0.7" />
+        </shape>
+    </item>
+
+</layer-list>
