@@ -1,5 +1,6 @@
 package com.example.datingapp.fragment;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,13 +11,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
+import com.example.datingapp.activity.ChatDetailActivity; // Import activity mới
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserInfoResponse;
 import com.example.datingapp.network.AuthService;
@@ -61,7 +61,6 @@ public class ChatFragment extends Fragment {
     }
 
     private void loadMatchedUsers() {
-        // Lấy token từ SharedPreferences
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", null);
 
@@ -98,19 +97,13 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    // Phương thức mở ChatDetailFragment
-    private void openChatDetailFragment(String userName, String userId) {
-        ChatDetailFragment chatDetailFragment = new ChatDetailFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("userName", userName);
-        bundle.putString("userId", userId);
-        chatDetailFragment.setArguments(bundle);
-
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.nav_host_fragment, chatDetailFragment); // Thay bằng ID container trong activity_main.xml
-        transaction.addToBackStack(null); // Thêm vào back stack để quay lại
-        transaction.commit();
+    // Phương thức mở ChatDetailActivity
+    private void openChatDetailActivity(String userName, String userId, String userAvatar) {
+        Intent intent = new Intent(requireContext(), ChatDetailActivity.class);
+        intent.putExtra("userName", userName);
+        intent.putExtra("userId", userId);
+        intent.putExtra("userAvatar", userAvatar);
+        startActivity(intent);
     }
 
     // Adapter cho RecyclerView
@@ -155,7 +148,8 @@ public class ChatFragment extends Fragment {
                     UserInfoResponse user = users.get(getAdapterPosition());
                     String fullName = user.getFirstName() + " " + user.getLastName();
                     String userId = user.getUserId();
-                    openChatDetailFragment(fullName, userId);
+                    String userAvatar = user.getPic1();
+                    openChatDetailActivity(fullName, userId, userAvatar);
                 });
             }
         }

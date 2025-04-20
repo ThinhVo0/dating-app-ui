@@ -1,21 +1,22 @@
-package com.example.datingapp.fragment;
+package com.example.datingapp.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 import com.example.datingapp.dto.MessageDTO;
 import com.example.datingapp.network.AuthService;
@@ -35,7 +36,6 @@ import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,64 +44,80 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ChatDetailFragment extends Fragment {
+public class ChatDetailActivity extends AppCompatActivity {
 
-    private static final String TAG = "ChatDetailFragment";
+    private static final String TAG = "ChatDetailActivity";
     private RecyclerView rvMessages;
     private MessageAdapter messageAdapter;
     private List<MessageDTO> messageList;
     private EditText etMessageInput;
-    private ImageButton btnSendMessage;
+    private ImageButton btnSendMessage, btnBack;
     private TextView tvChatUserName;
+    private ImageView ivChatUserAvatar;
     private String userName;
     private String targetUserId;
     private String currentUserId;
+    private String userAvatar;
     private WebSocketStompClient stompClient;
     private StompSession stompSession;
     private ExecutorService executorService;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chat_detail, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.fragment_chat_detail);
 
         executorService = Executors.newSingleThreadExecutor();
 
-        if (getArguments() != null) {
-            userName = getArguments().getString("userName", "Người dùng");
-            targetUserId = getArguments().getString("userId");
-        }
+        // Lấy dữ liệu từ Intent
+        Intent intent = getIntent();
+        userName = intent.getStringExtra("userName");
+        targetUserId = intent.getStringExtra("userId");
+        userAvatar = intent.getStringExtra("userAvatar");
 
-        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
+        // Lấy currentUserId và authToken từ SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentUserId = prefs.getString("userId", null);
         String authToken = prefs.getString("authToken", null);
 
         if (currentUserId == null || authToken == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            finish();
             return;
         }
 
-        rvMessages = view.findViewById(R.id.rvMessages);
-        etMessageInput = view.findViewById(R.id.etMessageInput);
-        btnSendMessage = view.findViewById(R.id.btnSendMessage);
-        tvChatUserName = view.findViewById(R.id.tvChatUserName);
+        // Khởi tạo view
+        rvMessages = findViewById(R.id.rvMessages);
+        etMessageInput = findViewById(R.id.etMessageInput);
+        btnSendMessage = findViewById(R.id.btnSendMessage);
+        btnBack = findViewById(R.id.btnBack);
+        tvChatUserName = findViewById(R.id.tvChatUserName);
+        ivChatUserAvatar = findViewById(R.id.ivChatUserAvatar);
         tvChatUserName.setText(userName);
 
+        // Load avatar
+        Glide.with(this)
+                .load(userAvatar != null && !userAvatar.isEmpty() ? userAvatar : "https://via.placeholder.com/150")
+                .circleCrop()
+                .into(ivChatUserAvatar);
+
+        // Thiết lập RecyclerView
         messageList = new ArrayList<>();
-        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
         messageAdapter = new MessageAdapter(messageList);
         rvMessages.setAdapter(messageAdapter);
 
+        // Thiết lập WebSocket và load tin nhắn
         setupWebSocket(authToken);
         loadInitialMessages(authToken);
 
+        // Sự kiện gửi tin nhắn
         btnSendMessage.setOnClickListener(v -> sendMessage());
+
+        // Sự kiện nút back
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void setupWebSocket(String authToken) {
@@ -134,7 +150,7 @@ public class ChatDetailFragment extends Fragment {
                                 MessageDTO message = (MessageDTO) payload;
                                 Log.i(TAG, "Received message: " + message.toString());
                                 if (!messageList.stream().anyMatch(m -> m.getId() != null && m.getId().equals(message.getId()))) {
-                                    requireActivity().runOnUiThread(() -> {
+                                    runOnUiThread(() -> {
                                         messageList.add(message);
                                         messageAdapter.notifyItemInserted(messageList.size() - 1);
                                         rvMessages.scrollToPosition(messageList.size() - 1);
@@ -159,8 +175,8 @@ public class ChatDetailFragment extends Fragment {
                 }, connectHeaders).get();
             } catch (Exception e) {
                 Log.e(TAG, "Failed to connect WebSocket: " + e.getMessage(), e);
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Không thể kết nối WebSocket: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                runOnUiThread(() ->
+                        Toast.makeText(ChatDetailActivity.this, "Không thể kết nối WebSocket: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                 );
             }
         });
@@ -180,14 +196,14 @@ public class ChatDetailFragment extends Fragment {
                     rvMessages.scrollToPosition(messageList.size() - 1);
                 } else {
                     Log.e(TAG, "Failed to load messages: " + response.code());
-                    Toast.makeText(requireContext(), "Không thể tải tin nhắn: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatDetailActivity.this, "Không thể tải tin nhắn: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<MessageDTO>> call, Throwable t) {
                 Log.e(TAG, "Load messages failed: " + t.getMessage(), t);
-                Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChatDetailActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -213,18 +229,18 @@ public class ChatDetailFragment extends Fragment {
                     Log.i(TAG, "Message sent: " + messageText);
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(requireContext(), "Lỗi gửi tin nhắn", Toast.LENGTH_SHORT).show()
+                    runOnUiThread(() ->
+                            Toast.makeText(ChatDetailActivity.this, "Lỗi gửi tin nhắn", Toast.LENGTH_SHORT).show()
                     );
                 }
             });
         } else {
-            Toast.makeText(requireContext(), "Không thể gửi tin nhắn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không thể gửi tin nhắn", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         super.onDestroy();
         if (stompClient != null && stompClient.isRunning()) {
             stompClient.stop();
@@ -243,7 +259,7 @@ public class ChatDetailFragment extends Fragment {
 
         @Override
         public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
+            View view = android.view.LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
             return new MessageViewHolder(view);
         }
 
@@ -253,13 +269,13 @@ public class ChatDetailFragment extends Fragment {
             boolean isSelf = message.getSenderId().equals(currentUserId);
 
             if (isSelf) {
-                holder.selfMessageLayout.setVisibility(View.VISIBLE);
-                holder.otherMessageLayout.setVisibility(View.GONE);
+                holder.selfMessageLayout.setVisibility(android.view.View.VISIBLE);
+                holder.otherMessageLayout.setVisibility(android.view.View.GONE);
                 holder.tvMessageSelf.setText(message.getContent());
                 holder.tvTimeSelf.setText(message.getSendTime());
             } else {
-                holder.selfMessageLayout.setVisibility(View.GONE);
-                holder.otherMessageLayout.setVisibility(View.VISIBLE);
+                holder.selfMessageLayout.setVisibility(android.view.View.GONE);
+                holder.otherMessageLayout.setVisibility(android.view.View.VISIBLE);
                 holder.tvMessageOther.setText(message.getContent());
                 holder.tvTimeOther.setText(message.getSendTime());
             }
@@ -271,10 +287,10 @@ public class ChatDetailFragment extends Fragment {
         }
 
         class MessageViewHolder extends RecyclerView.ViewHolder {
-            LinearLayout selfMessageLayout, otherMessageLayout;
+            android.widget.LinearLayout selfMessageLayout, otherMessageLayout;
             TextView tvMessageSelf, tvMessageOther, tvTimeSelf, tvTimeOther;
 
-            MessageViewHolder(View itemView) {
+            MessageViewHolder(android.view.View itemView) {
                 super(itemView);
                 selfMessageLayout = itemView.findViewById(R.id.selfMessageLayout);
                 otherMessageLayout = itemView.findViewById(R.id.otherMessageLayout);
