@@ -18,6 +18,7 @@ import com.example.datingapp.R;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class FilterFragment extends Fragment {
@@ -25,8 +26,8 @@ public class FilterFragment extends Fragment {
     private RangeSlider ageRangeSlider;
     private TextView tvAgeRange;
     private RadioGroup rgGender;
-    private Slider distanceSlider; // Thêm Slider cho khoảng cách
-    private TextView tvDistanceValue; // Thêm TextView để hiển thị giá trị khoảng cách
+    private Slider distanceSlider;
+    private TextView tvDistanceValue;
     private Button btnApplyFilter;
 
     @Override
@@ -41,55 +42,79 @@ public class FilterFragment extends Fragment {
         ageRangeSlider = view.findViewById(R.id.ageRangeSlider);
         tvAgeRange = view.findViewById(R.id.tvAgeRange);
         rgGender = view.findViewById(R.id.rgGender);
-        distanceSlider = view.findViewById(R.id.distanceSlider); // Ánh xạ Slider
-        tvDistanceValue = view.findViewById(R.id.tvDistanceValue); // Ánh xạ TextView
+        distanceSlider = view.findViewById(R.id.distanceSlider);
+        tvDistanceValue = view.findViewById(R.id.tvDistanceValue);
         btnApplyFilter = view.findViewById(R.id.btnApplyFilter);
 
-        // Log giá trị ban đầu của RangeSlider
-        List<Float> initialValues = ageRangeSlider.getValues();
-        Log.d(TAG, "Initial Age Range: " + initialValues.get(0) + " - " + initialValues.get(1));
+        // Tải dữ liệu từ SharedPreferences
+        SharedPreferences filterPrefs = requireContext().getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
+        int minAge = filterPrefs.getInt("minAge", 18); // Giá trị mặc định
+        int maxAge = filterPrefs.getInt("maxAge", 100);
+        String gender = filterPrefs.getString("gender", null);
+        float maxDistance = filterPrefs.getFloat("maxDistance", 10.0f);
 
+        // Cập nhật UI với giá trị từ SharedPreferences
+        ageRangeSlider.setValues((float) minAge, (float) maxAge);
+        tvAgeRange.setText(minAge + " - " + maxAge);
+        Log.d(TAG, "Loaded Age Range: " + minAge + " - " + maxAge);
+
+        if ("MALE".equals(gender)) {
+            rgGender.check(R.id.rbMale);
+        } else if ("FEMALE".equals(gender)) {
+            rgGender.check(R.id.rbFemale);
+        } else {
+            rgGender.clearCheck();
+        }
+        Log.d(TAG, "Loaded Gender: " + gender);
+
+        distanceSlider.setValue(maxDistance);
+        tvDistanceValue.setText(Math.round(maxDistance) + " km");
+        Log.d(TAG, "Loaded Distance: " + maxDistance + " km");
+
+        // Xử lý sự kiện thay đổi RangeSlider
         ageRangeSlider.addOnChangeListener((slider, value, fromUser) -> {
             List<Float> values = slider.getValues();
-            int minAge = Math.round(values.get(0));
-            int maxAge = Math.round(values.get(1));
-            tvAgeRange.setText(minAge + " - " + maxAge);
-            Log.d(TAG, "Age Range changed: " + minAge + " - " + maxAge);
+            int minAgeValue = Math.round(values.get(0));
+            int maxAgeValue = Math.round(values.get(1));
+            tvAgeRange.setText(minAgeValue + " - " + maxAgeValue);
+            Log.d(TAG, "Age Range changed: " + minAgeValue + " - " + maxAgeValue);
         });
 
-        // Xử lý sự kiện thay đổi giá trị của distanceSlider
+        // Xử lý sự kiện thay đổi Slider khoảng cách
         distanceSlider.addOnChangeListener((slider, value, fromUser) -> {
             int distance = Math.round(value);
             tvDistanceValue.setText(distance + " km");
             Log.d(TAG, "Distance changed: " + distance + " km");
         });
 
+        // Xử lý nút Áp dụng
         btnApplyFilter.setOnClickListener(v -> {
             List<Float> ageValues = ageRangeSlider.getValues();
-            int minAge = Math.round(ageValues.get(0));
-            int maxAge = Math.round(ageValues.get(1));
+            int minAgeValue = Math.round(ageValues.get(0));
+            int maxAgeValue = Math.round(ageValues.get(1));
 
             int selectedId = rgGender.getCheckedRadioButtonId();
-            String gender = null;
+            String genderValue = null;
             if (selectedId == R.id.rbMale) {
-                gender = "MALE";
+                genderValue = "MALE";
             } else if (selectedId == R.id.rbFemale) {
-                gender = "FEMALE";
+                genderValue = "FEMALE";
             }
 
-            float maxDistance = distanceSlider.getValue(); // Lấy giá trị từ distanceSlider
+            float maxDistanceValue = distanceSlider.getValue();
 
-            SharedPreferences filterPrefs = requireContext().getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
+            // Lưu vào SharedPreferences
             SharedPreferences.Editor editor = filterPrefs.edit();
-            editor.putInt("minAge", minAge);
-            editor.putInt("maxAge", maxAge);
-            editor.putString("gender", gender);
-            editor.putFloat("maxDistance", maxDistance); // Lưu maxDistance vào SharedPreferences
+            editor.putInt("minAge", minAgeValue);
+            editor.putInt("maxAge", maxAgeValue);
+            editor.putString("gender", genderValue);
+            editor.putFloat("maxDistance", maxDistanceValue);
             editor.apply();
 
-            Log.d(TAG, "Filter applied - MinAge: " + minAge + ", MaxAge: " + maxAge + ", Gender: " + gender + ", MaxDistance: " + maxDistance + " km");
+            Log.d(TAG, "Filter applied - MinAge: " + minAgeValue + ", MaxAge: " + maxAgeValue + ", Gender: " + genderValue + ", MaxDistance: " + maxDistanceValue + " km");
             Toast.makeText(getContext(), "Đã lưu bộ lọc!", Toast.LENGTH_SHORT).show();
 
+            // Quay lại và làm mới ProfileFragment
             requireActivity().onBackPressed();
         });
     }
