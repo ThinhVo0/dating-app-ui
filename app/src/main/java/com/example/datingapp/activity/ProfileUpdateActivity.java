@@ -1,8 +1,6 @@
-package com.example.datingapp.fragment;
+package com.example.datingapp.activity;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,12 +8,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -26,8 +22,9 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
@@ -63,27 +60,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileUpdateFragment extends Fragment {
+public class ProfileUpdateActivity extends AppCompatActivity {
 
-    private static final String TAG = "ProfileUpdateFragment";
+    private static final String TAG = "ProfileUpdateActivity";
     private TextInputEditText etFirstName, etLastName, etAge, etHeight, etBio;
     private RadioGroup rgGender;
     private FlexboxLayout flHobbies;
     private Spinner spZodiac, spPersonality, spCommunication, spLoveLanguage,
             spPetPreference, spDrinking, spSmoking, spSleeping;
     private Button btnSave;
+    private ImageButton btnBack;
     private List<Hobbies> selectedHobbies = new ArrayList<>();
     private AuthService authService;
     private String authToken;
     private static final int STORAGE_PERMISSION_CODE = 100;
     private int currentImagePosition = -1;
-    private SharedPreferences sharedPreferences; // Thêm biến SharedPreferences
+    private SharedPreferences sharedPreferences;
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 Log.d(TAG, "imagePickerLauncher: Result received, resultCode = " + result.getResultCode());
-                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Intent data = result.getData();
                     Uri imageUri = data.getData();
                     if (imageUri != null) {
@@ -97,44 +95,57 @@ public class ProfileUpdateFragment extends Fragment {
     );
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView: Starting");
-        View view = inflater.inflate(R.layout.fragment_profile_update, container, false);
-        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE); // Khởi tạo SharedPreferences
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile_update);
+
+        // Setup Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", null);
-        Log.d(TAG, "onCreateView: authToken = " + authToken);
+        Log.d(TAG, "onCreate: authToken = " + authToken);
 
         // Initialize views
-        etFirstName = view.findViewById(R.id.etFirstName);
-        etLastName = view.findViewById(R.id.etLastName);
-        etAge = view.findViewById(R.id.etAge);
-        etHeight = view.findViewById(R.id.etHeight);
-        etBio = view.findViewById(R.id.etBio);
-        rgGender = view.findViewById(R.id.rgGender);
-        flHobbies = view.findViewById(R.id.flHobbies);
-        spZodiac = view.findViewById(R.id.spZodiac);
-        spPersonality = view.findViewById(R.id.spPersonality);
-        spCommunication = view.findViewById(R.id.spCommunication);
-        spLoveLanguage = view.findViewById(R.id.spLoveLanguage);
-        spPetPreference = view.findViewById(R.id.spPetPreference);
-        spDrinking = view.findViewById(R.id.spDrinking);
-        spSmoking = view.findViewById(R.id.spSmoking);
-        spSleeping = view.findViewById(R.id.spSleeping);
-        btnSave = view.findViewById(R.id.btnSave);
-        Log.d(TAG, "onCreateView: Views initialized");
+        btnBack = findViewById(R.id.btnBack);
+        etFirstName = findViewById(R.id.etFirstName);
+        etLastName = findViewById(R.id.etLastName);
+        etAge = findViewById(R.id.etAge);
+        etHeight = findViewById(R.id.etHeight);
+        etBio = findViewById(R.id.etBio);
+        rgGender = findViewById(R.id.rgGender);
+        flHobbies = findViewById(R.id.flHobbies);
+        spZodiac = findViewById(R.id.spZodiac);
+        spPersonality = findViewById(R.id.spPersonality);
+        spCommunication = findViewById(R.id.spCommunication);
+        spLoveLanguage = findViewById(R.id.spLoveLanguage);
+        spPetPreference = findViewById(R.id.spPetPreference);
+        spDrinking = findViewById(R.id.spDrinking);
+        spSmoking = findViewById(R.id.spSmoking);
+        spSleeping = findViewById(R.id.spSleeping);
+        btnSave = findViewById(R.id.btnSave);
+        Log.d(TAG, "onCreate: Views initialized");
+
+        // Back button listener
+        btnBack.setOnClickListener(v -> finish());
 
         // Initialize Retrofit service
         authService = RetrofitClient.getClient().create(AuthService.class);
-        Log.d(TAG, "onCreateView: Retrofit service initialized");
+        Log.d(TAG, "onCreate: Retrofit service initialized");
 
         // Setup adapters
         setupHobbiesFlexbox();
         setupSpinners();
-        setupImageClickListeners(view);
-        Log.d(TAG, "onCreateView: Adapters and listeners set up");
+        setupImageClickListeners();
+        Log.d(TAG, "onCreate: Adapters and listeners set up");
 
         // Load profile data
-        loadProfileData(sharedPreferences, view);
+        loadProfileData();
 
         // Setup save button listener
         btnSave.setOnClickListener(v -> {
@@ -142,11 +153,10 @@ public class ProfileUpdateFragment extends Fragment {
             saveProfile();
         });
 
-        Log.d(TAG, "onCreateView: Completed");
-        return view;
+        Log.d(TAG, "onCreate: Completed");
     }
 
-    private void loadProfileData(SharedPreferences sharedPreferences, View view) {
+    private void loadProfileData() {
         // Load text fields
         etFirstName.setText(sharedPreferences.getString("firstName", ""));
         etLastName.setText(sharedPreferences.getString("lastName", ""));
@@ -186,12 +196,12 @@ public class ProfileUpdateFragment extends Fragment {
         setSpinnerSelection(spSmoking, SmokingHabit.values(), sharedPreferences.getString("smokingHabit", ""), SmokingHabit::getDisplayName);
         setSpinnerSelection(spSleeping, SleepingHabit.values(), sharedPreferences.getString("sleepingHabit", ""), SleepingHabit::getDisplayName);
 
-        // Load images using the passed view
+        // Load images
         for (int i = 1; i <= 9; i++) {
             String picUrl = sharedPreferences.getString("pic" + i, null);
             if (picUrl != null && !picUrl.isEmpty()) {
-                int imageViewId = getResources().getIdentifier("img" + i, "id", requireContext().getPackageName());
-                ImageView imageView = view.findViewById(imageViewId);
+                int imageViewId = getResources().getIdentifier("img" + i, "id", getPackageName());
+                ImageView imageView = findViewById(imageViewId);
                 if (imageView != null) {
                     Glide.with(this)
                             .load(picUrl)
@@ -228,7 +238,7 @@ public class ProfileUpdateFragment extends Fragment {
             return;
         }
         String[] permissions = getPermissions();
-        if (ContextCompat.checkSelfPermission(requireContext(), permissions[0]) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED) {
             openImagePicker();
         } else {
             requestPermissions(permissions, STORAGE_PERMISSION_CODE);
@@ -244,9 +254,9 @@ public class ProfileUpdateFragment extends Fragment {
                 openImagePicker();
             } else {
                 Log.d(TAG, "onRequestPermissionsResult: Permission denied");
-                Toast.makeText(getContext(), "Quyền truy cập bị từ chối. Vào cài đặt để bật.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Quyền truy cập bị từ chối. Vào cài đặt để bật.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
+                intent.setData(Uri.parse("package:" + getPackageName()));
                 startActivity(intent);
             }
         }
@@ -260,11 +270,11 @@ public class ProfileUpdateFragment extends Fragment {
         Log.d(TAG, "openImagePicker: Intent launched");
     }
 
-    private void setupImageClickListeners(View view) {
+    private void setupImageClickListeners() {
         Log.d(TAG, "setupImageClickListeners: Starting");
         for (int i = 1; i <= 9; i++) {
-            int frameLayoutId = getResources().getIdentifier("flImg" + i, "id", requireContext().getPackageName());
-            FrameLayout frameLayout = view.findViewById(frameLayoutId);
+            int frameLayoutId = getResources().getIdentifier("flImg" + i, "id", getPackageName());
+            FrameLayout frameLayout = findViewById(frameLayoutId);
             final int position = i;
             if (frameLayout != null) {
                 frameLayout.setOnClickListener(v -> {
@@ -281,8 +291,8 @@ public class ProfileUpdateFragment extends Fragment {
 
     private void updateImageView(Uri imageUri) {
         Log.d(TAG, "updateImageView: Updating image at position " + currentImagePosition);
-        int imageViewId = getResources().getIdentifier("img" + currentImagePosition, "id", requireContext().getPackageName());
-        ImageView imageView = getView().findViewById(imageViewId);
+        int imageViewId = getResources().getIdentifier("img" + currentImagePosition, "id", getPackageName());
+        ImageView imageView = findViewById(imageViewId);
         if (imageView != null) {
             imageView.setImageURI(imageUri);
             Log.d(TAG, "updateImageView: Image set successfully");
@@ -291,10 +301,10 @@ public class ProfileUpdateFragment extends Fragment {
 
     private void uploadImageToServer(Uri imageUri, String position) {
         Log.d(TAG, "uploadImageToServer: Starting upload for position " + position);
-        String filePath = RealPathUtil.getRealPath(requireContext(), imageUri);
+        String filePath = RealPathUtil.getRealPath(this, imageUri);
         if (filePath == null) {
             Log.e(TAG, "uploadImageToServer: Failed to get file path for URI = " + imageUri);
-            Toast.makeText(getContext(), "Không thể lấy đường dẫn ảnh", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không thể lấy đường dẫn ảnh", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -311,17 +321,17 @@ public class ProfileUpdateFragment extends Fragment {
                 Log.d(TAG, "uploadImageToServer: Response received, code = " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "uploadImageToServer: Upload successful");
-                    Toast.makeText(getContext(), "Upload ảnh thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUpdateActivity.this, "Upload ảnh thành công", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d(TAG, "uploadImageToServer: Upload failed, message = " + response.message());
-                    Toast.makeText(getContext(), "Upload thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUpdateActivity.this, "Upload thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Album>> call, Throwable t) {
                 Log.e(TAG, "uploadImageToServer: Network error, " + t.getMessage());
-                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileUpdateActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -330,7 +340,7 @@ public class ProfileUpdateFragment extends Fragment {
         Log.d(TAG, "setupHobbiesFlexbox: Starting");
         Hobbies[] hobbiesValues = Hobbies.values();
         for (Hobbies hobby : hobbiesValues) {
-            TextView hobbyView = (TextView) LayoutInflater.from(getContext())
+            TextView hobbyView = (TextView) android.view.LayoutInflater.from(this)
                     .inflate(R.layout.hobby_item, flHobbies, false);
             hobbyView.setText(hobby.getDisplayName());
             hobbyView.setOnClickListener(v -> {
@@ -350,42 +360,42 @@ public class ProfileUpdateFragment extends Fragment {
 
     private void setupSpinners() {
         Log.d(TAG, "setupSpinners: Starting");
-        ArrayAdapter<ZodiacSign> zodiacAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<ZodiacSign> zodiacAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, ZodiacSign.values());
         zodiacAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spZodiac.setAdapter(zodiacAdapter);
 
-        ArrayAdapter<PersonalityType> personalityAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<PersonalityType> personalityAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, PersonalityType.values());
         personalityAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPersonality.setAdapter(personalityAdapter);
 
-        ArrayAdapter<CommunicationStyle> communicationAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<CommunicationStyle> communicationAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, CommunicationStyle.values());
         communicationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spCommunication.setAdapter(communicationAdapter);
 
-        ArrayAdapter<LoveLanguage> loveLanguageAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<LoveLanguage> loveLanguageAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, LoveLanguage.values());
         loveLanguageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spLoveLanguage.setAdapter(loveLanguageAdapter);
 
-        ArrayAdapter<PetPreference> petAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<PetPreference> petAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, PetPreference.values());
         petAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spPetPreference.setAdapter(petAdapter);
 
-        ArrayAdapter<DrinkingHabit> drinkingAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<DrinkingHabit> drinkingAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, DrinkingHabit.values());
         drinkingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spDrinking.setAdapter(drinkingAdapter);
 
-        ArrayAdapter<SmokingHabit> smokingAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<SmokingHabit> smokingAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, SmokingHabit.values());
         smokingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spSmoking.setAdapter(smokingAdapter);
 
-        ArrayAdapter<SleepingHabit> sleepingAdapter = new ArrayAdapter<>(getContext(),
+        ArrayAdapter<SleepingHabit> sleepingAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, SleepingHabit.values());
         sleepingAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spSleeping.setAdapter(sleepingAdapter);
@@ -404,14 +414,14 @@ public class ProfileUpdateFragment extends Fragment {
             int age = Integer.parseInt(etAge.getText().toString().trim());
             if (age < 18) {
                 Log.d(TAG, "saveProfile: Age < 18");
-                Toast.makeText(getContext(), "Tuổi phải lớn hơn hoặc bằng 18", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Tuổi phải lớn hơn hoặc bằng 18", Toast.LENGTH_SHORT).show();
                 return;
             }
             profile.setAge(age);
             Log.d(TAG, "saveProfile: Age = " + age);
         } catch (NumberFormatException e) {
             Log.e(TAG, "saveProfile: Invalid age, " + e.getMessage());
-            Toast.makeText(getContext(), "Vui lòng nhập tuổi hợp lệ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng nhập tuổi hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -419,21 +429,21 @@ public class ProfileUpdateFragment extends Fragment {
             int height = Integer.parseInt(etHeight.getText().toString().trim());
             if (height < 100) {
                 Log.d(TAG, "saveProfile: Height < 100");
-                Toast.makeText(getContext(), "Chiều cao phải lớn hơn 100 cm", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Chiều cao phải lớn hơn 100 cm", Toast.LENGTH_SHORT).show();
                 return;
             }
             profile.setHeight(height);
             Log.d(TAG, "saveProfile: Height = " + height);
         } catch (NumberFormatException e) {
             Log.e(TAG, "saveProfile: Invalid height, " + e.getMessage());
-            Toast.makeText(getContext(), "Vui lòng nhập chiều cao hợp lệ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng nhập chiều cao hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
 
         String bio = etBio.getText().toString().trim();
         if (bio.length() > 50) {
             Log.d(TAG, "saveProfile: Bio too long, length = " + bio.length());
-            Toast.makeText(getContext(), "Tiểu sử không được quá 50 ký tự", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Tiểu sử không được quá 50 ký tự", Toast.LENGTH_SHORT).show();
             return;
         }
         profile.setBio(bio);
@@ -441,7 +451,7 @@ public class ProfileUpdateFragment extends Fragment {
 
         int selectedGenderId = rgGender.getCheckedRadioButtonId();
         if (selectedGenderId != -1) {
-            RadioButton selectedRadio = getView().findViewById(selectedGenderId);
+            RadioButton selectedRadio = findViewById(selectedGenderId);
             String genderText = selectedRadio.getText().toString();
             if (genderText.equals("Nam")) {
                 profile.setGender(Gender.MALE.name());
@@ -466,7 +476,7 @@ public class ProfileUpdateFragment extends Fragment {
 
         if (authToken == null) {
             Log.d(TAG, "saveProfile: No auth token");
-            Toast.makeText(getContext(), "Không tìm thấy token, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không tìm thấy token, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -478,9 +488,9 @@ public class ProfileUpdateFragment extends Fragment {
                 Log.d(TAG, "saveProfile: Response received, code = " + response.code());
                 if (response.isSuccessful()) {
                     Log.d(TAG, "saveProfile: Update successful");
-                    Toast.makeText(getContext(), "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUpdateActivity.this, "Cập nhật hồ sơ thành công", Toast.LENGTH_SHORT).show();
 
-                    // Cập nhật SharedPreferences với dữ liệu mới
+                    // Update SharedPreferences with new data
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("firstName", profile.getFirstName());
                     editor.putString("lastName", profile.getLastName());
@@ -488,7 +498,7 @@ public class ProfileUpdateFragment extends Fragment {
                     editor.putInt("height", profile.getHeight());
                     editor.putString("bio", profile.getBio());
                     editor.putString("gender", profile.getGender() != null ? (profile.getGender().equals(Gender.MALE.name()) ? "Nam" : "Nữ") : "");
-                    // Lưu danh sách hobbies
+                    // Save hobbies list
                     String hobbiesStr = selectedHobbies.stream()
                             .map(Hobbies::getDisplayName)
                             .collect(Collectors.joining(","));
@@ -503,18 +513,18 @@ public class ProfileUpdateFragment extends Fragment {
                     editor.putString("sleepingHabit", ((SleepingHabit) spSleeping.getSelectedItem()).getDisplayName());
                     editor.apply();
 
-                    // Tải lại dữ liệu để cập nhật giao diện
-                    loadProfileData(sharedPreferences, getView());
+                    // Finish activity
+                    finish();
                 } else {
                     Log.d(TAG, "saveProfile: Update failed, message = " + response.message());
-                    Toast.makeText(getContext(), "Cập nhật thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUpdateActivity.this, "Cập nhật thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Log.e(TAG, "saveProfile: Network error, " + t.getMessage());
-                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileUpdateActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

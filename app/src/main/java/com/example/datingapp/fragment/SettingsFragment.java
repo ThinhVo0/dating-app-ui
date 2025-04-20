@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.datingapp.R;
 import com.example.datingapp.activity.LoginActivity;
+import com.example.datingapp.activity.ProfileUpdateActivity;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
@@ -53,7 +54,7 @@ public class SettingsFragment extends Fragment {
         // Xử lý click vào tvEditProfile
         tvEditProfile.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa thông tin", Toast.LENGTH_SHORT).show();
-            openFragment(new ProfileUpdateFragment());
+            startActivity(new Intent(requireContext(), ProfileUpdateActivity.class));
         });
 
         // Xử lý click vào tvEditAccount

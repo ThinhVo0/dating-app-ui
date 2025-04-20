@@ -33,6 +33,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.FilterActivity" />
+        <activity android:name=".activity.ProfileUpdateActivity" />
         <activity android:name=".activity.ChatDetailActivity" />
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.ResetPasswordActivity" />

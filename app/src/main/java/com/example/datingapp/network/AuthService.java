@@ -2,6 +2,7 @@ package com.example.datingapp.network;
 
 import android.provider.ContactsContract;
 
+import com.example.datingapp.dto.ConversationSummaryDTO;
 import com.example.datingapp.dto.MessageDTO;
 import com.example.datingapp.dto.Notification;
 import com.example.datingapp.dto.request.AccessTokenDto;
@@ -124,5 +125,18 @@ public interface AuthService {
     Call<List<Notification>> getNotifications(
             @Header("Authorization") String authToken,
             @Path("userId") String userId
+    );
+
+    // Thêm endpoint để lấy danh sách cuộc trò chuyện
+    @GET("api/messages/summaries")
+    Call<List<ConversationSummaryDTO>> getConversationSummaries(
+            @Header("Authorization") String authToken
+    );
+
+    // Thêm endpoint để đánh dấu tin nhắn đã đọc
+    @PUT("api/messages/mark-read")
+    Call<Void> markMessagesAsRead(
+            @Header("Authorization") String authToken,
+            @Query("senderId") String senderId
     );
 }

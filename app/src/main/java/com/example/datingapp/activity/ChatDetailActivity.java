@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,7 +66,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_chat_detail);
+        setContentView(R.layout.activity_chat_detail);
 
         executorService = Executors.newSingleThreadExecutor();
 
@@ -80,7 +81,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         currentUserId = prefs.getString("userId", null);
         String authToken = prefs.getString("authToken", null);
 
-        if (currentUserId == null || authToken == null) {
+        if (currentUserId == null || authToken == null || targetUserId == null) {
             Toast.makeText(this, "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -109,6 +110,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         messageAdapter = new MessageAdapter(messageList);
         rvMessages.setAdapter(messageAdapter);
 
+        // Đánh dấu tin nhắn đã đọc
+        markMessagesAsRead(authToken);
+
         // Thiết lập WebSocket và load tin nhắn
         setupWebSocket(authToken);
         loadInitialMessages(authToken);
@@ -118,6 +122,29 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // Sự kiện nút back
         btnBack.setOnClickListener(v -> finish());
+    }
+
+    private void markMessagesAsRead(String authToken) {
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        Call<Void> call = authService.markMessagesAsRead("Bearer " + authToken, targetUserId);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Messages marked as read for user: " + targetUserId);
+                } else {
+                    Log.e(TAG, "Failed to mark messages as read: " + response.code());
+                    Toast.makeText(ChatDetailActivity.this, "Không thể đánh dấu tin nhắn đã đọc", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, "Mark messages as read failed: " + t.getMessage(), t);
+                Toast.makeText(ChatDetailActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupWebSocket(String authToken) {
@@ -189,13 +216,15 @@ public class ChatDetailActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<MessageDTO>>() {
             @Override
             public void onResponse(Call<List<MessageDTO>> call, Response<List<MessageDTO>> response) {
+                Log.d(TAG, "loadInitialMessages response code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "Messages loaded: " + response.body().size());
                     messageList.clear();
                     messageList.addAll(response.body());
                     messageAdapter.notifyDataSetChanged();
                     rvMessages.scrollToPosition(messageList.size() - 1);
                 } else {
-                    Log.e(TAG, "Failed to load messages: " + response.code());
+                    Log.e(TAG, "Failed to load messages: " + response.code() + ", body: " + (response.errorBody() != null ? response.errorBody().toString() : "null"));
                     Toast.makeText(ChatDetailActivity.this, "Không thể tải tin nhắn: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -268,14 +297,16 @@ public class ChatDetailActivity extends AppCompatActivity {
             MessageDTO message = messages.get(position);
             boolean isSelf = message.getSenderId().equals(currentUserId);
 
+            Log.d(TAG, "Binding message at position " + position + ": " + message.getContent() + ", isSelf: " + isSelf);
+
             if (isSelf) {
-                holder.selfMessageLayout.setVisibility(android.view.View.VISIBLE);
-                holder.otherMessageLayout.setVisibility(android.view.View.GONE);
+                holder.selfMessageLayout.setVisibility(View.VISIBLE);
+                holder.otherMessageLayout.setVisibility(View.GONE);
                 holder.tvMessageSelf.setText(message.getContent());
                 holder.tvTimeSelf.setText(message.getSendTime());
             } else {
-                holder.selfMessageLayout.setVisibility(android.view.View.GONE);
-                holder.otherMessageLayout.setVisibility(android.view.View.VISIBLE);
+                holder.selfMessageLayout.setVisibility(View.GONE);
+                holder.otherMessageLayout.setVisibility(View.VISIBLE);
                 holder.tvMessageOther.setText(message.getContent());
                 holder.tvTimeOther.setText(message.getSendTime());
             }
@@ -283,14 +314,15 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
+            Log.d(TAG, "Message count: " + messages.size());
             return messages.size();
         }
 
         class MessageViewHolder extends RecyclerView.ViewHolder {
-            android.widget.LinearLayout selfMessageLayout, otherMessageLayout;
+            LinearLayout selfMessageLayout, otherMessageLayout;
             TextView tvMessageSelf, tvMessageOther, tvTimeSelf, tvTimeOther;
 
-            MessageViewHolder(android.view.View itemView) {
+            MessageViewHolder(View itemView) {
                 super(itemView);
                 selfMessageLayout = itemView.findViewById(R.id.selfMessageLayout);
                 otherMessageLayout = itemView.findViewById(R.id.otherMessageLayout);

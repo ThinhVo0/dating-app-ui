@@ -16,7 +16,6 @@ import com.example.datingapp.R;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.fragment.ChatFragment;
-import com.example.datingapp.fragment.FilterFragment;
 import com.example.datingapp.fragment.LikeYouFragment;
 import com.example.datingapp.fragment.NotificationsFragment;
 import com.example.datingapp.fragment.ProfileFragment;
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         // Xử lý click vào filter_icon
         ImageView filterIcon = findViewById(R.id.filter_icon);
         filterIcon.setOnClickListener(v -> {
-            openFragment(new FilterFragment());
+            startActivity(new Intent(MainActivity.this, FilterActivity.class));
         });
 
         // Xử lý click vào FloatingActionButton

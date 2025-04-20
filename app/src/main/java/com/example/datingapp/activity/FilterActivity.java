@@ -1,59 +1,66 @@
-package com.example.datingapp.fragment;
+package com.example.datingapp.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.datingapp.R;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 
-import java.util.Arrays;
 import java.util.List;
 
-public class FilterFragment extends Fragment {
-    private static final String TAG = "FilterFragment";
+public class FilterActivity extends AppCompatActivity {
+    private static final String TAG = "FilterActivity";
     private RangeSlider ageRangeSlider;
     private TextView tvAgeRange;
     private RadioGroup rgGender;
     private Slider distanceSlider;
     private TextView tvDistanceValue;
     private Button btnApplyFilter;
+    private ImageButton btnBack;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_filter, container, false);
-    }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_filter);
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // Setup Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
-        ageRangeSlider = view.findViewById(R.id.ageRangeSlider);
-        tvAgeRange = view.findViewById(R.id.tvAgeRange);
-        rgGender = view.findViewById(R.id.rgGender);
-        distanceSlider = view.findViewById(R.id.distanceSlider);
-        tvDistanceValue = view.findViewById(R.id.tvDistanceValue);
-        btnApplyFilter = view.findViewById(R.id.btnApplyFilter);
+        // Initialize views
+        btnBack = findViewById(R.id.btnBack);
+        ageRangeSlider = findViewById(R.id.ageRangeSlider);
+        tvAgeRange = findViewById(R.id.tvAgeRange);
+        rgGender = findViewById(R.id.rgGender);
+        distanceSlider = findViewById(R.id.distanceSlider);
+        tvDistanceValue = findViewById(R.id.tvDistanceValue);
+        btnApplyFilter = findViewById(R.id.btnApplyFilter);
 
-        // Tải dữ liệu từ SharedPreferences
-        SharedPreferences filterPrefs = requireContext().getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
-        int minAge = filterPrefs.getInt("minAge", 18); // Giá trị mặc định
+        // Back button listener
+        btnBack.setOnClickListener(v -> finish());
+
+        // Load data from SharedPreferences
+        SharedPreferences filterPrefs = getSharedPreferences("FilterPrefs", Context.MODE_PRIVATE);
+        int minAge = filterPrefs.getInt("minAge", 18); // Default value
         int maxAge = filterPrefs.getInt("maxAge", 100);
         String gender = filterPrefs.getString("gender", null);
         float maxDistance = filterPrefs.getFloat("maxDistance", 10.0f);
 
-        // Cập nhật UI với giá trị từ SharedPreferences
+        // Update UI with SharedPreferences values
         ageRangeSlider.setValues((float) minAge, (float) maxAge);
         tvAgeRange.setText(minAge + " - " + maxAge);
         Log.d(TAG, "Loaded Age Range: " + minAge + " - " + maxAge);
@@ -63,7 +70,7 @@ public class FilterFragment extends Fragment {
         } else if ("FEMALE".equals(gender)) {
             rgGender.check(R.id.rbFemale);
         } else {
-            rgGender.clearCheck();
+            rgGender.check(R.id.rbAll);
         }
         Log.d(TAG, "Loaded Gender: " + gender);
 
@@ -71,7 +78,7 @@ public class FilterFragment extends Fragment {
         tvDistanceValue.setText(Math.round(maxDistance) + " km");
         Log.d(TAG, "Loaded Distance: " + maxDistance + " km");
 
-        // Xử lý sự kiện thay đổi RangeSlider
+        // Handle RangeSlider changes
         ageRangeSlider.addOnChangeListener((slider, value, fromUser) -> {
             List<Float> values = slider.getValues();
             int minAgeValue = Math.round(values.get(0));
@@ -80,14 +87,14 @@ public class FilterFragment extends Fragment {
             Log.d(TAG, "Age Range changed: " + minAgeValue + " - " + maxAgeValue);
         });
 
-        // Xử lý sự kiện thay đổi Slider khoảng cách
+        // Handle Distance Slider changes
         distanceSlider.addOnChangeListener((slider, value, fromUser) -> {
             int distance = Math.round(value);
             tvDistanceValue.setText(distance + " km");
             Log.d(TAG, "Distance changed: " + distance + " km");
         });
 
-        // Xử lý nút Áp dụng
+        // Handle Apply button
         btnApplyFilter.setOnClickListener(v -> {
             List<Float> ageValues = ageRangeSlider.getValues();
             int minAgeValue = Math.round(ageValues.get(0));
@@ -99,11 +106,13 @@ public class FilterFragment extends Fragment {
                 genderValue = "MALE";
             } else if (selectedId == R.id.rbFemale) {
                 genderValue = "FEMALE";
+            } else if (selectedId == R.id.rbAll) {
+                genderValue = null; // All
             }
 
             float maxDistanceValue = distanceSlider.getValue();
 
-            // Lưu vào SharedPreferences
+            // Save to SharedPreferences
             SharedPreferences.Editor editor = filterPrefs.edit();
             editor.putInt("minAge", minAgeValue);
             editor.putInt("maxAge", maxAgeValue);
@@ -112,10 +121,10 @@ public class FilterFragment extends Fragment {
             editor.apply();
 
             Log.d(TAG, "Filter applied - MinAge: " + minAgeValue + ", MaxAge: " + maxAgeValue + ", Gender: " + genderValue + ", MaxDistance: " + maxDistanceValue + " km");
-            Toast.makeText(getContext(), "Đã lưu bộ lọc!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Đã lưu bộ lọc!", Toast.LENGTH_SHORT).show();
 
-            // Quay lại và làm mới ProfileFragment
-            requireActivity().onBackPressed();
+            // Return to previous screen
+            finish();
         });
     }
 }

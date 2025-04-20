@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="4dp">
 
     <!-- Tin nhắn của bản thân -->
     <LinearLayout
@@ -12,18 +14,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="end"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:layout_marginVertical="4dp">
 
-        <TextView
-            android:id="@+id/tvMessageSelf"
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:background="@drawable/self_message_background"
-            android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:maxWidth="280dp" />
+            app:cardElevation="2dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#2196F3">
+
+            <TextView
+                android:id="@+id/tvMessageSelf"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:maxWidth="320dp"
+                android:text="Xin chào!" />
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tvTimeSelf"
@@ -32,7 +45,8 @@
             android:layout_gravity="end"
             android:textSize="12sp"
             android:textColor="#757575"
-            android:paddingTop="4dp" />
+            android:paddingTop="4dp"
+            android:text="12:34" />
     </LinearLayout>
 
     <!-- Tin nhắn của người khác -->
@@ -42,18 +56,29 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="start"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:layout_marginVertical="4dp">
 
-        <TextView
-            android:id="@+id/tvMessageOther"
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
-            android:background="@drawable/other_message_background"
-            android:padding="12dp"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:maxWidth="280dp" />
+            app:cardElevation="2dp"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#E0E0E0">
+
+            <TextView
+                android:id="@+id/tvMessageOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif"
+                android:maxWidth="320dp"
+                android:text="Chào bạn!" />
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tvTimeOther"
@@ -62,6 +87,7 @@
             android:layout_gravity="start"
             android:textSize="12sp"
             android:textColor="#757575"
-            android:paddingTop="4dp" />
+            android:paddingTop="4dp"
+            android:text="12:35" />
     </LinearLayout>
 </LinearLayout>
