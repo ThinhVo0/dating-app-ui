@@ -29,15 +29,14 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,6 +59,9 @@ public class ChatDetailActivity extends AppCompatActivity {
     private WebSocketStompClient stompClient;
     private StompSession stompSession;
     private ExecutorService executorService;
+    private ScheduledExecutorService reconnectExecutor;
+    private boolean isConnecting = false;
+    private static final int RECONNECT_DELAY_SECONDS = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_detail);
 
         executorService = Executors.newSingleThreadExecutor();
+        reconnectExecutor = Executors.newScheduledThreadPool(1);
 
         // Lấy dữ liệu từ Intent
         Intent intent = getIntent();
@@ -146,25 +149,44 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void setupWebSocket(String authToken) {
-        List<Transport> transports = new ArrayList<>();
-        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        SockJsClient sockJsClient = new SockJsClient(transports);
-        stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        String wsUrl = "http://10.0.2.2:8080/ws"; // SockJS URL
+        String wsUrl = getString(R.string.websocket_url);
+        Log.d(TAG, "Connecting to WebSocket URL: " + wsUrl);
+
+        if (wsUrl == null || wsUrl.isEmpty()) {
+            Log.e(TAG, "WebSocket URL is null or empty");
+            Toast.makeText(this, "URL WebSocket không được cấu hình", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        connectWebSocket(authToken, wsUrl);
+    }
+
+    private void connectWebSocket(String authToken, String wsUrl) {
+        if (isConnecting || (stompSession != null && stompSession.isConnected())) {
+            return;
+        }
+        isConnecting = true;
 
         executorService.execute(() -> {
             try {
                 StompHeaders connectHeaders = new StompHeaders();
-                connectHeaders.add("Authorization", "Bearer " + authToken);
+                // Tạm thời bỏ Authorization để kiểm tra
+                // connectHeaders.add("Authorization", "Bearer " + authToken);
+                Log.d(TAG, "Connecting with headers: " + connectHeaders);
 
                 StompSession session = stompClient.connect(wsUrl, new StompSessionHandlerAdapter() {
                     @Override
                     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                        Log.i(TAG, "Connected to WebSocket");
+                        Log.i(TAG, "Connected to WebSocket with headers: " + connectedHeaders);
                         stompSession = session;
-                        session.subscribe("/user/queue/messages", new StompFrameHandler() {
+                        isConnecting = false;
+
+                        String subscriptionTopic = "/topic/messages";
+                        Log.d(TAG, "Subscribing to topic: " + subscriptionTopic);
+                        session.subscribe(subscriptionTopic, new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
                                 return MessageDTO.class;
@@ -172,17 +194,31 @@ public class ChatDetailActivity extends AppCompatActivity {
 
                             @Override
                             public void handleFrame(StompHeaders headers, Object payload) {
-                                MessageDTO message = (MessageDTO) payload;
-                                Log.i(TAG, "Received message: " + message.toString());
-                                if (!messageList.stream().anyMatch(m -> m.getId() != null && m.getId().equals(message.getId()))) {
-                                    runOnUiThread(() -> {
-                                        messageList.add(message);
-                                        messageAdapter.notifyItemInserted(messageList.size() - 1);
-                                        rvMessages.scrollToPosition(messageList.size() - 1);
-                                        Log.i(TAG, "Updated UI with message: " + message.getContent());
-                                    });
-                                } else {
-                                    Log.i(TAG, "Message already exists: " + message.getId());
+                                Log.i(TAG, "Received headers: " + headers);
+                                Log.i(TAG, "Raw payload: " + (payload != null ? payload.toString() : "null"));
+                                try {
+                                    if (payload instanceof MessageDTO) {
+                                        MessageDTO message = (MessageDTO) payload;
+                                        Log.i(TAG, "Received message: id=" + message.getId() +
+                                                ", content=" + message.getContent());
+
+                                        // Lọc tin nhắn cho cuộc trò chuyện hiện tại
+                                        if (isMessageForCurrentConversation(message)) {
+                                            if (!isMessageDuplicate(message)) {
+                                                runOnUiThread(() -> {
+                                                    messageList.add(message);
+                                                    messageAdapter.notifyItemInserted(messageList.size() - 1);
+                                                    rvMessages.scrollToPosition(messageList.size() - 1);
+                                                });
+                                            } else {
+                                                Log.i(TAG, "Duplicate message ignored: " + message.getContent());
+                                            }
+                                        }
+                                    } else {
+                                        Log.e(TAG, "Invalid payload type: " + (payload != null ? payload.getClass().getName() : "null"));
+                                    }
+                                } catch (Exception e) {
+                                    Log.e(TAG, "Error processing message: " + e.getMessage(), e);
                                 }
                             }
                         });
@@ -190,7 +226,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
                     @Override
                     public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
-                        Log.e(TAG, "WebSocket error: " + exception.getMessage(), exception);
+                        Log.e(TAG, "STOMP exception: " + exception.getMessage(), exception);
                     }
 
                     @Override
@@ -198,13 +234,41 @@ public class ChatDetailActivity extends AppCompatActivity {
                         Log.e(TAG, "Transport error: " + exception.getMessage(), exception);
                     }
                 }, connectHeaders).get();
+
             } catch (Exception e) {
                 Log.e(TAG, "Failed to connect WebSocket: " + e.getMessage(), e);
                 runOnUiThread(() ->
                         Toast.makeText(ChatDetailActivity.this, "Không thể kết nối WebSocket: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                 );
+                scheduleReconnect(authToken, wsUrl);
+            } finally {
+                isConnecting = false;
             }
         });
+    }
+
+    private boolean isMessageForCurrentConversation(MessageDTO message) {
+        return (message.getSenderId().equals(currentUserId) && message.getReceiverId().equals(targetUserId)) ||
+                (message.getSenderId().equals(targetUserId) && message.getReceiverId().equals(currentUserId));
+    }
+
+    private void scheduleReconnect(String authToken, String wsUrl) {
+        if (!isConnecting) {
+            Log.i(TAG, "Scheduling WebSocket reconnect in " + RECONNECT_DELAY_SECONDS + " seconds");
+            reconnectExecutor.schedule(() -> connectWebSocket(authToken, wsUrl), RECONNECT_DELAY_SECONDS, TimeUnit.SECONDS);
+        }
+    }
+
+    private boolean isMessageDuplicate(MessageDTO message) {
+        if (message.getId() != null) {
+            return messageList.stream().anyMatch(m -> m.getId() != null && m.getId().equals(message.getId()));
+        }
+        return messageList.stream().anyMatch(m ->
+                m.getContent() != null &&
+                        m.getContent().equals(message.getContent()) &&
+                        m.getSenderId() != null &&
+                        m.getSenderId().equals(message.getSenderId())
+        );
     }
 
     private void loadInitialMessages(String authToken) {
@@ -242,12 +306,8 @@ public class ChatDetailActivity extends AppCompatActivity {
             messageDTO.setSenderId(currentUserId);
             messageDTO.setReceiverId(targetUserId);
             messageDTO.setContent(messageText);
-            messageDTO.setSendTime(new java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+            messageDTO.setSendTime(new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new java.util.Date()));
 
-            // Thêm tin nhắn vào danh sách ngay lập tức
-            messageList.add(messageDTO);
-            messageAdapter.notifyItemInserted(messageList.size() - 1);
-            rvMessages.scrollToPosition(messageList.size() - 1);
             etMessageInput.setText("");
 
             executorService.execute(() -> {
@@ -257,12 +317,12 @@ public class ChatDetailActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to send message: " + e.getMessage(), e);
                     runOnUiThread(() ->
-                            Toast.makeText(ChatDetailActivity.this, "Lỗi gửi tin nhắn", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(ChatDetailActivity.this, "Lỗi gửi tin nhắn: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                     );
                 }
             });
         } else {
-            Toast.makeText(this, "Không thể gửi tin nhắn", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Không thể gửi tin nhắn. Kiểm tra kết nối hoặc nội dung.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -274,6 +334,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdown();
+        }
+        if (reconnectExecutor != null && !reconnectExecutor.isShutdown()) {
+            reconnectExecutor.shutdown();
         }
     }
 }
