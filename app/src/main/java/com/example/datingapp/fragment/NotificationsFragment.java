@@ -26,9 +26,6 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.web.socket.sockjs.client.SockJsClient;
-import org.springframework.web.socket.sockjs.client.Transport;
-import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -36,6 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,6 +50,9 @@ public class NotificationsFragment extends Fragment {
     private WebSocketStompClient stompClient;
     private StompSession stompSession;
     private ExecutorService executorService;
+    private ScheduledExecutorService reconnectExecutor;
+    private boolean isConnecting = false;
+    private static final int RECONNECT_DELAY_SECONDS = 5;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class NotificationsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         executorService = Executors.newSingleThreadExecutor();
+        reconnectExecutor = Executors.newScheduledThreadPool(1);
 
         SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
         currentUserId = prefs.getString("userId", null);
@@ -110,25 +113,43 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void setupWebSocket(String authToken) {
-        List<Transport> transports = new ArrayList<>();
-        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        SockJsClient sockJsClient = new SockJsClient(transports);
-        stompClient = new WebSocketStompClient(sockJsClient);
+        stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        String wsUrl = "http://192.168.1.100:8080/ws"; // Thay bằng IP máy bạn
+        String wsUrl = getString(R.string.websocket_url); // Ví dụ: ws://10.0.2.2:8080/ws
+        Log.d(TAG, "Connecting to WebSocket URL: " + wsUrl);
+
+        if (wsUrl == null || wsUrl.isEmpty()) {
+            Log.e(TAG, "WebSocket URL is null or empty");
+            Toast.makeText(requireContext(), "URL WebSocket không được cấu hình", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        connectWebSocket(authToken, wsUrl);
+    }
+
+    private void connectWebSocket(String authToken, String wsUrl) {
+        if (isConnecting || (stompSession != null && stompSession.isConnected())) {
+            return;
+        }
+        isConnecting = true;
 
         executorService.execute(() -> {
             try {
                 StompHeaders connectHeaders = new StompHeaders();
-                connectHeaders.add("Authorization", "Bearer " + authToken);
+                // Tạm thời bỏ Authorization vì /ws/** đã permitAll
+                // connectHeaders.add("Authorization", "Bearer " + authToken);
 
                 StompSession session = stompClient.connect(wsUrl, new StompSessionHandlerAdapter() {
                     @Override
                     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
                         Log.i(TAG, "Connected to WebSocket with session ID: " + session.getSessionId());
                         stompSession = session;
-                        session.subscribe("/user/queue/notifications", new StompFrameHandler() {
+                        isConnecting = false;
+
+                        String subscriptionTopic = "/topic/notifications";
+                        Log.d(TAG, "Subscribing to topic: " + subscriptionTopic);
+                        session.subscribe(subscriptionTopic, new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
                                 return Notification.class;
@@ -136,14 +157,23 @@ public class NotificationsFragment extends Fragment {
 
                             @Override
                             public void handleFrame(StompHeaders headers, Object payload) {
-                                Notification notification = (Notification) payload;
-                                Log.i(TAG, "Received realtime notification: " + notification.getContent());
-                                requireActivity().runOnUiThread(() -> {
-                                    notificationList.add(0, notification); // Thêm vào đầu danh sách
-                                    notificationAdapter.notifyItemInserted(0);
-                                    rvNotifications.scrollToPosition(0);
-                                    Log.i(TAG, "Updated UI with notification: " + notification.getContent());
-                                });
+                                if (payload instanceof Notification) {
+                                    Notification notification = (Notification) payload;
+                                    Log.i(TAG, "Received notification: " + notification.getContent());
+
+                                    // Lọc thông báo cho user hiện tại
+                                    if (notification.getUserId() != null &&
+                                            notification.getUserId().equals(currentUserId)) {
+                                        requireActivity().runOnUiThread(() -> {
+                                            notificationList.add(0, notification);
+                                            notificationAdapter.notifyItemInserted(0);
+                                            rvNotifications.scrollToPosition(0);
+                                            Log.i(TAG, "Updated UI with notification: " + notification.getContent());
+                                        });
+                                    }
+                                } else {
+                                    Log.e(TAG, "Invalid payload type: " + (payload != null ? payload.getClass().getName() : "null"));
+                                }
                             }
                         });
                     }
@@ -156,15 +186,27 @@ public class NotificationsFragment extends Fragment {
                     @Override
                     public void handleTransportError(StompSession session, Throwable exception) {
                         Log.e(TAG, "Transport error: " + exception.getMessage(), exception);
+                        scheduleReconnect(authToken, wsUrl);
                     }
                 }, connectHeaders).get();
+
             } catch (Exception e) {
                 Log.e(TAG, "Failed to connect WebSocket: " + e.getMessage(), e);
                 requireActivity().runOnUiThread(() ->
                         Toast.makeText(requireContext(), "Không thể kết nối WebSocket: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                 );
+                scheduleReconnect(authToken, wsUrl);
+            } finally {
+                isConnecting = false;
             }
         });
+    }
+
+    private void scheduleReconnect(String authToken, String wsUrl) {
+        if (!isConnecting) {
+            Log.i(TAG, "Scheduling WebSocket reconnect in " + RECONNECT_DELAY_SECONDS + " seconds");
+            reconnectExecutor.schedule(() -> connectWebSocket(authToken, wsUrl), RECONNECT_DELAY_SECONDS, TimeUnit.SECONDS);
+        }
     }
 
     @Override
@@ -175,6 +217,9 @@ public class NotificationsFragment extends Fragment {
         }
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdown();
+        }
+        if (reconnectExecutor != null && !reconnectExecutor.isShutdown()) {
+            reconnectExecutor.shutdown();
         }
     }
 }
