@@ -7,29 +7,24 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 import com.example.datingapp.activity.ChatDetailActivity;
+import com.example.datingapp.adapter.ChatAdapter;
+import com.example.datingapp.adapter.ConversationAdapter;
 import com.example.datingapp.dto.ConversationSummaryDTO;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.UserInfoResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -58,7 +53,7 @@ public class ChatFragment extends Fragment {
         LinearLayoutManager chatLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         rvChatList.setLayoutManager(chatLayoutManager);
         matchedUsers = new ArrayList<>();
-        chatAdapter = new ChatAdapter(matchedUsers);
+        chatAdapter = new ChatAdapter(matchedUsers, this::openChatDetailActivity);
         rvChatList.setAdapter(chatAdapter);
 
         // Initialize vertical RecyclerView for conversation summaries
@@ -66,7 +61,7 @@ public class ChatFragment extends Fragment {
         LinearLayoutManager conversationLayoutManager = new LinearLayoutManager(requireContext());
         rvConversationList.setLayoutManager(conversationLayoutManager);
         conversationSummaries = new ArrayList<>();
-        conversationAdapter = new ConversationAdapter(conversationSummaries);
+        conversationAdapter = new ConversationAdapter(conversationSummaries, this::openChatDetailActivity);
         rvConversationList.setAdapter(conversationAdapter);
 
         // Load initial data
@@ -161,128 +156,5 @@ public class ChatFragment extends Fragment {
         intent.putExtra("userId", userId);
         intent.putExtra("userAvatar", userAvatar);
         startActivity(intent);
-    }
-
-    // Adapter for horizontal matched users (using item_chat_icon.xml)
-    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
-        private List<UserInfoResponse> users;
-
-        ChatAdapter(List<UserInfoResponse> users) {
-            this.users = users;
-        }
-
-        @Override
-        public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat_icon, parent, false);
-            return new ChatViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ChatViewHolder holder, int position) {
-            UserInfoResponse user = users.get(position);
-            String fullName = user.getFirstName() + " " + user.getLastName();
-
-            Glide.with(requireContext())
-                    .load(user.getPic1() != null && !user.getPic1().isEmpty() ? user.getPic1() : "https://via.placeholder.com/150")
-                    .circleCrop()
-                    .into(holder.ivUserAvatar);
-        }
-
-        @Override
-        public int getItemCount() {
-            return users.size();
-        }
-
-        class ChatViewHolder extends RecyclerView.ViewHolder {
-            ImageView ivUserAvatar;
-
-            ChatViewHolder(View itemView) {
-                super(itemView);
-                ivUserAvatar = itemView.findViewById(R.id.ivUserAvatar);
-
-                itemView.setOnClickListener(v -> {
-                    UserInfoResponse user = users.get(getAdapterPosition());
-                    String fullName = user.getFirstName() + " " + user.getLastName();
-                    String userId = user.getUserId();
-                    String userAvatar = user.getPic1();
-                    openChatDetailActivity(fullName, userId, userAvatar);
-                });
-            }
-        }
-    }
-
-    // Adapter for vertical conversation summaries (using item_chat.xml)
-    private class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder> {
-        private List<ConversationSummaryDTO> summaries;
-
-        ConversationAdapter(List<ConversationSummaryDTO> summaries) {
-            this.summaries = summaries;
-        }
-
-        @Override
-        public ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chat, parent, false);
-            return new ConversationViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(ConversationViewHolder holder, int position) {
-            ConversationSummaryDTO summary = summaries.get(position);
-
-            // Load avatar
-            Glide.with(requireContext())
-                    .load(summary.getProfilePicture() != null && !summary.getProfilePicture().isEmpty()
-                            ? summary.getProfilePicture()
-                            : "https://via.placeholder.com/150")
-                    .circleCrop()
-                    .into(holder.ivUserAvatar);
-
-            // Set name and latest message
-            holder.tvUserName.setText(summary.getName());
-            holder.tvLastMessage.setText(summary.getLatestMessage());
-
-            // Format and set message time
-            try {
-                SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
-                Date date = isoFormat.parse(summary.getLatestMessageTime());
-                SimpleDateFormat displayFormat = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-                holder.tvMessageTime.setText(displayFormat.format(date));
-            } catch (ParseException e) {
-                holder.tvMessageTime.setText(summary.getLatestMessageTime());
-                Log.e(TAG, "Date parsing error: " + e.getMessage());
-            }
-
-            // Set unread count
-            if (summary.getUnreadCount() > 0) {
-                holder.tvUnreadCount.setText(String.valueOf(summary.getUnreadCount()));
-                holder.tvUnreadCount.setVisibility(View.VISIBLE);
-            } else {
-                holder.tvUnreadCount.setVisibility(View.GONE);
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return summaries.size();
-        }
-
-        class ConversationViewHolder extends RecyclerView.ViewHolder {
-            ImageView ivUserAvatar;
-            TextView tvUserName, tvLastMessage, tvMessageTime, tvUnreadCount;
-
-            ConversationViewHolder(View itemView) {
-                super(itemView);
-                ivUserAvatar = itemView.findViewById(R.id.ivUserAvatar);
-                tvUserName = itemView.findViewById(R.id.tvUserName);
-                tvLastMessage = itemView.findViewById(R.id.tvLastMessage);
-                tvMessageTime = itemView.findViewById(R.id.tvMessageTime);
-                tvUnreadCount = itemView.findViewById(R.id.tvUnreadCount);
-
-                itemView.setOnClickListener(v -> {
-                    ConversationSummaryDTO summary = summaries.get(getAdapterPosition());
-                    openChatDetailActivity(summary.getName(), summary.getUserId(), summary.getProfilePicture());
-                });
-            }
-        }
     }
 }
