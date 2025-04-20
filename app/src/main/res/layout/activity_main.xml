@@ -26,6 +26,7 @@
             android:layout_marginStart="8dp"
             android:contentDescription="Logo Ứng Dụng"
             android:src="@drawable/thunder"
+            app:tint="@color/thunder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

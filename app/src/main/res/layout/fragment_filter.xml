@@ -53,10 +53,10 @@
                 app:haloRadius="20dp"
                 app:thumbRadius="10dp"
                 app:tickVisible="false"
-                app:trackColorActive="#00BCD4"
+                app:trackColorActive="@color/thunder"
                 app:trackColorInactive="#E0E0E0"
                 app:trackHeight="8dp"
-                app:thumbColor="#00BCD4"
+                app:thumbColor="@color/thunder"
                 app:thumbElevation="2dp" />
             <TextView
                 android:id="@+id/tvAgeRange"
@@ -106,11 +106,11 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvDistanceLabel"
-                app:thumbColor="#00BCD4"
+                app:thumbColor="@color/thunder"
                 app:thumbElevation="2dp"
                 app:thumbRadius="20dp"
                 app:tickVisible="false"
-                app:trackColorActive="#00BCD4"
+                app:trackColorActive="@color/thunder"
                 app:trackColorInactive="#E0E0E0"
                 app:trackHeight="8dp" />
 
@@ -165,7 +165,7 @@
                     android:text="Nam"
                     android:textColor="#212121"
                     android:textSize="16sp"
-                    app:buttonTint="#00BCD4" />
+                    app:buttonTint="@color/thunder" />
 
                 <RadioButton
                     android:id="@+id/rbFemale"
@@ -175,7 +175,7 @@
                     android:text="Nữ"
                     android:textColor="#212121"
                     android:textSize="16sp"
-                    app:buttonTint="#00BCD4" />
+                    app:buttonTint="@color/thunder" />
 
                 <RadioButton
                     android:id="@+id/rbAll"
@@ -186,7 +186,7 @@
                     android:text="Tất cả"
                     android:textColor="#212121"
                     android:textSize="16sp"
-                    app:buttonTint="#00BCD4" />
+                    app:buttonTint="@color/thunder" />
             </RadioGroup>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -197,7 +197,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#00BCD4"
+            android:backgroundTint="@color/thunder"
             android:padding="12dp"
             android:text="Áp dụng"
             android:textAllCaps="false"

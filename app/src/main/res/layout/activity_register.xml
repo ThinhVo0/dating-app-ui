@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00BCD4">
+    android:background="@color/thunder">
 
     <!-- Background Image -->
     <ImageView
@@ -40,6 +40,7 @@
 
             <!-- Logo -->
             <ImageView
+                app:tint="@color/thunder"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_gravity="center"
@@ -96,7 +97,7 @@
                 android:id="@+id/signupButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:backgroundTint="#00BCD4"
+                android:backgroundTint="@color/thunder"
                 android:text="Đăng ký"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
@@ -108,7 +109,7 @@
                 android:id="@+id/verifyOtpButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:backgroundTint="#00BCD4"
+                android:backgroundTint="@color/thunder"
                 android:text="Xác nhận OTP"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
@@ -122,7 +123,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Đã có tài khoản? Đăng nhập"
-                android:textColor="#00BCD4"
+                android:textColor="@color/thunder"
                 android:textSize="16sp"
                 android:padding="8dp"
                 android:layout_gravity="center" />

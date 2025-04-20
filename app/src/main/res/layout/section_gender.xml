@@ -46,7 +46,7 @@
             android:layout_weight="1"
             android:text="Nam"
             android:textColor="#212121"
-            android:buttonTint="#00BCD4" />
+            android:buttonTint="@color/thunder" />
 
         <RadioButton
             android:id="@+id/rbFemale"
@@ -55,7 +55,7 @@
             android:layout_weight="1"
             android:text="Nữ"
             android:textColor="#212121"
-            android:buttonTint="#00BCD4" />
+            android:buttonTint="@color/thunder" />
 
         <RadioButton
             android:id="@+id/rbOther"
@@ -64,6 +64,6 @@
             android:layout_weight="1"
             android:text="Khác"
             android:textColor="#212121"
-            android:buttonTint="#00BCD4" />
+            android:buttonTint="@color/thunder" />
     </RadioGroup>
 </LinearLayout>

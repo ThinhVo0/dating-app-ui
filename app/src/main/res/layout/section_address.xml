@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:text="Cập nhật"
         android:textColor="#FFFFFF"
-        android:backgroundTint="#00BCD4"
+        android:backgroundTint="@color/thunder"
         android:textAllCaps="false"
         android:padding="12dp"
         app:cornerRadius="8dp" />
