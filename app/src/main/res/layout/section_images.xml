@@ -21,11 +21,12 @@
             android:src="@drawable/ic_image" />
 
         <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/tvImagesLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ảnh"
-            android:textSize="18sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#212121"
             android:layout_marginStart="8dp" />
@@ -61,10 +62,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -93,10 +94,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -125,10 +126,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -157,10 +158,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -189,10 +190,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -221,10 +222,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"
@@ -252,7 +253,7 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
                 android:scaleType="centerInside"
@@ -284,7 +285,7 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
 
@@ -316,10 +317,10 @@
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_iconplus"
+                android:src="@drawable/ic_edit_pencil"
                 android:background="@drawable/gradient_circle_button"
                 android:layout_gravity="bottom|end"
-                
+
                 android:scaleType="centerInside"
                 android:padding="6dp"
                 app:tint="#FFFFFF"

@@ -20,31 +20,47 @@
             android:id="@+id/ivProvinceIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/baseline_add_location_24"
+            android:src="@drawable/ic_location"
               />
 
         <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/tvProvinceLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tỉnh/Thành phố"
-            android:textSize="18sp"
+            android:text="Địa chỉ"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#212121"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 
-    <!-- Spinner Tỉnh/Thành phố -->
-    <Spinner
-        android:id="@+id/spinnerProvince"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@drawable/modern_spinner_background"
-        android:padding="8dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="wrap_content"
+        android:hint="Tỉnh/Thành phố"
+        app:hintTextColor="#757575"
+        app:boxStrokeColor="@color/thunder"
+        app:boxBackgroundMode="outline"
+        app:boxBackgroundColor="#FFFFFF"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:fontFamily="@font/gothamrnd_medium"
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:inputType="textPersonName"
+            android:textColor="#212121"
+            android:padding="16dp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Nút Cập Nhật -->
     <com.google.android.material.button.MaterialButton
+        android:fontFamily="@font/gothamrnd_medium"
         android:id="@+id/btnUpdateAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

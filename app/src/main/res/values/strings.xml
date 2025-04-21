@@ -6,6 +6,6 @@
     <string name="chat">Chat</string>
     <string name="profile">Profile</string>
     <string name="notifications">Notifications</string>
-    <string name="websocket_url">ws://10.0.2.2:8080/ws</string>
+    <string name="websocket_url">ws://192.168.100.84:8080/ws</string>
     <string name="settings">Settings</string>
 </resources>

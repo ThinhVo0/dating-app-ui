@@ -45,6 +45,7 @@
 
                 <!-- Tiêu đề -->
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cập nhật hồ sơ"

@@ -6,7 +6,25 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
-
+    <!-- Header: Tỉnh/Thành phố -->
+    <LinearLayout
+        android:id="@+id/province_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
+            android:id="@+id/tvProvinceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phong cách sống"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
     <!-- Zodiac Sign -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,6 +34,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivZodiacIcon"
             android:layout_width="30dp"
@@ -23,6 +42,7 @@
             android:src="@drawable/ic_zodiacsign" />
 
         <Spinner
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/spZodiac"
             android:layout_width="0dp"
             android:layout_height="56dp"
@@ -41,6 +61,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivPersonalityIcon"
             android:layout_width="30dp"
@@ -48,7 +69,7 @@
             android:src="@drawable/ic_mind" />
 
         <Spinner
-            android:id="@+id/spPersonality"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spPersonality"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -66,6 +87,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivCommunicationIcon"
             android:layout_width="30dp"
@@ -73,7 +95,7 @@
             android:src="@drawable/ic_comunicate" />
 
         <Spinner
-            android:id="@+id/spCommunication"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spCommunication"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -91,6 +113,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivLoveLanguageIcon"
             android:layout_width="30dp"
@@ -98,7 +121,7 @@
             android:src="@drawable/ic_romance" />
 
         <Spinner
-            android:id="@+id/spLoveLanguage"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spLoveLanguage"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -116,6 +139,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivPetPreferenceIcon"
             android:layout_width="30dp"
@@ -123,7 +147,7 @@
             android:src="@drawable/ic_pet" />
 
         <Spinner
-            android:id="@+id/spPetPreference"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spPetPreference"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -141,6 +165,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivDrinkingIcon"
             android:layout_width="30dp"
@@ -148,7 +173,7 @@
             android:src="@drawable/ic_drink" />
 
         <Spinner
-            android:id="@+id/spDrinking"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spDrinking"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -166,6 +191,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            app:tint="@color/thunder"
 
             android:id="@+id/ivSmokingIcon"
             android:layout_width="30dp"
@@ -173,7 +199,7 @@
             android:src="@drawable/ic_smoking" />
 
         <Spinner
-            android:id="@+id/spSmoking"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spSmoking"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -191,14 +217,14 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
-
+            app:tint="@color/thunder"
             android:id="@+id/ivSleepingIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_sleep" />
 
         <Spinner
-            android:id="@+id/spSleeping"
+            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spSleeping"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"

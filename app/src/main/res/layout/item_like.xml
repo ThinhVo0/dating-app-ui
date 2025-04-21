@@ -20,6 +20,7 @@
         android:scaleType="centerCrop" />
 
         <TextView
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/textAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

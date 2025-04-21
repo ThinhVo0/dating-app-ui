@@ -14,18 +14,19 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
-             
+
             android:id="@+id/ivGenderIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_gender" />
 
         <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/tvGenderLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Giới tính"
-            android:textSize="18sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#212121"
             android:layout_marginStart="8dp" />
@@ -37,33 +38,46 @@
         android:layout_height="56dp"
         android:orientation="horizontal"
         android:background="@drawable/rounded_input"
-        android:padding="8dp">
+        android:padding="4dp"
+        android:gravity="center_vertical">
 
         <RadioButton
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/rbMale"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="Nam"
-            android:textColor="#212121"
-            android:buttonTint="@color/thunder" />
+            android:textColor="@color/black"
+            android:background="@drawable/selector_gender_button"
+            android:button="@null"
+            android:textStyle="bold" />
 
         <RadioButton
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/rbFemale"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="Nữ"
-            android:textColor="#212121"
-            android:buttonTint="@color/thunder" />
+            android:textColor="@color/black"
+            android:background="@drawable/selector_gender_button"
+            android:button="@null"
+            android:textStyle="bold" />
 
         <RadioButton
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/rbOther"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:gravity="center"
             android:text="Khác"
-            android:textColor="#212121"
-            android:buttonTint="@color/thunder" />
+            android:textColor="@color/black"
+            android:background="@drawable/selector_gender_button"
+            android:button="@null"
+            android:textStyle="bold" />
     </RadioGroup>
 </LinearLayout>

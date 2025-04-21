@@ -7,6 +7,31 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:id="@+id/ivHobbiesIcon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_manage_account"
+            />
+
+        <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
+            android:id="@+id/tvHobbiesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thông tin cá nhân"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#212121"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
     <!-- First Name -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -25,6 +50,7 @@
             android:id="@+id/etFirstName"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:fontFamily="@font/gothamrnd_medium"
             android:inputType="textPersonName"
             android:textColor="#212121"
             android:padding="16dp" />
@@ -37,6 +63,7 @@
         android:hint="Họ"
         app:hintTextColor="#757575"
         app:boxStrokeColor="@color/thunder"
+
         app:boxBackgroundMode="outline"
         app:boxBackgroundColor="#FFFFFF"
         app:boxCornerRadiusTopStart="8dp"
@@ -47,6 +74,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etLastName"
             android:layout_width="match_parent"
+            android:fontFamily="@font/gothamrnd_medium"
             android:layout_height="56dp"
             android:inputType="textPersonName"
             android:textColor="#212121"
@@ -72,6 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:inputType="number"
+            android:fontFamily="@font/gothamrnd_medium"
             android:textColor="#212121"
             android:padding="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -95,6 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:inputType="number"
+            android:fontFamily="@font/gothamrnd_medium"
             android:textColor="#212121"
             android:padding="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -103,6 +133,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:hint="Tiểu sử"
         app:hintTextColor="#757575"
         app:boxStrokeColor="@color/thunder"
@@ -114,6 +145,7 @@
         app:boxCornerRadiusBottomEnd="8dp"
         android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
+            android:fontFamily="@font/gothamrnd_medium"
             android:id="@+id/etBio"
             android:layout_width="match_parent"
             android:layout_height="56dp"

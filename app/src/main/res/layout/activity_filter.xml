@@ -52,6 +52,7 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -89,7 +90,7 @@
                     android:text="Độ tuổi"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/gothamrnd_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -115,6 +116,7 @@
                     app:thumbElevation="2dp" />
                 <TextView
                     android:id="@+id/tvAgeRange"
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -142,7 +144,7 @@
                     android:text="Khoảng cách tối đa (km)"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/gothamrnd_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -168,6 +170,7 @@
                     app:trackHeight="8dp" />
 
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:id="@+id/tvDistanceValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -197,49 +200,57 @@
                     android:text="Giới tính"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/gothamrnd_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <RadioGroup
                     android:id="@+id/rgGender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/rounded_input"
+                    android:padding="4dp"
+                    android:gravity="center_vertical"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvGenderLabel">
 
                     <RadioButton
                         android:id="@+id/rbMale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:text="Nam"
-                        android:textColor="#212121"
-                        android:textSize="16sp"
-                        app:buttonTint="@color/thunder" />
+                        android:textColor="@color/black"
+                        android:background="@drawable/selector_gender_button"
+                        android:button="@null"
+                        android:textStyle="bold" />
 
                     <RadioButton
                         android:id="@+id/rbFemale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:text="Nữ"
-                        android:textColor="#212121"
-                        android:textSize="16sp"
-                        app:buttonTint="@color/thunder" />
+                        android:textColor="@color/black"
+                        android:background="@drawable/selector_gender_button"
+                        android:button="@null"
+                        android:textStyle="bold" />
 
                     <RadioButton
                         android:id="@+id/rbAll"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:checked="true"
-                        android:text="Tất cả"
-                        android:textColor="#212121"
-                        android:textSize="16sp"
-                        app:buttonTint="@color/thunder" />
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Khác"
+                        android:textColor="@color/black"
+                        android:background="@drawable/selector_gender_button"
+                        android:button="@null"
+                        android:textStyle="bold" />
                 </RadioGroup>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -255,7 +266,7 @@
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/gothamrnd_medium"
                 app:cornerRadius="8dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

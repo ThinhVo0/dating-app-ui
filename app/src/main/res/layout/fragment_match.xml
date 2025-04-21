@@ -77,6 +77,7 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:id="@+id/tvNameAge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -86,6 +87,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:id="@+id/tvAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

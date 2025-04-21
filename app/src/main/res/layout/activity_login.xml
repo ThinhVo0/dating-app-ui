@@ -46,6 +46,7 @@
                 android:layout_marginBottom="16dp" />
 
             <EditText
+                android:fontFamily="@font/gothamrnd_medium"
                 android:id="@+id/emailInput"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -56,6 +57,7 @@
                 android:layout_marginBottom="16dp" />
 
             <EditText
+                android:fontFamily="@font/gothamrnd_medium"
                 android:id="@+id/passwordInput"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -66,6 +68,7 @@
                 android:layout_marginBottom="24dp" />
 
             <Button
+                android:fontFamily="@font/gothamrnd_medium"
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -83,6 +86,7 @@
                 android:gravity="center">
 
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:id="@+id/forgotPassword"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -91,6 +95,7 @@
                     android:padding="8dp" />
 
                 <TextView
+                    android:fontFamily="@font/gothamrnd_medium"
                     android:id="@+id/registerLink"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
