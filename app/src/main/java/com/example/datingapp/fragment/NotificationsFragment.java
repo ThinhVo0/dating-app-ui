@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.datingapp.R;
+import com.example.datingapp.activity.MainActivity;
 import com.example.datingapp.adapter.NotificationAdapter;
 import com.example.datingapp.dto.Notification;
 import com.example.datingapp.network.AuthService;
@@ -102,12 +103,43 @@ public class NotificationsFragment extends Fragment {
                     Log.e(TAG, "Failed to load notifications: " + response.code());
                     Toast.makeText(requireContext(), "Không thể tải thông báo: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
+                markNotificationsAsRead(authToken);
             }
 
             @Override
             public void onFailure(Call<List<Notification>> call, Throwable t) {
                 Log.e(TAG, "Load notifications failed: " + t.getMessage(), t);
                 Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void markNotificationsAsRead(String authToken) {
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        Call<Void> call = authService.markNotificationsAsRead("Bearer " + authToken);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.i(TAG, "All notifications marked as read");
+
+                    // Đặt lại unreadNotificationCount về 0
+                    SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt("unreadNotificationCount", 0);
+                    editor.apply();
+
+                    // Cập nhật huy hiệu trong MainActivity
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).updateNotificationBadge(0);
+                    }
+                } else {
+                    Log.e(TAG, "Failed to mark notifications as read: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e(TAG, "Error marking notifications as read: " + t.getMessage(), t);
             }
         });
     }

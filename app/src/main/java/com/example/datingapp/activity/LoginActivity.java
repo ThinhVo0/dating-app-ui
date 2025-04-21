@@ -104,6 +104,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
                     Log.d("LoginActivity", "Token hợp lệ: " + authToken);
+                    // Update location before navigating to MainActivity
+                    checkLocationPermission();
+                    // Navigate to MainActivity
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
