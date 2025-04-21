@@ -1,5 +1,6 @@
 package com.example.datingapp.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,13 +24,17 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.datingapp.R;
 import com.example.datingapp.adapter.ImageAdapter;
+import com.example.datingapp.dto.request.ReportDto;
+import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileData;
 import com.example.datingapp.model.ProfileDetailResponse;
+import com.example.datingapp.model.Report;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -487,6 +494,119 @@ public class ProfileFragment extends Fragment {
         ((TextView) view.findViewById(R.id.smoking_text)).setText(data.getSmokingHabit() != null ? data.getSmokingHabit() : "Không xác định");
         ((TextView) view.findViewById(R.id.sleep_text)).setText(data.getSleepingHabit() != null ? data.getSleepingHabit() : "Không xác định");
 
+        // Xử lý nút báo cáo
+        Button reportButton = view.findViewById(R.id.buttonReport);
+        reportButton.setOnClickListener(v -> {
+            // Đóng bottom sheet
+            bottomSheetDialog.dismiss();
+
+            // Hiển thị dialog để nhập lý do báo cáo
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Báo cáo người dùng");
+
+            // Thêm EditText để nhập lý do
+            final EditText reasonInput = new EditText(requireContext());
+            reasonInput.setHint("Nhập lý do báo cáo");
+            reasonInput.setMinHeight((int) (48 * getResources().getDisplayMetrics().density));
+            builder.setView(reasonInput);
+
+            builder.setPositiveButton("Gửi", (dialog, which) -> {
+                String reason = reasonInput.getText().toString().trim();
+                if (reason.isEmpty()) {
+                    Toast.makeText(requireContext(), "Vui lòng nhập lý do", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Gọi API trực tiếp
+                AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+                String reportedUserId = profileIds.get(currentProfileIndex);
+                Log.d("ProfileFragment", "Auth Token: " + authToken);
+                Log.d("ProfileFragment", "Reported User ID: " + reportedUserId);
+                ReportDto reportDto = new ReportDto(reportedUserId, reason);
+                Log.d("ProfileFragment", "Sending report: " + new Gson().toJson(reportDto));
+                Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
+
+                call.enqueue(new Callback<ApiResponse<Report>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
+                        Log.d("ProfileFragment", "HTTP Status Code (sendReport): " + response.code());
+                        if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                            String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
+                            Log.d("ProfileFragment", "Report successful: " + message);
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+
+                            // Loại bỏ profile đã báo cáo khỏi danh sách
+                            String reportedProfileId = profileIds.get(currentProfileIndex);
+                            Log.d("ProfileFragment", "Removing reported profile ID: " + reportedProfileId);
+                            profileIds.remove(currentProfileIndex);
+                            profileDataMap.remove(reportedProfileId);
+
+                            // Gọi API skipProfile để đánh dấu người dùng đã bị skip
+                            Call<ProfileActionResponse> skipCall = authService.skipProfile("Bearer " + authToken, reportedProfileId);
+                            skipCall.enqueue(new Callback<ProfileActionResponse>() {
+                                @Override
+                                public void onResponse(Call<ProfileActionResponse> call, Response<ProfileActionResponse> response) {
+                                    Log.d("ProfileFragment", "HTTP Status Code (skipProfile): " + response.code());
+                                    if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                                        Log.d("ProfileFragment", "Skip successful: " + response.body().getData());
+                                    } else {
+                                        Log.e("ProfileFragment", "Failed to skip profile after report");
+                                        if (response.errorBody() != null) {
+                                            try {
+                                                Log.e("ProfileFragment", "Skip error response: " + response.errorBody().string());
+                                            } catch (Exception e) {
+                                                Log.e("ProfileFragment", "Error parsing skip errorBody: " + e.getMessage(), e);
+                                            }
+                                        }
+                                    }
+                                    // Gọi nextProfile để chuyển sang profile tiếp theo
+                                    Log.d("ProfileFragment", "Calling nextProfile to remove reported profile");
+                                    nextProfile(getView());
+                                }
+
+                                @Override
+                                public void onFailure(Call<ProfileActionResponse> call, Throwable t) {
+                                    Log.e("ProfileFragment", "Skip API call failed: " + t.getMessage(), t);
+                                    // Vẫn gọi nextProfile để đảm bảo giao diện được cập nhật
+                                    Log.d("ProfileFragment", "Calling nextProfile despite skip failure");
+                                    nextProfile(getView());
+                                }
+                            });
+                        } else {
+                            if (response.code() == 401) {
+                                Toast.makeText(requireContext(), "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+                                dialog.dismiss();
+                                return;
+                            }
+                            String errorMessage = "Gửi báo cáo thất bại";
+                            if (response.errorBody() != null) {
+                                try {
+                                    errorMessage = response.errorBody().string();
+                                    Log.e("ProfileFragment", "Error response: " + errorMessage);
+                                } catch (Exception e) {
+                                    Log.e("ProfileFragment", "Error parsing errorBody: " + e.getMessage(), e);
+                                }
+                            } else if (response.body() != null) {
+                                Log.e("ProfileFragment", "Response body: " + new Gson().toJson(response.body()));
+                                errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
+                            }
+                            Toast.makeText(requireContext(), "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
+                        Log.e("ProfileFragment", "Report API call failed: " + t.getMessage(), t);
+                        Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+            });
+
+            builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+            builder.show();
+        });
+
         bottomSheetDialog.show();
-    }
-}
+    }}

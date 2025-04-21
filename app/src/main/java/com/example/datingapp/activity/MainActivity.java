@@ -136,8 +136,7 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString("drinkingHabit", profile.getDrinkingHabit());
                     editor.putString("smokingHabit", profile.getSmokingHabit());
                     editor.putString("sleepingHabit", profile.getSleepingHabit());
-                    editor.putString("hobbies", String.join(",", profile.getHobbies()));
-                    editor.putString("pic1", profile.getPic1());
+                    editor.putString("hobbies", profile.getHobbies() != null ? String.join(",", profile.getHobbies()) : "");                    editor.putString("pic1", profile.getPic1());
                     editor.putString("pic2", profile.getPic2());
                     editor.putString("pic3", profile.getPic3());
                     editor.putString("pic4", profile.getPic4());

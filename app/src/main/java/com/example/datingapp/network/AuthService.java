@@ -10,6 +10,7 @@ import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.request.ForgotPassWordDto;
 import com.example.datingapp.dto.request.LocationUpdateDto;
 import com.example.datingapp.dto.request.LoginDto;
+import com.example.datingapp.dto.request.ReportDto;
 import com.example.datingapp.dto.request.ResetPasswordDto;
 import com.example.datingapp.dto.request.SignUpDto;
 import com.example.datingapp.dto.request.VerifySignUpDto;
@@ -20,6 +21,7 @@ import com.example.datingapp.model.ProfileActionResponse;
 import com.example.datingapp.model.ProfileDetailResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.model.ProfileUpdateDTO;
+import com.example.datingapp.model.Report;
 import com.example.datingapp.model.User;
 
 import java.util.List;
@@ -138,5 +140,11 @@ public interface AuthService {
     Call<Void> markMessagesAsRead(
             @Header("Authorization") String authToken,
             @Query("senderId") String senderId
+    );
+
+    @POST("api/reports/send")
+    Call<ApiResponse<Report>> sendReport(
+            @Header("Authorization") String authToken,
+            @Body ReportDto reportDto
     );
 }

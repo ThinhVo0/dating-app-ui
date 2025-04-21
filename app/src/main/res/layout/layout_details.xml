@@ -76,8 +76,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_account"
-                      />
+                    android:src="@drawable/ic_account" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -104,8 +103,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_gender"
-                      />
+                    android:src="@drawable/ic_gender" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -144,8 +142,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_height"
-                      />
+                    android:src="@drawable/ic_height" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -184,8 +181,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_zodiacsign"
-                      />
+                    android:src="@drawable/ic_zodiacsign" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -224,8 +220,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_mind"
-                      />
+                    android:src="@drawable/ic_mind" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -276,8 +271,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_infoplus"
-                      />
+                    android:src="@drawable/ic_infoplus" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -304,8 +298,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_comunicate"
-                      />
+                    android:src="@drawable/ic_comunicate" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -344,8 +337,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_romance"
-                      />
+                    android:src="@drawable/ic_romance" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -384,8 +376,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_pet"
-                      />
+                    android:src="@drawable/ic_pet" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -443,13 +434,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="24dp"
-            app:flexWrap="wrap"
-            app:alignItems="center"
-            app:alignContent="flex_start"
-            app:justifyContent="flex_start"
-            app:layout_constraintTop_toBottomOf="@id/hobbies_row"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+                app:flexWrap="wrap"
+                app:alignItems="center"
+                app:alignContent="flex_start"
+                app:justifyContent="flex_start"
+                app:layout_constraintTop_toBottomOf="@id/hobbies_row"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -480,8 +471,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_lifestyle"
-                      />
+                    android:src="@drawable/ic_lifestyle" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -508,8 +498,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_drink"
-                      />
+                    android:src="@drawable/ic_drink" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -548,8 +537,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_smoking"
-                      />
+                    android:src="@drawable/ic_smoking" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -588,8 +576,7 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_sleep"
-                      />
+                    android:src="@drawable/ic_sleep" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -613,6 +600,21 @@
                     android:fontFamily="@font/roboto" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Nút báo cáo -->
+        <Button
+            android:id="@+id/buttonReport"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="@android:color/holo_red_light"
+            android:text="Báo cáo người dùng"
+            android:textColor="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lifestyle_section" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
