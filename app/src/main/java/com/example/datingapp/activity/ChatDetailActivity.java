@@ -11,12 +11,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
 import com.example.datingapp.adapter.MessageAdapter;
+import com.example.datingapp.dto.ConversationSummaryDTO;
 import com.example.datingapp.dto.MessageDTO;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
@@ -134,6 +136,43 @@ public class ChatDetailActivity extends AppCompatActivity {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Messages marked as read for user: " + targetUserId);
+                    // Tải lại số tin nhắn chưa đọc từ API
+                    Call<List<ConversationSummaryDTO>> summaryCall = authService.getConversationSummaries("Bearer " + authToken);
+                    summaryCall.enqueue(new Callback<List<ConversationSummaryDTO>>() {
+                        @Override
+                        public void onResponse(Call<List<ConversationSummaryDTO>> call, Response<List<ConversationSummaryDTO>> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                int totalUnreadMessages = 0;
+                                for (ConversationSummaryDTO summary : response.body()) {
+                                    totalUnreadMessages += summary.getUnreadCount();
+                                }
+                                // Lưu số tin nhắn chưa đọc vào SharedPreferences
+                                SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putInt("unreadMessageCount", totalUnreadMessages);
+                                editor.apply();
+                                Log.i(TAG, "Updated unread message count: " + totalUnreadMessages);
+
+                                // Gửi broadcast để cập nhật badge
+                                Intent badgeIntent = new Intent("UPDATE_CHAT_BADGE");
+                                badgeIntent.putExtra("unreadMessageCount", totalUnreadMessages);
+                                LocalBroadcastManager.getInstance(ChatDetailActivity.this).sendBroadcast(badgeIntent);
+
+                                // Gửi broadcast để làm mới danh sách conversationSummaries
+                                Intent refreshIntent = new Intent("MESSAGES_READ");
+                                LocalBroadcastManager.getInstance(ChatDetailActivity.this).sendBroadcast(refreshIntent);
+                            } else {
+                                Log.e(TAG, "Failed to load conversation summaries: " + response.code());
+                                Toast.makeText(ChatDetailActivity.this, "Không thể cập nhật số tin nhắn chưa đọc", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<ConversationSummaryDTO>> call, Throwable t) {
+                            Log.e(TAG, "Failed to load conversation summaries: " + t.getMessage(), t);
+                            Toast.makeText(ChatDetailActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 } else {
                     Log.e(TAG, "Failed to mark messages as read: " + response.code());
                     Toast.makeText(ChatDetailActivity.this, "Không thể đánh dấu tin nhắn đã đọc", Toast.LENGTH_SHORT).show();

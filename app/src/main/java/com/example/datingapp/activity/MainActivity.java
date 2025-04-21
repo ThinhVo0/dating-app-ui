@@ -1,6 +1,9 @@
 package com.example.datingapp.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,8 +15,12 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.datingapp.R;
+import com.example.datingapp.dto.ConversationSummaryDTO;
+import com.example.datingapp.dto.MessageDTO;
+import com.example.datingapp.dto.Notification;
 import com.example.datingapp.dto.response.ApiResponse;
 import com.example.datingapp.dto.response.ProfileResponse;
 import com.example.datingapp.fragment.ChatFragment;
@@ -23,7 +30,6 @@ import com.example.datingapp.fragment.ProfileFragment;
 import com.example.datingapp.fragment.SettingsFragment;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
-import com.example.datingapp.dto.Notification;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -38,6 +44,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -59,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RECONNECT_DELAY_SECONDS = 5;
     private String currentUserId;
     private String authToken;
+    private BroadcastReceiver badgeUpdateReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,8 +141,57 @@ public class MainActivity extends AppCompatActivity {
         fetchUserProfile();
 
         // Cập nhật huy hiệu ban đầu
-        int unreadCount = prefs.getInt("unreadNotificationCount", 0);
-        updateNotificationBadge(unreadCount);
+        int unreadNotificationCount = prefs.getInt("unreadNotificationCount", 0);
+        updateNotificationBadge(unreadNotificationCount);
+
+        // Tải số tin nhắn chưa đọc ban đầu
+        loadInitialUnreadMessageCount(authToken);
+
+        // Đăng ký BroadcastReceiver để nhận cập nhật badge
+        badgeUpdateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if ("UPDATE_CHAT_BADGE".equals(intent.getAction())) {
+                    int unreadMessageCount = intent.getIntExtra("unreadMessageCount", 0);
+                    updateChatBadge(unreadMessageCount);
+                    Log.i(TAG, "Received badge update broadcast: " + unreadMessageCount);
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                badgeUpdateReceiver, new IntentFilter("UPDATE_CHAT_BADGE"));
+    }
+
+    private void loadInitialUnreadMessageCount(String authToken) {
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        Call<List<ConversationSummaryDTO>> call = authService.getConversationSummaries("Bearer " + authToken);
+
+        call.enqueue(new Callback<List<ConversationSummaryDTO>>() {
+            @Override
+            public void onResponse(Call<List<ConversationSummaryDTO>> call, Response<List<ConversationSummaryDTO>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int totalUnreadMessages = 0;
+                    for (ConversationSummaryDTO summary : response.body()) {
+                        totalUnreadMessages += summary.getUnreadCount();
+                    }
+                    SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt("unreadMessageCount", totalUnreadMessages);
+                    editor.apply();
+                    updateChatBadge(totalUnreadMessages);
+                    Log.i(TAG, "Initial unread message count: " + totalUnreadMessages);
+                } else {
+                    Log.e(TAG, "Failed to load conversation summaries: " + response.code());
+                    Toast.makeText(MainActivity.this, "Không thể tải số tin nhắn chưa đọc", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ConversationSummaryDTO>> call, Throwable t) {
+                Log.e(TAG, "Load conversation summaries failed: " + t.getMessage(), t);
+                Toast.makeText(MainActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupWebSocket(String authToken) {
@@ -169,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
                         stompSession = session;
                         isConnecting = false;
 
-                        String subscriptionTopic = "/topic/notifications";
-                        Log.d(TAG, "Subscribing to topic: " + subscriptionTopic);
-                        session.subscribe(subscriptionTopic, new StompFrameHandler() {
+                        String notificationTopic = "/topic/notifications";
+                        Log.d(TAG, "Subscribing to topic: " + notificationTopic);
+                        session.subscribe(notificationTopic, new StompFrameHandler() {
                             @Override
                             public Type getPayloadType(StompHeaders headers) {
                                 return Notification.class;
@@ -186,17 +243,42 @@ public class MainActivity extends AppCompatActivity {
                                     if (notification.getUserId() != null &&
                                             notification.getUserId().equals(currentUserId)) {
                                         runOnUiThread(() -> {
-                                            // Tăng số lượng thông báo chưa đọc
                                             SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
                                             int unreadCount = prefs.getInt("unreadNotificationCount", 0) + 1;
                                             SharedPreferences.Editor editor = prefs.edit();
                                             editor.putInt("unreadNotificationCount", unreadCount);
                                             editor.apply();
-
-                                            // Cập nhật huy hiệu
                                             updateNotificationBadge(unreadCount);
-
                                             Log.i(TAG, "Updated badge with unread count: " + unreadCount);
+                                        });
+                                    }
+                                } else {
+                                    Log.e(TAG, "Invalid payload type: " + (payload != null ? payload.getClass().getName() : "null"));
+                                }
+                            }
+                        });
+
+                        String messageTopic = "/topic/messages";
+                        Log.d(TAG, "Subscribing to topic: " + messageTopic);
+                        session.subscribe(messageTopic, new StompFrameHandler() {
+                            @Override
+                            public Type getPayloadType(StompHeaders headers) {
+                                return MessageDTO.class;
+                            }
+
+                            @Override
+                            public void handleFrame(StompHeaders headers, Object payload) {
+                                if (payload instanceof MessageDTO) {
+                                    MessageDTO message = (MessageDTO) payload;
+                                    Log.i(TAG, "Received message: " + message.getContent());
+
+                                    if (message.getReceiverId().equals(currentUserId) || message.getSenderId().equals(currentUserId)) {
+                                        runOnUiThread(() -> {
+                                            // Tải lại số tin nhắn chưa đọc từ API
+                                            loadInitialUnreadMessageCount(authToken);
+                                            // Gửi broadcast để thông báo tin nhắn mới
+                                            Intent intent = new Intent("NEW_MESSAGE");
+                                            LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
                                         });
                                     }
                                 } else {
@@ -250,12 +332,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateChatBadge(int unreadCount) {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.menu_navigation);
+        BadgeDrawable badge = bottomNavigationView.getOrCreateBadge(R.id.nav_chat);
+
+        if (unreadCount > 0) {
+            badge.setVisible(true);
+            badge.setNumber(unreadCount);
+            badge.setBackgroundColor(ContextCompat.getColor(this, R.color.red));
+        } else {
+            badge.setVisible(false);
+        }
+    }
+
     private void openFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R
-
-                .id.nav_host_fragment, fragment);
+        transaction.replace(R.id.nav_host_fragment, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -334,6 +427,10 @@ public class MainActivity extends AppCompatActivity {
         }
         if (reconnectExecutor != null && !reconnectExecutor.isShutdown()) {
             reconnectExecutor.shutdown();
+        }
+        // Hủy đăng ký BroadcastReceiver
+        if (badgeUpdateReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(badgeUpdateReceiver);
         }
     }
 }

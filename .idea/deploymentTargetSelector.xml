@@ -18,11 +18,6 @@
                 <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\thang\.android\avd\May01.avd" />
               </handle>
             </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\thang\.android\avd\May02.avd" />
-              </handle>
-            </Target>
           </targets>
         </DialogSelection>
       </SelectionState>

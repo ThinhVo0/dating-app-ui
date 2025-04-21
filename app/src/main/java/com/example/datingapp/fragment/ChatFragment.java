@@ -1,6 +1,9 @@
 package com.example.datingapp.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,7 +27,10 @@ import com.example.datingapp.dto.response.UserInfoResponse;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -38,6 +45,8 @@ public class ChatFragment extends Fragment {
     private ConversationAdapter conversationAdapter;
     private List<UserInfoResponse> matchedUsers;
     private List<ConversationSummaryDTO> conversationSummaries;
+    private String currentUserId;
+    private BroadcastReceiver messageReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,6 +56,16 @@ public class ChatFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Get currentUserId and authToken
+        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
+        currentUserId = prefs.getString("userId", null);
+        String authToken = prefs.getString("authToken", null);
+
+        if (currentUserId == null || authToken == null) {
+            Toast.makeText(requireContext(), "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         // Initialize horizontal RecyclerView for matched users
         rvChatList = view.findViewById(R.id.rvChatList);
@@ -65,26 +84,46 @@ public class ChatFragment extends Fragment {
         rvConversationList.setAdapter(conversationAdapter);
 
         // Load initial data
-        loadMatchedUsers();
-        loadConversationSummaries();
+        loadMatchedUsers(authToken);
+        loadConversationSummaries(authToken);
+
+        // Đăng ký BroadcastReceiver để nhận tin nhắn mới và tin nhắn đã đọc
+        messageReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if ("NEW_MESSAGE".equals(intent.getAction()) || "MESSAGES_READ".equals(intent.getAction())) {
+                    Log.i(TAG, "Received broadcast: " + intent.getAction());
+                    loadConversationSummaries(authToken);
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("NEW_MESSAGE");
+        filter.addAction("MESSAGES_READ");
+        LocalBroadcastManager.getInstance(requireContext()).registerReceiver(messageReceiver, filter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         // Refresh conversation summaries when returning to the fragment
-        loadConversationSummaries();
+        SharedPreferences prefs = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
+        String authToken = prefs.getString("authToken", null);
+        if (authToken != null) {
+            loadConversationSummaries(authToken);
+        }
     }
 
-    private void loadMatchedUsers() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
-
-        if (authToken == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để xem danh sách", Toast.LENGTH_SHORT).show();
-            return;
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Hủy đăng ký BroadcastReceiver
+        if (messageReceiver != null) {
+            LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(messageReceiver);
         }
+    }
 
+    private void loadMatchedUsers(String authToken) {
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         Call<ApiResponse<List<UserInfoResponse>>> call = authService.getMatchedUsers("Bearer " + authToken);
 
@@ -113,15 +152,7 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    private void loadConversationSummaries() {
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", requireContext().MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
-
-        if (authToken == null) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để xem danh sách tin nhắn", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+    private void loadConversationSummaries(String authToken) {
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         Call<List<ConversationSummaryDTO>> call = authService.getConversationSummaries("Bearer " + authToken);
 
@@ -131,6 +162,24 @@ public class ChatFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     conversationSummaries.clear();
                     conversationSummaries.addAll(response.body());
+
+                    // Sắp xếp conversationSummaries theo latestMessageTime (giảm dần)
+                    Collections.sort(conversationSummaries, (c1, c2) -> {
+                        try {
+                            // Parse latestMessageTime thành LocalDateTime
+                            LocalDateTime t1 = c1.getLatestMessageTime() != null
+                                    ? LocalDateTime.parse(c1.getLatestMessageTime())
+                                    : LocalDateTime.MIN;
+                            LocalDateTime t2 = c2.getLatestMessageTime() != null
+                                    ? LocalDateTime.parse(c2.getLatestMessageTime())
+                                    : LocalDateTime.MIN;
+                            return t2.compareTo(t1); // Giảm dần: t2 trước t1 nếu t2 mới hơn
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error parsing latestMessageTime: " + e.getMessage());
+                            return 0; // Giữ nguyên thứ tự nếu có lỗi
+                        }
+                    });
+
                     conversationAdapter.notifyDataSetChanged();
 
                     if (conversationSummaries.isEmpty()) {
@@ -149,7 +198,6 @@ public class ChatFragment extends Fragment {
             }
         });
     }
-
     private void openChatDetailActivity(String userName, String userId, String userAvatar) {
         Intent intent = new Intent(requireContext(), ChatDetailActivity.class);
         intent.putExtra("userName", userName);
