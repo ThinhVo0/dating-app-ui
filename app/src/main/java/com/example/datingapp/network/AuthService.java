@@ -139,4 +139,6 @@ public interface AuthService {
             @Header("Authorization") String authToken,
             @Query("senderId") String senderId
     );
+    @PUT("/api/notifications/mark-as-read")
+    Call<Void> markNotificationsAsRead(@Header("Authorization") String authToken);
 }
