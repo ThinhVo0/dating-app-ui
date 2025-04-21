@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
@@ -322,6 +323,8 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "uploadImageToServer: Upload successful");
                     Toast.makeText(ProfileUpdateActivity.this, "Upload ảnh thành công", Toast.LENGTH_SHORT).show();
+                    // Gửi Broadcast để yêu cầu fetch profile
+                    sendFetchProfileBroadcast();
                 } else {
                     Log.d(TAG, "uploadImageToServer: Upload failed, message = " + response.message());
                     Toast.makeText(ProfileUpdateActivity.this, "Upload thất bại: " + response.message(), Toast.LENGTH_SHORT).show();
@@ -334,6 +337,12 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                 Toast.makeText(ProfileUpdateActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void sendFetchProfileBroadcast() {
+        Intent intent = new Intent("FETCH_USER_PROFILE");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.d(TAG, "sendFetchProfileBroadcast: Broadcast sent");
     }
 
     private void setupHobbiesFlexbox() {
@@ -498,7 +507,6 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                     editor.putInt("height", profile.getHeight());
                     editor.putString("bio", profile.getBio());
                     editor.putString("gender", profile.getGender() != null ? (profile.getGender().equals(Gender.MALE.name()) ? "Nam" : "Nữ") : "");
-                    // Save hobbies list
                     String hobbiesStr = selectedHobbies.stream()
                             .map(Hobbies::getDisplayName)
                             .collect(Collectors.joining(","));
@@ -512,6 +520,9 @@ public class ProfileUpdateActivity extends AppCompatActivity {
                     editor.putString("smokingHabit", ((SmokingHabit) spSmoking.getSelectedItem()).getDisplayName());
                     editor.putString("sleepingHabit", ((SleepingHabit) spSleeping.getSelectedItem()).getDisplayName());
                     editor.apply();
+
+                    // Gửi Broadcast để yêu cầu fetch profile
+                    sendFetchProfileBroadcast();
 
                     // Finish activity
                     finish();

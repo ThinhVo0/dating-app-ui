@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentUserId;
     private String authToken;
     private BroadcastReceiver badgeUpdateReceiver;
+    private BroadcastReceiver fetchProfileReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +161,19 @@ public class MainActivity extends AppCompatActivity {
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 badgeUpdateReceiver, new IntentFilter("UPDATE_CHAT_BADGE"));
+
+        // Đăng ký BroadcastReceiver để nhận yêu cầu fetch profile
+        fetchProfileReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if ("FETCH_USER_PROFILE".equals(intent.getAction())) {
+                    Log.d(TAG, "Received fetch profile broadcast");
+                    fetchUserProfile();
+                }
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                fetchProfileReceiver, new IntentFilter("FETCH_USER_PROFILE"));
     }
 
     private void loadInitialUnreadMessageCount(String authToken) {
@@ -389,7 +403,8 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString("drinkingHabit", profile.getDrinkingHabit());
                     editor.putString("smokingHabit", profile.getSmokingHabit());
                     editor.putString("sleepingHabit", profile.getSleepingHabit());
-                    editor.putString("hobbies", profile.getHobbies() != null ? String.join(",", profile.getHobbies()) : "");                    editor.putString("pic1", profile.getPic1());
+                    editor.putString("hobbies", profile.getHobbies() != null ? String.join(",", profile.getHobbies()) : "");
+                    editor.putString("pic1", profile.getPic1());
                     editor.putString("pic2", profile.getPic2());
                     editor.putString("pic3", profile.getPic3());
                     editor.putString("pic4", profile.getPic4());
@@ -430,6 +445,9 @@ public class MainActivity extends AppCompatActivity {
         // Hủy đăng ký BroadcastReceiver
         if (badgeUpdateReceiver != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(badgeUpdateReceiver);
+        }
+        if (fetchProfileReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(fetchProfileReceiver);
         }
     }
 }

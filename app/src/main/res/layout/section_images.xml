@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:paddingTop="16dp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:paddingLeft="16dp"
+        android:layout_marginBottom="8dp">
 
         <ImageView
             android:id="@+id/ivImagesIcon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_infoplus"
-            />
+            android:src="@drawable/ic_image" />
 
         <TextView
             android:id="@+id/tvImagesLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ảnh hồ sơ (tối đa 9)"
+            android:text="Ảnh"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#212121"
@@ -37,241 +37,293 @@
         android:layout_height="wrap_content"
         android:columnCount="3"
         android:rowCount="3"
-        android:alignmentMode="alignMargins"
         android:layout_marginTop="8dp">
 
+        <!-- Image 1 -->
         <FrameLayout
             android:id="@+id/flImg1"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 2 -->
         <FrameLayout
             android:id="@+id/flImg2"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 3 -->
         <FrameLayout
             android:id="@+id/flImg3"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img3"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 4 -->
         <FrameLayout
             android:id="@+id/flImg4"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 5 -->
         <FrameLayout
             android:id="@+id/flImg5"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img5"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 6 -->
         <FrameLayout
             android:id="@+id/flImg6"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img6"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 7 -->
         <FrameLayout
             android:id="@+id/flImg7"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img7"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
             <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
 
         </FrameLayout>
 
+        <!-- Image 8 -->
         <FrameLayout
             android:id="@+id/flImg8"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img8"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
 
+        <!-- Image 9 -->
         <FrameLayout
             android:id="@+id/flImg9"
             android:layout_width="0dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
             android:layout_columnWeight="1"
-            android:layout_margin="4dp">
+            android:layout_margin="6dp"
+            android:background="@drawable/rounded_image_background"
+            android:elevation="4dp">
+
             <ImageView
                 android:id="@+id/img9"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:background="@drawable/rounded_input"
-                android:src="@drawable/avt" />
-            <ImageView
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:src="@drawable/ic_iconplus"
-    android:background="@drawable/rounded_image_button"
-    android:layout_gravity="center"
-    android:scaleType="center"
-    android:padding="10dp"
-    app:tint="#FFFFFF"
-    android:contentDescription="Tải ảnh lên" />
+                android:src="@drawable/avt"
+                android:clipToOutline="true"
+                android:background="@drawable/rounded_image_background" />
 
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_iconplus"
+                android:background="@drawable/gradient_circle_button"
+                android:layout_gravity="bottom|end"
+                
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                app:tint="#FFFFFF"
+                android:contentDescription="Tải ảnh lên" />
         </FrameLayout>
     </GridLayout>
 </LinearLayout>
