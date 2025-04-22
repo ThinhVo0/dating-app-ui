@@ -15,7 +15,7 @@
         android:gravity="center_vertical"
         android:layout_marginBottom="16dp">
         <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
             android:id="@+id/tvProvinceLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:src="@drawable/ic_zodiacsign" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/spZodiac"
             android:layout_width="0dp"
             android:layout_height="56dp"
@@ -69,7 +69,7 @@
             android:src="@drawable/ic_mind" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spPersonality"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spPersonality"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -95,7 +95,7 @@
             android:src="@drawable/ic_comunicate" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spCommunication"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spCommunication"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -121,7 +121,7 @@
             android:src="@drawable/ic_romance" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spLoveLanguage"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spLoveLanguage"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -147,7 +147,7 @@
             android:src="@drawable/ic_pet" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spPetPreference"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spPetPreference"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -173,7 +173,7 @@
             android:src="@drawable/ic_drink" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spDrinking"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spDrinking"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -199,7 +199,7 @@
             android:src="@drawable/ic_smoking" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spSmoking"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spSmoking"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -224,7 +224,7 @@
             android:src="@drawable/ic_sleep" />
 
         <Spinner
-            android:fontFamily="@font/gothamrnd_medium"  android:id="@+id/spSleeping"
+            android:fontFamily="@font/montserrat_medium"  android:id="@+id/spSleeping"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"

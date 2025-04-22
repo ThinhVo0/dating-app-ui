@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                     android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                     android:maxLines="1" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/tvMessageTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
                 android:layout_marginTop="4dp">
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/tvLastMessage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                     android:layout_alignBaseline="@id/tvUnreadCount" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/tvUnreadCount"
                     android:layout_width="20dp"
                     android:layout_height="20dp"

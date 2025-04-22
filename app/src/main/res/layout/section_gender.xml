@@ -21,7 +21,7 @@
             android:src="@drawable/ic_gender" />
 
         <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
             android:id="@+id/tvGenderLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
         android:gravity="center_vertical">
 
         <RadioButton
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/rbMale"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -55,7 +55,7 @@
             android:textStyle="bold" />
 
         <RadioButton
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/rbFemale"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -68,7 +68,7 @@
             android:textStyle="bold" />
 
         <RadioButton
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/rbOther"
             android:layout_width="0dp"
             android:layout_height="match_parent"

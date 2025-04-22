@@ -26,7 +26,7 @@
             app:cardBackgroundColor="#2196F3">
 
             <TextView
-                android:fontFamily="@font/gothamrnd_medium"
+                android:fontFamily="@font/montserrat_medium"
                 android:id="@+id/tvMessageSelf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/tvTimeSelf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
             app:cardBackgroundColor="#E0E0E0">
 
             <TextView
-                android:fontFamily="@font/gothamrnd_medium"
+                android:fontFamily="@font/montserrat_medium"
                 android:id="@+id/tvMessageOther"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:fontFamily="@font/gothamrnd_medium"
+            android:fontFamily="@font/montserrat_medium"
             android:id="@+id/tvTimeOther"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

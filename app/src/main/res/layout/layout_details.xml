@@ -25,7 +25,7 @@
             android:elevation="4dp">
 
             <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                 android:id="@+id/bio_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                 android:id="@+id/bio_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
                     android:src="@drawable/ic_account" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin chính"
@@ -109,7 +109,7 @@
                     android:src="@drawable/ic_gender" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Giới tính"
@@ -119,7 +119,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/gender_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -150,7 +150,7 @@
                     android:src="@drawable/ic_height" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chiều cao"
@@ -160,7 +160,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/height_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -191,7 +191,7 @@
                     android:src="@drawable/ic_zodiacsign" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cung hoàng đạo"
@@ -201,7 +201,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/zodiac_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -232,7 +232,7 @@
                     android:src="@drawable/ic_mind" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Kiểu tính cách"
@@ -242,7 +242,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/personality_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -285,7 +285,7 @@
                     android:src="@drawable/ic_infoplus" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thông tin thêm về tôi"
@@ -313,7 +313,7 @@
                     android:src="@drawable/ic_comunicate" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phong cách giao tiếp"
@@ -323,7 +323,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/communication_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -354,7 +354,7 @@
                     android:src="@drawable/ic_romance" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ngôn ngữ tình yêu"
@@ -364,7 +364,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/love_language_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -395,7 +395,7 @@
                     android:src="@drawable/ic_pet" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thú cưng"
@@ -405,7 +405,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/pet_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -436,7 +436,7 @@
                     android:src="@drawable/ic_hobby" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sở thích"
@@ -493,7 +493,7 @@
                     android:src="@drawable/ic_lifestyle" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Phong cách sống"
@@ -521,7 +521,7 @@
                     android:src="@drawable/ic_drink" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Uống rượu"
@@ -531,7 +531,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/drinking_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -562,7 +562,7 @@
                     android:src="@drawable/ic_smoking" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Hút thuốc"
@@ -572,7 +572,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/smoking_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -603,7 +603,7 @@
                     android:src="@drawable/ic_sleep" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Thói quen ngủ"
@@ -613,7 +613,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/sleep_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

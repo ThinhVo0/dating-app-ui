@@ -95,7 +95,7 @@
 
             <!-- Signup Button -->
             <Button
-                android:fontFamily="@font/gothamrnd_medium"
+                android:fontFamily="@font/montserrat_medium"
                 android:id="@+id/signupButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -121,7 +121,7 @@
 
             <!-- Back to Login Link -->
             <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                 android:id="@+id/backToLoginLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -22,7 +22,7 @@
              />
 
         <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
             android:id="@+id/tvHobbiesLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

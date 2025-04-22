@@ -45,14 +45,14 @@
 
                 <!-- Tiêu đề -->
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/montserrat_bold"
                     android:text="Cập nhật hồ sơ"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
                     android:textColor="#212121"
-                    android:layout_marginStart="12dp" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </androidx.cardview.widget.CardView>

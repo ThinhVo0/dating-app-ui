@@ -52,7 +52,7 @@
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_bold"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -90,7 +90,7 @@
                     android:text="Độ tuổi"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -116,7 +116,7 @@
                     app:thumbElevation="2dp" />
                 <TextView
                     android:id="@+id/tvAgeRange"
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -144,7 +144,7 @@
                     android:text="Khoảng cách tối đa (km)"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -170,7 +170,7 @@
                     app:trackHeight="8dp" />
 
                 <TextView
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     android:id="@+id/tvDistanceValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -200,7 +200,7 @@
                     android:text="Giới tính"
                     android:textColor="#212121"
                     android:textSize="20sp"
-                    android:fontFamily="@font/gothamrnd_medium"
+                    android:fontFamily="@font/montserrat_medium"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -266,7 +266,7 @@
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                android:fontFamily="@font/gothamrnd_medium"
+                android:fontFamily="@font/montserrat_medium"
                 app:cornerRadius="8dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -432,7 +432,8 @@ public class ProfileFragment extends Fragment {
         ProfileData data = profileDataMap.get(profileIds.get(currentProfileIndex));
 
         TextView bioText = view.findViewById(R.id.bio_text);
-        bioText.setText(data.getBio() != null ? data.getBio() : "Chưa có tiểu sử");
+        bioText.setText(data.getBio() != null ? "\"" + data.getBio() + "\"" : "\"Chưa có tiểu sử\"");
+
 
         ((TextView) view.findViewById(R.id.gender_text)).setText(data.getGender() != null ? data.getGender() : "Không xác định");
         ((TextView) view.findViewById(R.id.height_text)).setText(data.getHeight() > 0 ? data.getHeight() + " cm" : "Không xác định");
