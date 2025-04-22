@@ -33,7 +33,7 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
-                android:paddingEnd="16dp">
+                android:paddingEnd="8dp">
 
                 <!-- Nút Back -->
                 <ImageButton
@@ -68,6 +68,16 @@
                     android:textStyle="bold"
                     android:ellipsize="end"
                     android:maxLines="1" />
+
+                <!-- Nút ba chấm (menu) -->
+                <ImageButton
+                    android:id="@+id/btnMenu"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/ic_menu_more"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Menu"
+                    app:tint="@color/thunder" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </androidx.cardview.widget.CardView>
@@ -77,7 +87,6 @@
         android:id="@+id/rvMessages"
         android:layout_width="0dp"
         android:layout_height="0dp"
-
         android:clipToPadding="false"
         android:layout_marginTop="4dp"
         android:background="@color/white"
@@ -108,7 +117,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-
             android:paddingStart="12dp"
             android:paddingEnd="8dp"
             android:paddingTop="6dp"
@@ -140,6 +148,5 @@
                 android:scaleType="centerInside" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
