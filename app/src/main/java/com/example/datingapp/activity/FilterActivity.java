@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.example.datingapp.R;
 import com.google.android.material.slider.RangeSlider;
@@ -49,6 +50,12 @@ public class FilterActivity extends AppCompatActivity {
         distanceSlider = findViewById(R.id.distanceSlider);
         tvDistanceValue = findViewById(R.id.tvDistanceValue);
         btnApplyFilter = findViewById(R.id.btnApplyFilter);
+
+        // Set custom thumb drawable for RangeSlider (Age)
+        ageRangeSlider.setCustomThumbDrawable(ContextCompat.getDrawable(this, R.drawable.custom_thumb));
+
+        // Set custom thumb drawable for Slider (Distance)
+        distanceSlider.setCustomThumbDrawable(ContextCompat.getDrawable(this, R.drawable.custom_thumb));
 
         // Back button listener
         btnBack.setOnClickListener(v -> finish());
