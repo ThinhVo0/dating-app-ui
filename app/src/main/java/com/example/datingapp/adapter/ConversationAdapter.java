@@ -66,13 +66,15 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             Log.e(TAG, "Date parsing error: " + e.getMessage());
         }
 
-        // Set unread count
-        if (summary.getUnreadCount() > 0) {
-            holder.tvUnreadCount.setText(String.valueOf(summary.getUnreadCount()));
+        // Set unread count với 9+ nếu >9
+        int count = summary.getUnreadCount();
+        if (count > 0) {
+            holder.tvUnreadCount.setText(count > 9 ? "9+" : String.valueOf(count));
             holder.tvUnreadCount.setVisibility(View.VISIBLE);
         } else {
             holder.tvUnreadCount.setVisibility(View.GONE);
         }
+
     }
 
     @Override

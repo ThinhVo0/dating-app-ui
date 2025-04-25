@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.datingapp.R;
@@ -48,6 +50,9 @@ public class LoginActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
 
+    private boolean locationUpdated = false;
+    private final Handler locationTimeoutHandler = new Handler(Looper.getMainLooper());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,72 +64,47 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassword = findViewById(R.id.forgotPassword);
         registerLink = findViewById(R.id.registerLink);
 
-        // Khởi tạo FusedLocationProviderClient
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Khởi tạo launcher để yêu cầu quyền
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
-                updateUserLocation();
+                updateUserLocationAndNavigate();
             } else {
                 Toast.makeText(this, "Quyền truy cập vị trí bị từ chối", Toast.LENGTH_SHORT).show();
+                goToMainActivity(); // Vẫn cho vào app
             }
         });
 
-        // Kiểm tra nếu đã có token
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         String authToken = sharedPreferences.getString("authToken", null);
         if (authToken != null) {
             checkTokenValidity(authToken);
         }
 
-        // Handle Login button click
         loginButton.setOnClickListener(v -> loginUser());
 
-        // Handle Forgot Password click
-        forgotPassword.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-            startActivity(intent);
-        });
-
-        // Handle Register click
-        registerLink.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
+        forgotPassword.setOnClickListener(v -> startActivity(new Intent(this, ForgotPasswordActivity.class)));
+        registerLink.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     private void checkTokenValidity(String authToken) {
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-        AccessTokenDto tokenDto = new AccessTokenDto(authToken);
+        Call<ApiResponse<String>> call = authService.introspect(new AccessTokenDto(authToken));
 
-        Call<ApiResponse<String>> call = authService.introspect(tokenDto);
         call.enqueue(new Callback<ApiResponse<String>>() {
             @Override
             public void onResponse(Call<ApiResponse<String>> call, Response<ApiResponse<String>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                    Log.d("LoginActivity", "Token hợp lệ: " + authToken);
-                    // Update location before navigating to MainActivity
                     checkLocationPermission();
-                    // Navigate to MainActivity
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
                 } else {
-                    Log.d("LoginActivity", "Token không hợp lệ: " + authToken);
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove("authToken");
-                    editor.remove("userId");
-                    editor.apply();
-                    Toast.makeText(LoginActivity.this, "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+                    clearAuthToken();
+                    Toast.makeText(LoginActivity.this, "Phiên đăng nhập đã hết hạn", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<String>> call, Throwable t) {
-                Log.e("LoginActivity", "Lỗi khi kiểm tra token: " + t.getMessage());
-                Toast.makeText(LoginActivity.this, "Lỗi khi kiểm tra phiên đăng nhập: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "Lỗi khi kiểm tra token", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -134,154 +114,138 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordInput.getText().toString().trim();
 
         if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tên đăng nhập và mật khẩu", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         LoginDto request = new LoginDto();
         request.setUsername(username);
         request.setPassword(password);
 
-        Call<ApiResponse<UserResponse>> call = authService.login(request);
-        call.enqueue(new Callback<ApiResponse<UserResponse>>() {
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        authService.login(request).enqueue(new Callback<ApiResponse<UserResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<UserResponse>> call, Response<ApiResponse<UserResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<UserResponse> apiResponse = response.body();
-                    if (apiResponse.getStatus() == 200) {
-                        UserResponse userResponse = apiResponse.getData();
-                        String token = userResponse.getToken();
-                        String userId = userResponse.getId();
+                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                    UserResponse user = response.body().getData();
 
-                        // Lưu token và userId vào SharedPreferences
-                        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("authToken", token);
-                        editor.putString("userId", userId);
-                        editor.apply();
-                        Log.d("LoginActivity", "Saved token: " + token + ", userId: " + userId);
+                    SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                    editor.putString("authToken", user.getToken());
+                    editor.putString("userId", user.getId());
+                    editor.apply();
 
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 
-                        // Sau khi đăng nhập thành công, lấy tọa độ
-                        checkLocationPermission();
-
-                        // Chuyển đến MainActivity
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(LoginActivity.this, apiResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    checkLocationPermission();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Tên đăng nhập hoặc mật khẩu không đúng!", Toast.LENGTH_SHORT).show();
-                    Log.e("LoginActivity", "Response code: " + response.code());
+                    Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<UserResponse>> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("LoginActivity", "Login failed: " + t.getMessage());
             }
         });
     }
 
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            updateUserLocation();
+            updateUserLocationAndNavigate();
         } else {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
-    private void updateUserLocation() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Không có quyền truy cập vị trí", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setNumUpdates(1);
-        locationRequest.setInterval(0);
-
+    private void updateUserLocationAndNavigate() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            Toast.makeText(this, "Vui lòng bật GPS để lấy vị trí", Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(intent);
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Toast.makeText(this, "Vui lòng bật GPS để tiếp tục", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             return;
         }
 
-        fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    Log.e("LoginActivity", "Không nhận được kết quả vị trí");
-                    Toast.makeText(LoginActivity.this, "Không thể lấy vị trí", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Location location = locationResult.getLastLocation();
-                if (location != null) {
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    Log.d("LoginActivity", "Vị trí mới: " + latitude + ", " + longitude);
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(0);
+        request.setNumUpdates(1);
 
-                    // Lưu tọa độ vào SharedPreferences
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putFloat("latitude", (float) latitude);
-                    editor.putFloat("longitude", (float) longitude);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        fusedLocationClient.requestLocationUpdates(request, new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult result) {
+                Location location = result.getLastLocation();
+                if (location != null) {
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+
+                    SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+                    editor.putFloat("latitude", (float) lat);
+                    editor.putFloat("longitude", (float) lon);
                     editor.apply();
 
-                    // Gửi tọa độ lên server
-                    sendLocationToServer(latitude, longitude);
-                } else {
-                    Log.e("LoginActivity", "Location is null");
-                    Toast.makeText(LoginActivity.this, "Không thể lấy vị trí, thử lại sau", Toast.LENGTH_SHORT).show();
+                    sendLocationToServer(lat, lon);
                 }
-                fusedLocationClient.removeLocationUpdates(this);
+                locationUpdated = true;
+                goToMainActivity();
             }
-        }, Looper.getMainLooper()).addOnFailureListener(e -> {
-            Log.e("LoginActivity", "Lỗi khi yêu cầu vị trí: " + e.getMessage());
-            Toast.makeText(LoginActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+        }, Looper.getMainLooper());
+
+        // Timeout sau 5s nếu không có vị trí
+        locationTimeoutHandler.postDelayed(() -> {
+            if (!locationUpdated) {
+                Toast.makeText(this, "Không lấy được vị trí, tiếp tục vào app", Toast.LENGTH_SHORT).show();
+                goToMainActivity();
+            }
+        }, 5000);
     }
 
-    private void sendLocationToServer(double latitude, double longitude) {
-        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-        LocationUpdateDto request = new LocationUpdateDto();
-        request.setLatitude(latitude);
-        request.setLongitude(longitude);
+    private void sendLocationToServer(double lat, double lon) {
+        String token = getSharedPreferences("MyPrefs", MODE_PRIVATE).getString("authToken", null);
+        if (token == null) return;
 
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        String authToken = sharedPreferences.getString("authToken", null);
+        LocationUpdateDto dto = new LocationUpdateDto();
+        dto.setLatitude(lat);
+        dto.setLongitude(lon);
 
-        Call<ApiResponse<Void>> call = authService.updateLocation("Bearer " + authToken, request);
-        call.enqueue(new Callback<ApiResponse<Void>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                    Log.d("LoginActivity", "Cập nhật vị trí thành công");
-                } else {
-                    String errorMessage = "Cập nhật vị trí thất bại";
-                    if (response.errorBody() != null) {
-                        try {
-                            errorMessage += ": " + response.errorBody().string();
-                        } catch (Exception e) {
-                            errorMessage += ": Lỗi không xác định";
+        RetrofitClient.getClient().create(AuthService.class)
+                .updateLocation("Bearer " + token, dto)
+                .enqueue(new Callback<ApiResponse<Void>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                        if (response.isSuccessful()) {
+                            Log.d("LoginActivity", "Gửi vị trí thành công");
+                        } else {
+                            Log.e("LoginActivity", "Không thể gửi vị trí lên server");
                         }
                     }
-                    Log.e("LoginActivity", errorMessage);
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                Log.e("LoginActivity", "Lỗi khi gửi vị trí: " + t.getMessage());
-            }
-        });
+                    @Override
+                    public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                        Log.e("LoginActivity", "Lỗi gửi vị trí: " + t.getMessage());
+                    }
+                });
+    }
+
+    private void goToMainActivity() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void clearAuthToken() {
+        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+        editor.remove("authToken");
+        editor.remove("userId");
+        editor.apply();
     }
 }
