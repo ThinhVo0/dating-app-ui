@@ -4,13 +4,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,8 +23,12 @@ import com.example.datingapp.R;
 import com.example.datingapp.adapter.MessageAdapter;
 import com.example.datingapp.dto.ConversationSummaryDTO;
 import com.example.datingapp.dto.MessageDTO;
+import com.example.datingapp.dto.request.ReportDto;
+import com.example.datingapp.dto.response.ApiResponse;
+import com.example.datingapp.model.Report;
 import com.example.datingapp.network.AuthService;
 import com.example.datingapp.network.RetrofitClient;
+import com.google.gson.Gson;
 
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -51,7 +58,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
     private List<MessageDTO> messageList;
     private EditText etMessageInput;
-    private ImageButton btnSendMessage, btnBack;
+    private ImageButton btnSendMessage, btnBack, btnMenu; // Thêm btnMenu
     private TextView tvChatUserName;
     private ImageView ivChatUserAvatar;
     private String userName;
@@ -64,6 +71,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     private ScheduledExecutorService reconnectExecutor;
     private boolean isConnecting = false;
     private static final int RECONNECT_DELAY_SECONDS = 5;
+    private String authToken; // Thêm authToken để sử dụng trong báo cáo
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +90,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         // Lấy currentUserId và authToken từ SharedPreferences
         SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentUserId = prefs.getString("userId", null);
-        String authToken = prefs.getString("authToken", null);
+        authToken = prefs.getString("authToken", null);
 
         if (currentUserId == null || authToken == null || targetUserId == null) {
             Toast.makeText(this, "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
@@ -95,6 +103,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         etMessageInput = findViewById(R.id.etMessageInput);
         btnSendMessage = findViewById(R.id.btnSendMessage);
         btnBack = findViewById(R.id.btnBack);
+        btnMenu = findViewById(R.id.btnMenu); // Ánh xạ nút ba chấm
         tvChatUserName = findViewById(R.id.tvChatUserName);
         ivChatUserAvatar = findViewById(R.id.ivChatUserAvatar);
         tvChatUserName.setText(userName);
@@ -125,6 +134,90 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // Sự kiện nút back
         btnBack.setOnClickListener(v -> finish());
+
+        // Sự kiện nút ba chấm
+        btnMenu.setOnClickListener(v -> showPopupMenu(v));
+    }
+
+    private void showPopupMenu(View v) {
+        PopupMenu popupMenu = new PopupMenu(this, v);
+        popupMenu.getMenu().add("Báo cáo");
+        popupMenu.setOnMenuItemClickListener(item -> {
+            if (item.getTitle().equals("Báo cáo")) {
+                showReportDialog();
+            }
+            return true;
+        });
+        popupMenu.show();
+    }
+
+    private void showReportDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Báo cáo người dùng");
+
+        // Thêm EditText để nhập lý do
+        final EditText reasonInput = new EditText(this);
+        reasonInput.setHint("Nhập lý do báo cáo");
+        reasonInput.setMinHeight((int) (48 * getResources().getDisplayMetrics().density));
+        builder.setView(reasonInput);
+
+        builder.setPositiveButton("Gửi", (dialog, which) -> {
+            String reason = reasonInput.getText().toString().trim();
+            if (reason.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập lý do", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Gọi API báo cáo
+            AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+            ReportDto reportDto = new ReportDto(targetUserId, reason);
+            Log.d(TAG, "Sending report: " + new Gson().toJson(reportDto));
+            Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
+
+            call.enqueue(new Callback<ApiResponse<Report>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
+                    Log.d(TAG, "HTTP Status Code (sendReport): " + response.code());
+                    if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                        String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
+                        Log.d(TAG, "Report successful: " + message);
+                        Toast.makeText(ChatDetailActivity.this, message, Toast.LENGTH_SHORT).show();
+                        // Quay lại màn hình trước (ChatFragment)
+                        finish();
+                    } else {
+                        if (response.code() == 401) {
+                            Toast.makeText(ChatDetailActivity.this, "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                            return;
+                        }
+                        String errorMessage = "Gửi báo cáo thất bại";
+                        if (response.errorBody() != null) {
+                            try {
+                                errorMessage = response.errorBody().string();
+                                Log.e(TAG, "Error response: " + errorMessage);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error parsing errorBody: " + e.getMessage(), e);
+                            }
+                        } else if (response.body() != null) {
+                            Log.e(TAG, "Response body: " + new Gson().toJson(response.body()));
+                            errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
+                        }
+                        Toast.makeText(ChatDetailActivity.this, "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
+                        dialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
+                    Log.e(TAG, "Report API call failed: " + t.getMessage(), t);
+                    Toast.makeText(ChatDetailActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+        });
+
+        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
+        builder.show();
     }
 
     private void markMessagesAsRead(String authToken) {
@@ -212,8 +305,6 @@ public class ChatDetailActivity extends AppCompatActivity {
         executorService.execute(() -> {
             try {
                 StompHeaders connectHeaders = new StompHeaders();
-                // Tạm thời bỏ Authorization để kiểm tra
-                // connectHeaders.add("Authorization", "Bearer " + authToken);
                 Log.d(TAG, "Connecting with headers: " + connectHeaders);
 
                 StompSession session = stompClient.connect(wsUrl, new StompSessionHandlerAdapter() {
