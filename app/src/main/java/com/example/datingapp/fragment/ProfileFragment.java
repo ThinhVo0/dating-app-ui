@@ -2,6 +2,7 @@ package com.example.datingapp.fragment;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.datingapp.R;
+import com.example.datingapp.activity.LoginActivity;
 import com.example.datingapp.adapter.ImageAdapter;
 import com.example.datingapp.dto.request.ReportDto;
 import com.example.datingapp.dto.response.ApiResponse;
@@ -57,6 +60,8 @@ public class ProfileFragment extends Fragment {
     private String authToken;
     private float initialX, initialY;
     private boolean isDragging = false;
+    private LinearLayout imageIndicatorContainer; // Container cho các thanh ngang
+    private List<View> indicatorViews = new ArrayList<>(); // Danh sách các thanh ngang
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -87,6 +92,7 @@ public class ProfileFragment extends Fragment {
         btnLike = view.findViewById(R.id.btnLike);
         ImageButton btnChat = view.findViewById(R.id.btnChat);
         ImageButton btnViewDetails = view.findViewById(R.id.btnViewDetails);
+        imageIndicatorContainer = view.findViewById(R.id.imageIndicatorContainer); // Khởi tạo container
 
         btnDislike.setOnClickListener(v -> performSwipe(view, false));
         btnLike.setOnClickListener(v -> performSwipe(view, true));
@@ -169,6 +175,23 @@ public class ProfileFragment extends Fragment {
             return false;
         });
 
+        // Đăng ký callback để cập nhật thanh ngang chỉ số ảnh
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                updateImageIndicator(position);
+            }
+        });
+
+        // Kiểm tra trạng thái đăng nhập
+        if (authToken == null) {
+            Toast.makeText(requireContext(), "Vui lòng đăng nhập để tiếp tục", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(requireContext(), LoginActivity.class));
+            requireActivity().finish();
+            return;
+        }
+
         // Tải danh sách profile
         initializeProfileList(view);
     }
@@ -196,6 +219,45 @@ public class ProfileFragment extends Fragment {
             if (currentItem < itemCount - 1) {
                 viewPager.setCurrentItem(currentItem + 1, true);
             }
+        }
+    }
+
+    private void setupImageIndicators(int count) {
+        imageIndicatorContainer.removeAllViews();
+        indicatorViews.clear();
+
+        if (count <= 1) return; // Không hiển thị thanh ngang nếu chỉ có 1 ảnh
+
+        float density = getResources().getDisplayMetrics().density;
+        int indicatorHeight = (int) (4 * density); // Chiều cao mỗi thanh ngang (tăng lên 4dp)
+        int indicatorMargin = (int) (2 * density); // Khoảng cách giữa các thanh (giảm xuống 2dp)
+
+        // Tính chiều rộng của container (ViewPager2 width trừ padding)
+        int containerWidth = imageIndicatorContainer.getWidth();
+        if (containerWidth == 0) {
+            // Nếu container chưa được đo, sử dụng chiều rộng của ViewPager2
+            containerWidth = viewPager.getWidth() - (int) (32 * density); // Trừ padding 16dp mỗi bên
+        }
+
+        // Tính tổng khoảng cách giữa các thanh
+        int totalMargin = indicatorMargin * (count - 1);
+        // Tính chiều rộng mỗi thanh sao cho tổng chiều rộng các thanh và khoảng cách vừa với container
+        int indicatorWidth = (containerWidth - totalMargin) / count;
+
+        for (int i = 0; i < count; i++) {
+            View indicator = new View(requireContext());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(indicatorWidth, indicatorHeight);
+            params.setMargins(indicatorMargin, 0, indicatorMargin, 0);
+            indicator.setLayoutParams(params);
+            indicator.setBackgroundColor(i == 0 ? 0xFFFFFFFF : 0x80FFFFFF); // Màu trắng cho thanh hiện tại, màu mờ cho các thanh khác
+            imageIndicatorContainer.addView(indicator);
+            indicatorViews.add(indicator);
+        }
+    }
+
+    private void updateImageIndicator(int position) {
+        for (int i = 0; i < indicatorViews.size(); i++) {
+            indicatorViews.get(i).setBackgroundColor(i == position ? 0xFFFFFFFF : 0x80FFFFFF);
         }
     }
 
@@ -380,6 +442,10 @@ public class ProfileFragment extends Fragment {
         tvNameAge.setText("User not found");
         tvAddress.setText("");
 
+        // Xóa các thanh ngang khi reset UI
+        imageIndicatorContainer.removeAllViews();
+        indicatorViews.clear();
+
         if (viewPager != null) {
             viewPager.setAdapter(null);
         }
@@ -413,6 +479,13 @@ public class ProfileFragment extends Fragment {
         adapter = new ImageAdapter(requireContext(), imageUrls);
         viewPager.setAdapter(adapter);
 
+        // Thiết lập các thanh ngang chỉ số ảnh
+        // Đợi layout hoàn thành để lấy kích thước chính xác
+        viewPager.post(() -> {
+            setupImageIndicators(imageUrls.size());
+            updateImageIndicator(0); // Cập nhật thanh đầu tiên
+        });
+
         TextView tvNameAge = view.findViewById(R.id.tvNameAge);
         TextView tvAddress = view.findViewById(R.id.tvAddress);
         String fullName = data.getFirstName() + " " + data.getLastName();
@@ -433,7 +506,6 @@ public class ProfileFragment extends Fragment {
 
         TextView bioText = view.findViewById(R.id.bio_text);
         bioText.setText(data.getBio() != null ? "\"" + data.getBio() + "\"" : "\"Chưa có tiểu sử\"");
-
 
         ((TextView) view.findViewById(R.id.gender_text)).setText(data.getGender() != null ? data.getGender() : "Không xác định");
         ((TextView) view.findViewById(R.id.height_text)).setText(data.getHeight() > 0 ? data.getHeight() + " cm" : "Không xác định");
@@ -610,4 +682,5 @@ public class ProfileFragment extends Fragment {
         });
 
         bottomSheetDialog.show();
-    }}
+    }
+}
