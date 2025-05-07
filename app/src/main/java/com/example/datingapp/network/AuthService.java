@@ -8,6 +8,7 @@ import com.example.datingapp.dto.Notification;
 import com.example.datingapp.dto.request.AccessTokenDto;
 import com.example.datingapp.dto.request.Album;
 import com.example.datingapp.dto.request.ForgotPassWordDto;
+import com.example.datingapp.dto.request.IdTokenDto;
 import com.example.datingapp.dto.request.LocationUpdateDto;
 import com.example.datingapp.dto.request.LoginDto;
 import com.example.datingapp.dto.request.ReportDto;
@@ -149,4 +150,7 @@ public interface AuthService {
             @Header("Authorization") String authToken,
             @Body ReportDto reportDto
     );
+
+    @POST("/api/auth/google-login")
+    Call<ApiResponse<UserResponse>> googleLogin(@Body IdTokenDto tokenDto);
 }
