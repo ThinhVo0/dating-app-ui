@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/menuItemReport"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_report_image"
+                app:tint="#F44336" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Báo cáo người dùng"
+                android:textColor="#212121"
+                android:textSize="16sp"
+                android:fontFamily="@font/montserrat_medium"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0" />
+
+        <LinearLayout
+            android:id="@+id/menuItemBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel"
+                app:tint="#757575" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chặn người dùng"
+                android:textColor="#212121"
+                android:textSize="16sp"
+                android:fontFamily="@font/montserrat_medium"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 

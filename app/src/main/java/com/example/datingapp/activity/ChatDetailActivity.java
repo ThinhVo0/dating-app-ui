@@ -3,23 +3,31 @@ package com.example.datingapp.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupWindow;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.datingapp.R;
+import com.example.datingapp.adapter.EmojiAdapter;
 import com.example.datingapp.adapter.MessageAdapter;
 import com.example.datingapp.dto.ConversationSummaryDTO;
 import com.example.datingapp.dto.MessageDTO;
@@ -41,6 +49,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,13 +63,17 @@ import retrofit2.Response;
 public class ChatDetailActivity extends AppCompatActivity {
 
     private static final String TAG = "ChatDetailActivity";
-    private RecyclerView rvMessages;
+    private RecyclerView rvMessages, rvEmojis;
     private MessageAdapter messageAdapter;
+    private EmojiAdapter emojiAdapter;
     private List<MessageDTO> messageList;
+    private List<String> emojiList;
     private EditText etMessageInput;
-    private ImageButton btnSendMessage, btnBack, btnMenu; // Thêm btnMenu
+    private ImageButton btnSendMessage, btnBack, btnMenu, btnEmoji;
     private TextView tvChatUserName;
     private ImageView ivChatUserAvatar;
+    private View emojiContainer;
+    private boolean isEmojiShowing = false;
     private String userName;
     private String targetUserId;
     private String currentUserId;
@@ -103,7 +116,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         etMessageInput = findViewById(R.id.etMessageInput);
         btnSendMessage = findViewById(R.id.btnSendMessage);
         btnBack = findViewById(R.id.btnBack);
-        btnMenu = findViewById(R.id.btnMenu); // Ánh xạ nút ba chấm
+        btnMenu = findViewById(R.id.btnMenu);
+        btnEmoji = findViewById(R.id.btnEmoji);
+        emojiContainer = findViewById(R.id.emojiContainer);
+        rvEmojis = findViewById(R.id.rvEmojis);
         tvChatUserName = findViewById(R.id.tvChatUserName);
         ivChatUserAvatar = findViewById(R.id.ivChatUserAvatar);
         tvChatUserName.setText(userName);
@@ -114,13 +130,16 @@ public class ChatDetailActivity extends AppCompatActivity {
                 .circleCrop()
                 .into(ivChatUserAvatar);
 
-        // Thiết lập RecyclerView
+        // Thiết lập RecyclerView tin nhắn
         messageList = new ArrayList<>();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         rvMessages.setLayoutManager(layoutManager);
         messageAdapter = new MessageAdapter(messageList, currentUserId);
         rvMessages.setAdapter(messageAdapter);
+
+        // Thiết lập RecyclerView emoji
+        setupEmojiRecyclerView();
 
         // Đánh dấu tin nhắn đã đọc
         markMessagesAsRead(authToken);
@@ -137,87 +156,250 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // Sự kiện nút ba chấm
         btnMenu.setOnClickListener(v -> showPopupMenu(v));
+        
+        // Sự kiện hiển thị/ẩn emoji picker
+        btnEmoji.setOnClickListener(v -> toggleEmojiPicker());
+        
+        // Ẩn emoji picker khi nhấn vào trường nhập liệu
+        etMessageInput.setOnClickListener(v -> {
+            if (isEmojiShowing) {
+                toggleEmojiPicker();
+            }
+        });
+    }
+    
+    private void setupEmojiRecyclerView() {
+        // Tạo danh sách emoji
+        emojiList = new ArrayList<>();
+        // Thêm một số emoji phổ biến
+        addCommonEmojis();
+        
+        // Thiết lập adapter và layout cho RecyclerView emoji
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 5);
+        rvEmojis.setLayoutManager(gridLayoutManager);
+        emojiAdapter = new EmojiAdapter(emojiList, this::insertEmoji);
+        rvEmojis.setAdapter(emojiAdapter);
+    }
+    
+    private void addCommonEmojis() {
+        // Thêm một số emoji phổ biến
+        String[] commonEmojis = {
+            "😀", "😁", "😂", "🤣", "😃", "😄", "😅", "😆", "😉", "😊", 
+            "😋", "😎", "😍", "😘", "🥰", "😗", "😙", "😚", "☺️", "🙂",
+            "🤗", "🤩", "🤔", "🤨", "😐", "😑", "😶", "🙄", "😏", "😣",
+            "❤️", "💔", "💖", "💘", "💝", "💓", "💗", "💞", "❣️", "💕",
+            "👍", "👎", "✌️", "👊", "✋", "🤚", "👋", "👏", "🙌", "🤝"
+        };
+        emojiList.addAll(Arrays.asList(commonEmojis));
+    }
+    
+    private void toggleEmojiPicker() {
+        isEmojiShowing = !isEmojiShowing;
+        emojiContainer.setVisibility(isEmojiShowing ? View.VISIBLE : View.GONE);
+        
+        // Thay đổi icon của nút emoji
+        if (isEmojiShowing) {
+            btnEmoji.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+        } else {
+            btnEmoji.setImageResource(android.R.drawable.ic_menu_gallery);
+        }
+    }
+    
+    private void insertEmoji(String emoji) {
+        // Thêm emoji vào vị trí con trỏ
+        int cursorPosition = etMessageInput.getSelectionStart();
+        Editable editable = etMessageInput.getText();
+        editable.insert(cursorPosition, emoji);
     }
 
     private void showPopupMenu(View v) {
-        PopupMenu popupMenu = new PopupMenu(this, v);
-        popupMenu.getMenu().add("Báo cáo");
-        popupMenu.setOnMenuItemClickListener(item -> {
-            if (item.getTitle().equals("Báo cáo")) {
-                showReportDialog();
-            }
+        // Inflate the popup menu layout
+        View popupView = getLayoutInflater().inflate(R.layout.popup_menu_custom, null);
+        
+        // Create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
+        
+        // Set animation style
+        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        
+        // Set elevation for Lollipop and above
+        popupWindow.setElevation(20);
+        
+        // Set touch interceptor to dismiss the popup when clicking outside
+        popupView.setOnTouchListener((v1, event) -> {
+            popupWindow.dismiss();
             return true;
         });
-        popupMenu.show();
+        
+        // Set click listeners for the menu items
+        LinearLayout reportItem = popupView.findViewById(R.id.menuItemReport);
+        reportItem.setOnClickListener(view -> {
+            showReportDialog();
+            popupWindow.dismiss();
+        });
+        
+        LinearLayout blockItem = popupView.findViewById(R.id.menuItemBlock);
+        blockItem.setOnClickListener(view -> {
+            showBlockConfirmationDialog();
+            popupWindow.dismiss();
+        });
+        
+        // Show the popup window below the view or above it if there's not enough space below
+        popupWindow.showAsDropDown(v, 0, 0);
     }
-
+    
     private void showReportDialog() {
+        // Inflate custom layout for report dialog
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_report_user, null);
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Báo cáo người dùng");
-
-        // Thêm EditText để nhập lý do
-        final EditText reasonInput = new EditText(this);
-        reasonInput.setHint("Nhập lý do báo cáo");
-        reasonInput.setMinHeight((int) (48 * getResources().getDisplayMetrics().density));
-        builder.setView(reasonInput);
-
-        builder.setPositiveButton("Gửi", (dialog, which) -> {
-            String reason = reasonInput.getText().toString().trim();
-            if (reason.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập lý do", Toast.LENGTH_SHORT).show();
+        builder.setView(dialogView);
+        
+        // Initialize views
+        RadioGroup reportReasonGroup = dialogView.findViewById(R.id.reportReasonGroup);
+        EditText customReasonInput = dialogView.findViewById(R.id.customReasonInput);
+        RadioButton customReasonRadio = dialogView.findViewById(R.id.radioCustomReason);
+        
+        // Handle showing/hiding the custom reason input field
+        reportReasonGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.radioCustomReason) {
+                customReasonInput.setVisibility(View.VISIBLE);
+                customReasonInput.requestFocus();
+            } else {
+                customReasonInput.setVisibility(View.GONE);
+            }
+        });
+        
+        // Create and show dialog
+        AlertDialog alertDialog = builder.create();
+        
+        // Set up buttons
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
+        
+        dialogView.findViewById(R.id.btnSubmit).setOnClickListener(v -> {
+            String reason;
+            int selectedId = reportReasonGroup.getCheckedRadioButtonId();
+            
+            if (selectedId == -1) {
+                Toast.makeText(this, "Vui lòng chọn lý do báo cáo", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            // Gọi API báo cáo
-            AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-            ReportDto reportDto = new ReportDto(targetUserId, reason);
-            Log.d(TAG, "Sending report: " + new Gson().toJson(reportDto));
-            Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
-
-            call.enqueue(new Callback<ApiResponse<Report>>() {
-                @Override
-                public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
-                    Log.d(TAG, "HTTP Status Code (sendReport): " + response.code());
-                    if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                        String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
-                        Log.d(TAG, "Report successful: " + message);
-                        Toast.makeText(ChatDetailActivity.this, message, Toast.LENGTH_SHORT).show();
-                        // Quay lại màn hình trước (ChatFragment)
-                        finish();
-                    } else {
-                        if (response.code() == 401) {
-                            Toast.makeText(ChatDetailActivity.this, "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
-                            return;
-                        }
-                        String errorMessage = "Gửi báo cáo thất bại";
-                        if (response.errorBody() != null) {
-                            try {
-                                errorMessage = response.errorBody().string();
-                                Log.e(TAG, "Error response: " + errorMessage);
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error parsing errorBody: " + e.getMessage(), e);
-                            }
-                        } else if (response.body() != null) {
-                            Log.e(TAG, "Response body: " + new Gson().toJson(response.body()));
-                            errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
-                        }
-                        Toast.makeText(ChatDetailActivity.this, "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
-                        dialog.dismiss();
-                    }
+            
+            if (selectedId == R.id.radioCustomReason) {
+                reason = customReasonInput.getText().toString().trim();
+                if (reason.isEmpty()) {
+                    Toast.makeText(this, "Vui lòng nhập lý do báo cáo", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-
-                @Override
-                public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
-                    Log.e(TAG, "Report API call failed: " + t.getMessage(), t);
-                    Toast.makeText(ChatDetailActivity.this, "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                }
-            });
+            } else {
+                RadioButton selectedRadioButton = dialogView.findViewById(selectedId);
+                reason = selectedRadioButton.getText().toString();
+            }
+            
+            // Show confirmation before submitting
+            new AlertDialog.Builder(this)
+                .setTitle("Xác nhận báo cáo")
+                .setMessage("Bạn chắc chắn muốn báo cáo người dùng này với lý do: \"" + reason + "\"?")
+                .setPositiveButton("Xác nhận", (dialog, which) -> submitReport(reason, alertDialog))
+                .setNegativeButton("Hủy", null)
+                .show();
         });
+        
+        alertDialog.show();
+    }
+    
+    private void submitReport(String reason, AlertDialog parentDialog) {
+        // Show loading progress
+        View loadingView = getLayoutInflater().inflate(R.layout.dialog_loading, null);
+        AlertDialog loadingDialog = new AlertDialog.Builder(this)
+            .setView(loadingView)
+            .setCancelable(false)
+            .create();
+        loadingDialog.show();
+        
+        // Call API to report user
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        ReportDto reportDto = new ReportDto(targetUserId, reason);
+        Log.d(TAG, "Sending report: " + new Gson().toJson(reportDto));
+        Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
 
-        builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-        builder.show();
+        call.enqueue(new Callback<ApiResponse<Report>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
+                loadingDialog.dismiss();
+                parentDialog.dismiss();
+                
+                Log.d(TAG, "HTTP Status Code (sendReport): " + response.code());
+                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                    String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
+                    Log.d(TAG, "Report successful: " + message);
+                    
+                    // Show success dialog
+                    new AlertDialog.Builder(ChatDetailActivity.this)
+                        .setTitle("Báo cáo thành công")
+                        .setMessage("Cảm ơn bạn đã báo cáo. Chúng tôi sẽ xem xét nhanh chóng.")
+                        .setPositiveButton("Đóng", (dialog, which) -> finish())
+                        .setCancelable(false)
+                        .show();
+                } else {
+                    if (response.code() == 401) {
+                        Toast.makeText(ChatDetailActivity.this, "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    String errorMessage = "Gửi báo cáo thất bại";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage = response.errorBody().string();
+                            Log.e(TAG, "Error response: " + errorMessage);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error parsing errorBody: " + e.getMessage(), e);
+                        }
+                    } else if (response.body() != null) {
+                        Log.e(TAG, "Response body: " + new Gson().toJson(response.body()));
+                        errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
+                    }
+                    
+                    // Show error dialog
+                    new AlertDialog.Builder(ChatDetailActivity.this)
+                        .setTitle("Lỗi")
+                        .setMessage("Không thể gửi báo cáo: " + errorMessage)
+                        .setPositiveButton("Đóng", null)
+                        .show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
+                loadingDialog.dismiss();
+                parentDialog.dismiss();
+                
+                Log.e(TAG, "Report API call failed: " + t.getMessage(), t);
+                
+                // Show error dialog
+                new AlertDialog.Builder(ChatDetailActivity.this)
+                    .setTitle("Lỗi kết nối")
+                    .setMessage("Không thể gửi báo cáo: " + t.getMessage())
+                    .setPositiveButton("Thử lại", (dialog, which) -> showReportDialog())
+                    .setNegativeButton("Hủy", null)
+                    .show();
+            }
+        });
+    }
+
+    private void showBlockConfirmationDialog() {
+        new AlertDialog.Builder(this)
+            .setTitle("Chặn người dùng")
+            .setMessage("Bạn có chắc chắn muốn chặn người dùng này? Họ sẽ không thể nhắn tin cho bạn nữa.")
+            .setPositiveButton("Chặn", (dialog, which) -> {
+                // TODO: Implement block user API call
+                Toast.makeText(this, "Đã chặn người dùng", Toast.LENGTH_SHORT).show();
+                finish();
+            })
+            .setNegativeButton("Hủy", null)
+            .show();
     }
 
     private void markMessagesAsRead(String authToken) {

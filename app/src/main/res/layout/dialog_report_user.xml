@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:background="#FAFAFA">
+
+    <TextView
+        android:id="@+id/tvReportInstructions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="📢 Vui lòng chọn lý do báo cáo"
+        android:textSize="18sp"
+        android:textColor="#212121"
+        android:fontFamily="@font/montserrat_bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvReportInstructions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioGroup
+                android:id="@+id/reportReasonGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Các radio button hiện đại -->
+                <RadioButton
+                    android:id="@+id/radioInappropriateContent"
+                    style="@style/ModernRadioButton"
+                    android:text="Nội dung không phù hợp" />
+
+                <RadioButton
+                    android:id="@+id/radioFakeProfile"
+                    style="@style/ModernRadioButton"
+                    android:text="Hồ sơ giả mạo" />
+
+                <RadioButton
+                    android:id="@+id/radioHarassment"
+                    style="@style/ModernRadioButton"
+                    android:text="Quấy rối / Xúc phạm" />
+
+                <RadioButton
+                    android:id="@+id/radioSpam"
+                    style="@style/ModernRadioButton"
+                    android:text="Spam / Quảng cáo" />
+
+                <RadioButton
+                    android:id="@+id/radioViolence"
+                    style="@style/ModernRadioButton"
+                    android:text="Bạo lực / Hình ảnh xấu" />
+
+                <RadioButton
+                    android:id="@+id/radioCustomReason"
+                    style="@style/ModernRadioButton"
+                    android:text="Lý do khác" />
+            </RadioGroup>
+
+            <EditText
+                android:id="@+id/customReasonInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/edit_text_rounded_background"
+                android:hint="✍️ Nhập lý do chi tiết..."
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:padding="16dp"
+                android:textSize="14sp"
+                android:fontFamily="@font/montserrat_medium"
+                android:textColor="#212121"
+                android:textColorHint="#9E9E9E"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/scrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Hủy"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/red"
+/>
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Gửi báo cáo"
+            android:textAllCaps="false"
+            android:fontFamily="@font/montserrat_bold"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/thunder" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

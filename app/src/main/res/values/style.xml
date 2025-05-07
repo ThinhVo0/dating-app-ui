@@ -15,5 +15,14 @@
     <style name="ShapeAppearanceOverlay.RoundThumb" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerSize">50%</item>
     </style>
+    <style name="ModernRadioButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:buttonTint">#6200EE</item>
+        <item name="android:textColor">#455A64</item>
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+        <item name="android:textSize">15sp</item>
+    </style>
 
 </resources>
