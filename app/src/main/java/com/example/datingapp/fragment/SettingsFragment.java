@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.Toast;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,7 +33,7 @@ import retrofit2.Response;
 
 public class SettingsFragment extends Fragment {
 
-    private TextView tvNameAge, tvEditAccount, tvPrivacy;
+    private TextView tvNameAge;
     private SwitchMaterial switchNotifications;
     private Button btnLogout;
     private ImageView ivProfilePic, ivEditPencil;
@@ -48,9 +48,8 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Khởi tạo các view
         tvNameAge = view.findViewById(R.id.tvNameAge);
-        tvEditAccount = view.findViewById(R.id.tvEditAccount);
-        tvPrivacy = view.findViewById(R.id.tvPrivacy);
         switchNotifications = view.findViewById(R.id.switchNotifications);
         btnLogout = view.findViewById(R.id.btnLogout);
         ivProfilePic = view.findViewById(R.id.ivProfilePic);
@@ -58,29 +57,25 @@ public class SettingsFragment extends Fragment {
 
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
 
+        // Tải dữ liệu hồ sơ
         loadProfileData();
 
+        // Sự kiện click cho nút chỉnh sửa hồ sơ
         ivEditPencil.setOnClickListener(v -> {
             startActivity(new Intent(requireContext(), ProfileUpdateActivity.class));
         });
 
-
-        tvEditAccount.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Chuyển đến màn hình chỉnh sửa tài khoản", Toast.LENGTH_SHORT).show();
-        });
-
-        tvPrivacy.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Chuyển đến màn hình quyền riêng tư", Toast.LENGTH_SHORT).show();
-        });
-
+        // Sự kiện thay đổi trạng thái thông báo
         switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("notificationsEnabled", isChecked);
             editor.apply();
         });
 
+        // Sự kiện đăng xuất
         btnLogout.setOnClickListener(v -> logout());
 
+        // Khôi phục trạng thái thông báo
         switchNotifications.setChecked(sharedPreferences.getBoolean("notificationsEnabled", true));
     }
 

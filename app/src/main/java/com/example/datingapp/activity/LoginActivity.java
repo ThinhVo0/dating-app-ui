@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginButton;
-    private TextView forgotPassword, registerLink;
+    private TextView forgotPassword, registerLink, guestLoginLink; // Thêm TextView cho đăng nhập khách
     private ImageButton googleLoginButton;
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -86,6 +86,7 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassword = findViewById(R.id.forgotPassword);
         registerLink = findViewById(R.id.registerLink);
         googleLoginButton = findViewById(R.id.googleLoginButton);
+        guestLoginLink = findViewById(R.id.guestLoginLink); // Khởi tạo TextView cho đăng nhập khách
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Log.d("LoginActivity", "onCreate: UI components initialized");
 
@@ -131,6 +132,13 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, RegisterActivity.class));
         });
         Log.d("LoginActivity", "onCreate: Forgot password and register listeners set");
+
+        // Thêm sự kiện cho đăng nhập khách
+        guestLoginLink.setOnClickListener(v -> {
+            Log.d("Auth", "guestLoginLink: Guest login clicked");
+            loginAsGuest();
+        });
+        Log.d("LoginActivity", "onCreate: Guest login listener set");
 
         // Cấu hình Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -195,7 +203,7 @@ public class LoginActivity extends AppCompatActivity {
         // Sự kiện nút đăng nhập Google
         googleLoginButton.setOnClickListener(v -> {
             Log.d("GoogleSignIn", "googleLoginButton: Starting Google Sign-In intent");
-            
+
             // Đăng xuất khỏi tài khoản Google hiện tại trước khi bắt đầu quy trình đăng nhập
             googleSignInClient.signOut().addOnCompleteListener(this, task -> {
                 Log.d("GoogleSignIn", "googleLoginButton: Signed out from previous Google account");
@@ -208,6 +216,19 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
         Log.d("LoginActivity", "onCreate: Google login button listener set");
+    }
+
+    // Thêm phương thức xử lý đăng nhập khách
+    private void loginAsGuest() {
+        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+        editor.putBoolean("isGuest", true);
+        editor.remove("authToken");
+        editor.remove("userId");
+        editor.apply();
+        Log.d("Auth", "loginAsGuest: Guest login successful, isGuest set to true");
+
+        Toast.makeText(this, "Đăng nhập với tư cách khách", Toast.LENGTH_SHORT).show();
+        goToMainActivity();
     }
 
     // Kiểm tra Google Play Services
@@ -249,16 +270,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loginWithGoogleEmail(String email, String displayName) {
         Log.d("GoogleSignIn", "loginWithGoogleEmail: Email=" + email + ", Name=" + displayName);
-        
+
         // Tạo đối tượng LoginDto với flag googleLogin
         LoginDto request = new LoginDto();
         request.setUsername(email);
         request.setPassword(""); // Mật khẩu trống, backend sẽ xử lý dựa vào flag googleLogin
         request.setGoogleLogin(true);
-        
+
         AuthService authService = RetrofitClient.getClient().create(AuthService.class);
         Log.d("GoogleSignIn", "loginWithGoogleEmail: API call initiated");
-        
+
         authService.login(request).enqueue(new Callback<ApiResponse<UserResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<UserResponse>> call, Response<ApiResponse<UserResponse>> response) {
@@ -274,6 +295,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
                     editor.putString("authToken", user.getToken());
                     editor.putString("userId", user.getId());
+                    editor.putBoolean("isGuest", false); // Đảm bảo isGuest là false khi đăng nhập Google
                     editor.apply();
                     Log.d("GoogleSignIn", "loginWithGoogleEmail: Token saved, userId=" + user.getId());
 
@@ -357,6 +379,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
                     editor.putString("authToken", user.getToken());
                     editor.putString("userId", user.getId());
+                    editor.putBoolean("isGuest", false); // Đảm bảo isGuest là false khi đăng nhập thường
                     editor.apply();
                     Log.d("Auth", "loginUser: Token saved, userId=" + user.getId());
 
@@ -493,6 +516,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
         editor.remove("authToken");
         editor.remove("userId");
+        editor.putBoolean("isGuest", false); // Đảm bảo isGuest là false khi xóa token
         editor.apply();
         Log.d("Auth", "clearAuthToken: Auth token cleared");
     }
@@ -509,8 +533,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // Có thể gọi phương thức này trong onDestroy() nếu muốn xóa kết nối khi thoát
-    // hoặc gọi khi người dùng đăng xuất
     @Override
     protected void onDestroy() {
         super.onDestroy();

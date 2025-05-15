@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int RECONNECT_DELAY_SECONDS = 5;
     private String currentUserId;
     private String authToken;
+    private boolean isGuest;
     private BroadcastReceiver badgeUpdateReceiver;
     private BroadcastReceiver fetchProfileReceiver;
 
@@ -80,26 +81,39 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Retrofit service
         authService = RetrofitClient.getClient().create(AuthService.class);
 
-        // Lấy userId và authToken
+        // Lấy userId, authToken và trạng thái guest
         SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         currentUserId = prefs.getString("userId", null);
         authToken = prefs.getString("authToken", null);
+        isGuest = prefs.getBoolean("isGuest", false);
 
-        if (currentUserId == null || authToken == null) {
+        if (!isGuest && (currentUserId == null || authToken == null)) {
             Toast.makeText(this, "Vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
 
-        // Thiết lập WebSocket
-        executorService = Executors.newSingleThreadExecutor();
-        reconnectExecutor = Executors.newScheduledThreadPool(1);
-        setupWebSocket(authToken);
+        // Thiết lập WebSocket và các API chỉ cho người dùng đăng nhập
+        if (!isGuest) {
+            executorService = Executors.newSingleThreadExecutor();
+            reconnectExecutor = Executors.newScheduledThreadPool(1);
+            setupWebSocket(authToken);
+
+            // Lấy thông tin hồ sơ người dùng
+            fetchUserProfile();
+
+            // Tải số tin nhắn chưa đọc ban đầu
+            loadInitialUnreadMessageCount(authToken);
+        }
 
         // Thiết lập BottomNavigationView
         BottomNavigationView bottomNavigationView = findViewById(R.id.menu_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
+            if (isGuest) {
+                redirectToLogin();
+                return false;
+            }
             Fragment selectedFragment = null;
             int itemId = item.getItemId();
             if (itemId == R.id.nav_liked) {
@@ -128,52 +142,66 @@ public class MainActivity extends AppCompatActivity {
         // Xử lý click vào filter_icon
         ImageView filterIcon = findViewById(R.id.filter_icon);
         filterIcon.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, FilterActivity.class));
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                startActivity(new Intent(MainActivity.this, FilterActivity.class));
+            }
         });
 
         // Xử lý click vào FloatingActionButton
         FloatingActionButton fab = findViewById(R.id.fab_center);
         fab.setOnClickListener(v -> {
-            openFragment(new ProfileFragment());
-            Toast.makeText(MainActivity.this, "Chuyển đến trang hồ sơ!", Toast.LENGTH_SHORT).show();
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                openFragment(new ProfileFragment());
+                Toast.makeText(MainActivity.this, "Chuyển đến trang hồ sơ!", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // Lấy thông tin hồ sơ người dùng
-        fetchUserProfile();
-
-        // Cập nhật huy hiệu ban đầu
-        int unreadNotificationCount = prefs.getInt("unreadNotificationCount", 0);
-        updateNotificationBadge(unreadNotificationCount);
-
-        // Tải số tin nhắn chưa đọc ban đầu
-        loadInitialUnreadMessageCount(authToken);
+        // Cập nhật huy hiệu ban đầu nếu không phải guest
+        if (!isGuest) {
+            int unreadNotificationCount = prefs.getInt("unreadNotificationCount", 0);
+            updateNotificationBadge(unreadNotificationCount);
+        }
 
         // Đăng ký BroadcastReceiver để nhận cập nhật badge
-        badgeUpdateReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if ("UPDATE_CHAT_BADGE".equals(intent.getAction())) {
-                    int unreadMessageCount = intent.getIntExtra("unreadMessageCount", 0);
-                    updateChatBadge(unreadMessageCount);
-                    Log.i(TAG, "Received badge update broadcast: " + unreadMessageCount);
+        if (!isGuest) {
+            badgeUpdateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if ("UPDATE_CHAT_BADGE".equals(intent.getAction())) {
+                        int unreadMessageCount = intent.getIntExtra("unreadMessageCount", 0);
+                        updateChatBadge(unreadMessageCount);
+                        Log.i(TAG, "Received badge update broadcast: " + unreadMessageCount);
+                    }
                 }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                badgeUpdateReceiver, new IntentFilter("UPDATE_CHAT_BADGE"));
+            };
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    badgeUpdateReceiver, new IntentFilter("UPDATE_CHAT_BADGE"));
 
-        // Đăng ký BroadcastReceiver để nhận yêu cầu fetch profile
-        fetchProfileReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if ("FETCH_USER_PROFILE".equals(intent.getAction())) {
-                    Log.d(TAG, "Received fetch profile broadcast");
-                    fetchUserProfile();
+            fetchProfileReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if ("FETCH_USER_PROFILE".equals(intent.getAction())) {
+                        Log.d(TAG, "Received fetch profile broadcast");
+                        fetchUserProfile();
+                    }
                 }
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                fetchProfileReceiver, new IntentFilter("FETCH_USER_PROFILE"));
+            };
+            LocalBroadcastManager.getInstance(this).registerReceiver(
+                    fetchProfileReceiver, new IntentFilter("FETCH_USER_PROFILE"));
+        }
+    }
+
+    private void redirectToLogin() {
+        Toast.makeText(this, "Vui lòng đăng nhập để thực hiện hành động này", Toast.LENGTH_SHORT).show();
+        SharedPreferences.Editor editor = getSharedPreferences("MyPrefs", MODE_PRIVATE).edit();
+        editor.putBoolean("isGuest", false);
+        editor.apply();
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     private void loadInitialUnreadMessageCount(String authToken) {
@@ -288,9 +316,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     if (message.getReceiverId().equals(currentUserId) || message.getSenderId().equals(currentUserId)) {
                                         runOnUiThread(() -> {
-                                            // Tải lại số tin nhắn chưa đọc từ API
                                             loadInitialUnreadMessageCount(authToken);
-                                            // Gửi broadcast để thông báo tin nhắn mới
                                             Intent intent = new Intent("NEW_MESSAGE");
                                             LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(intent);
                                         });
@@ -433,21 +459,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (stompClient != null && stompClient.isRunning()) {
-            stompClient.stop();
-        }
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
-        if (reconnectExecutor != null && !reconnectExecutor.isShutdown()) {
-            reconnectExecutor.shutdown();
-        }
-        // Hủy đăng ký BroadcastReceiver
-        if (badgeUpdateReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(badgeUpdateReceiver);
-        }
-        if (fetchProfileReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(fetchProfileReceiver);
+        if (!isGuest) {
+            if (stompClient != null && stompClient.isRunning()) {
+                stompClient.stop();
+            }
+            if (executorService != null && !executorService.isShutdown()) {
+                executorService.shutdown();
+            }
+            if (reconnectExecutor != null && !reconnectExecutor.isShutdown()) {
+                reconnectExecutor.shutdown();
+            }
+            if (badgeUpdateReceiver != null) {
+                LocalBroadcastManager.getInstance(this).unregisterReceiver(badgeUpdateReceiver);
+            }
+            if (fetchProfileReceiver != null) {
+                LocalBroadcastManager.getInstance(this).unregisterReceiver(fetchProfileReceiver);
+            }
         }
     }
 }

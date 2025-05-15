@@ -2,6 +2,15 @@ package com.example.datingapp.model;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProfileData {
     private String firstName;
     private String lastName;
@@ -30,33 +39,4 @@ public class ProfileData {
     private String pic7;
     private String pic8;
     private String pic9;
-
-    // Getters
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }
-    public String getGender() { return gender; }
-    public int getAge() { return age; }
-    public int getHeight() { return height; }
-    public String getBio() { return bio; }
-    public String getZodiacSign() { return zodiacSign; }
-    public String getPersonalityType() { return personalityType; }
-    public String getCommunicationStyle() { return communicationStyle; }
-    public String getLoveLanguage() { return loveLanguage; }
-    public String getPetPreference() { return petPreference; }
-    public String getDrinkingHabit() { return drinkingHabit; }
-    public String getSmokingHabit() { return smokingHabit; }
-    public String getSleepingHabit() { return sleepingHabit; }
-    public List<String> getHobbies() { return hobbies; }
-    public String getStreet() { return street; }
-    public String getDistrict() { return district; }
-    public String getProvince() { return province; }
-    public String getPic1() { return pic1; }
-    public String getPic2() { return pic2; }
-    public String getPic3() { return pic3; }
-    public String getPic4() { return pic4; }
-    public String getPic5() { return pic5; }
-    public String getPic6() { return pic6; }
-    public String getPic7() { return pic7; }
-    public String getPic8() { return pic8; }
-    public String getPic9() { return pic9; }
 }

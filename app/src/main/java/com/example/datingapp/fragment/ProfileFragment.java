@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,10 +60,11 @@ public class ProfileFragment extends Fragment {
     private ImageButton btnDislike;
     private ImageButton btnLike;
     private String authToken;
+    private boolean isGuest;
     private float initialX, initialY;
     private boolean isDragging = false;
-    private LinearLayout imageIndicatorContainer; // Container cho các thanh ngang
-    private List<View> indicatorViews = new ArrayList<>(); // Danh sách các thanh ngang
+    private LinearLayout imageIndicatorContainer;
+    private List<View> indicatorViews = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,6 +87,7 @@ public class ProfileFragment extends Fragment {
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         authToken = sharedPreferences.getString("authToken", null);
+        isGuest = sharedPreferences.getBoolean("isGuest", false);
 
         viewPager = view.findViewById(R.id.viewPager);
         viewPager.setUserInputEnabled(false);
@@ -92,15 +96,46 @@ public class ProfileFragment extends Fragment {
         btnLike = view.findViewById(R.id.btnLike);
         ImageButton btnChat = view.findViewById(R.id.btnChat);
         ImageButton btnViewDetails = view.findViewById(R.id.btnViewDetails);
-        imageIndicatorContainer = view.findViewById(R.id.imageIndicatorContainer); // Khởi tạo container
+        imageIndicatorContainer = view.findViewById(R.id.imageIndicatorContainer);
 
-        btnDislike.setOnClickListener(v -> performSwipe(view, false));
-        btnLike.setOnClickListener(v -> performSwipe(view, true));
-        btnChat.setOnClickListener(v -> Toast.makeText(requireContext(), "Chat clicked!", Toast.LENGTH_SHORT).show());
-        btnViewDetails.setOnClickListener(v -> showDetailsBottomSheet());
+        btnDislike.setOnClickListener(v -> {
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                performSwipe(view, false);
+            }
+        });
+
+        btnLike.setOnClickListener(v -> {
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                performSwipe(view, true);
+            }
+        });
+
+        btnChat.setOnClickListener(v -> {
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                Toast.makeText(requireContext(), "Chat clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnViewDetails.setOnClickListener(v -> {
+            if (isGuest) {
+                redirectToLogin();
+            } else {
+                showDetailsBottomSheet();
+            }
+        });
 
         View profileCard = view.findViewById(R.id.profileCard);
         profileCard.setOnTouchListener((v, event) -> {
+            if (isGuest) {
+                redirectToLogin();
+                return true;
+            }
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     initialX = event.getRawX();
@@ -175,7 +210,6 @@ public class ProfileFragment extends Fragment {
             return false;
         });
 
-        // Đăng ký callback để cập nhật thanh ngang chỉ số ảnh
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -184,24 +218,49 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        // Kiểm tra trạng thái đăng nhập
-        if (authToken == null) {
+        if (isGuest) {
+            loadGuestProfile(view);
+        } else if (authToken == null) {
             Toast.makeText(requireContext(), "Vui lòng đăng nhập để tiếp tục", Toast.LENGTH_LONG).show();
             startActivity(new Intent(requireContext(), LoginActivity.class));
             requireActivity().finish();
-            return;
+        } else {
+            initializeProfileList(view);
         }
+    }
 
-        // Tải danh sách profile
-        initializeProfileList(view);
+    private void redirectToLogin() {
+        Toast.makeText(requireContext(), "Vui lòng đăng nhập để thực hiện hành động này", Toast.LENGTH_SHORT).show();
+        SharedPreferences.Editor editor = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).edit();
+        editor.putBoolean("isGuest", false);
+        editor.apply();
+        startActivity(new Intent(requireContext(), LoginActivity.class));
+        requireActivity().finish();
+    }
+
+    private void loadGuestProfile(View view) {
+        ProfileData guestProfile = ProfileData.builder()
+                .firstName("Khách")
+                .lastName("")
+                .age(25)
+                .province("Hà Nội")
+                .pic1("https://dongvat.edu.vn/upload/2025/01/meo-cute-meme-69.webp")
+                .build();
+
+        profileIds.clear();
+        profileDataMap.clear();
+        String guestId = "guest_id";
+        profileIds.add(guestId);
+        profileDataMap.put(guestId, guestProfile);
+
+        loadProfile(view, guestId);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Làm mới danh sách profile khi quay lại từ FilterFragment
         View view = getView();
-        if (view != null) {
+        if (view != null && !isGuest) {
             initializeProfileList(view);
         }
     }
@@ -226,22 +285,18 @@ public class ProfileFragment extends Fragment {
         imageIndicatorContainer.removeAllViews();
         indicatorViews.clear();
 
-        if (count <= 1) return; // Không hiển thị thanh ngang nếu chỉ có 1 ảnh
+        if (count <= 1) return;
 
         float density = getResources().getDisplayMetrics().density;
-        int indicatorHeight = (int) (4 * density); // Chiều cao mỗi thanh ngang (tăng lên 4dp)
-        int indicatorMargin = (int) (2 * density); // Khoảng cách giữa các thanh (giảm xuống 2dp)
+        int indicatorHeight = (int) (4 * density);
+        int indicatorMargin = (int) (2 * density);
 
-        // Tính chiều rộng của container (ViewPager2 width trừ padding)
         int containerWidth = imageIndicatorContainer.getWidth();
         if (containerWidth == 0) {
-            // Nếu container chưa được đo, sử dụng chiều rộng của ViewPager2
-            containerWidth = viewPager.getWidth() - (int) (32 * density); // Trừ padding 16dp mỗi bên
+            containerWidth = viewPager.getWidth() - (int) (32 * density);
         }
 
-        // Tính tổng khoảng cách giữa các thanh
         int totalMargin = indicatorMargin * (count - 1);
-        // Tính chiều rộng mỗi thanh sao cho tổng chiều rộng các thanh và khoảng cách vừa với container
         int indicatorWidth = (containerWidth - totalMargin) / count;
 
         for (int i = 0; i < count; i++) {
@@ -249,7 +304,7 @@ public class ProfileFragment extends Fragment {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(indicatorWidth, indicatorHeight);
             params.setMargins(indicatorMargin, 0, indicatorMargin, 0);
             indicator.setLayoutParams(params);
-            indicator.setBackgroundColor(i == 0 ? 0xFFFFFFFF : 0x80FFFFFF); // Màu trắng cho thanh hiện tại, màu mờ cho các thanh khác
+            indicator.setBackgroundColor(i == 0 ? 0xFFFFFFFF : 0x80FFFFFF);
             imageIndicatorContainer.addView(indicator);
             indicatorViews.add(indicator);
         }
@@ -349,6 +404,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void performSwipe(View view, boolean isSwipeRight) {
+        if (isGuest) {
+            redirectToLogin();
+            return;
+        }
         if (currentProfileIndex >= profileIds.size() || profileDataMap.isEmpty()) {
             Toast.makeText(requireContext(), "Không còn profile để swipe", Toast.LENGTH_SHORT).show();
             return;
@@ -423,6 +482,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void nextProfile(View view) {
+        if (isGuest) {
+            redirectToLogin();
+            return;
+        }
         currentProfileIndex++;
         if (currentProfileIndex >= profileIds.size()) {
             Toast.makeText(requireContext(), "Đã hết profile!", Toast.LENGTH_SHORT).show();
@@ -442,7 +505,6 @@ public class ProfileFragment extends Fragment {
         tvNameAge.setText("User not found");
         tvAddress.setText("");
 
-        // Xóa các thanh ngang khi reset UI
         imageIndicatorContainer.removeAllViews();
         indicatorViews.clear();
 
@@ -455,7 +517,9 @@ public class ProfileFragment extends Fragment {
         if (!profileDataMap.containsKey(profileId)) {
             Log.e(TAG, "Profile data not found for ID: " + profileId);
             resetUI(view);
-            initializeProfileList(view);
+            if (!isGuest) {
+                initializeProfileList(view);
+            }
             return;
         }
 
@@ -479,11 +543,9 @@ public class ProfileFragment extends Fragment {
         adapter = new ImageAdapter(requireContext(), imageUrls);
         viewPager.setAdapter(adapter);
 
-        // Thiết lập các thanh ngang chỉ số ảnh
-        // Đợi layout hoàn thành để lấy kích thước chính xác
         viewPager.post(() -> {
             setupImageIndicators(imageUrls.size());
-            updateImageIndicator(0); // Cập nhật thanh đầu tiên
+            updateImageIndicator(0);
         });
 
         TextView tvNameAge = view.findViewById(R.id.tvNameAge);
@@ -494,6 +556,10 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showDetailsBottomSheet() {
+        if (isGuest) {
+            redirectToLogin();
+            return;
+        }
         if (currentProfileIndex >= profileIds.size() || !profileDataMap.containsKey(profileIds.get(currentProfileIndex))) {
             return;
         }
@@ -567,120 +633,160 @@ public class ProfileFragment extends Fragment {
         ((TextView) view.findViewById(R.id.smoking_text)).setText(data.getSmokingHabit() != null ? data.getSmokingHabit() : "Không xác định");
         ((TextView) view.findViewById(R.id.sleep_text)).setText(data.getSleepingHabit() != null ? data.getSleepingHabit() : "Không xác định");
 
-        // Xử lý nút báo cáo
         Button reportButton = view.findViewById(R.id.buttonReport);
         reportButton.setOnClickListener(v -> {
-            // Đóng bottom sheet
+            if (isGuest) {
+                redirectToLogin();
+                return;
+            }
             bottomSheetDialog.dismiss();
-
-            // Hiển thị dialog để nhập lý do báo cáo
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Báo cáo người dùng");
-
-            // Thêm EditText để nhập lý do
-            final EditText reasonInput = new EditText(requireContext());
-            reasonInput.setHint("Nhập lý do báo cáo");
-            reasonInput.setMinHeight((int) (48 * getResources().getDisplayMetrics().density));
-            builder.setView(reasonInput);
-
-            builder.setPositiveButton("Gửi", (dialog, which) -> {
-                String reason = reasonInput.getText().toString().trim();
-                if (reason.isEmpty()) {
-                    Toast.makeText(requireContext(), "Vui lòng nhập lý do", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Gọi API trực tiếp
-                AuthService authService = RetrofitClient.getClient().create(AuthService.class);
-                String reportedUserId = profileIds.get(currentProfileIndex);
-                Log.d("ProfileFragment", "Auth Token: " + authToken);
-                Log.d("ProfileFragment", "Reported User ID: " + reportedUserId);
-                ReportDto reportDto = new ReportDto(reportedUserId, reason);
-                Log.d("ProfileFragment", "Sending report: " + new Gson().toJson(reportDto));
-                Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
-
-                call.enqueue(new Callback<ApiResponse<Report>>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
-                        Log.d("ProfileFragment", "HTTP Status Code (sendReport): " + response.code());
-                        if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                            String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
-                            Log.d("ProfileFragment", "Report successful: " + message);
-                            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-
-                            // Loại bỏ profile đã báo cáo khỏi danh sách
-                            String reportedProfileId = profileIds.get(currentProfileIndex);
-                            Log.d("ProfileFragment", "Removing reported profile ID: " + reportedProfileId);
-                            profileIds.remove(currentProfileIndex);
-                            profileDataMap.remove(reportedProfileId);
-
-                            // Gọi API skipProfile để đánh dấu người dùng đã bị skip
-                            Call<ProfileActionResponse> skipCall = authService.skipProfile("Bearer " + authToken, reportedProfileId);
-                            skipCall.enqueue(new Callback<ProfileActionResponse>() {
-                                @Override
-                                public void onResponse(Call<ProfileActionResponse> call, Response<ProfileActionResponse> response) {
-                                    Log.d("ProfileFragment", "HTTP Status Code (skipProfile): " + response.code());
-                                    if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
-                                        Log.d("ProfileFragment", "Skip successful: " + response.body().getData());
-                                    } else {
-                                        Log.e("ProfileFragment", "Failed to skip profile after report");
-                                        if (response.errorBody() != null) {
-                                            try {
-                                                Log.e("ProfileFragment", "Skip error response: " + response.errorBody().string());
-                                            } catch (Exception e) {
-                                                Log.e("ProfileFragment", "Error parsing skip errorBody: " + e.getMessage(), e);
-                                            }
-                                        }
-                                    }
-                                    // Gọi nextProfile để chuyển sang profile tiếp theo
-                                    Log.d("ProfileFragment", "Calling nextProfile to remove reported profile");
-                                    nextProfile(getView());
-                                }
-
-                                @Override
-                                public void onFailure(Call<ProfileActionResponse> call, Throwable t) {
-                                    Log.e("ProfileFragment", "Skip API call failed: " + t.getMessage(), t);
-                                    // Vẫn gọi nextProfile để đảm bảo giao diện được cập nhật
-                                    Log.d("ProfileFragment", "Calling nextProfile despite skip failure");
-                                    nextProfile(getView());
-                                }
-                            });
-                        } else {
-                            if (response.code() == 401) {
-                                Toast.makeText(requireContext(), "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
-                                dialog.dismiss();
-                                return;
-                            }
-                            String errorMessage = "Gửi báo cáo thất bại";
-                            if (response.errorBody() != null) {
-                                try {
-                                    errorMessage = response.errorBody().string();
-                                    Log.e("ProfileFragment", "Error response: " + errorMessage);
-                                } catch (Exception e) {
-                                    Log.e("ProfileFragment", "Error parsing errorBody: " + e.getMessage(), e);
-                                }
-                            } else if (response.body() != null) {
-                                Log.e("ProfileFragment", "Response body: " + new Gson().toJson(response.body()));
-                                errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
-                            }
-                            Toast.makeText(requireContext(), "Lỗi: " + errorMessage, Toast.LENGTH_LONG).show();
-                            dialog.dismiss();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
-                        Log.e("ProfileFragment", "Report API call failed: " + t.getMessage(), t);
-                        Toast.makeText(requireContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    }
-                });
-            });
-
-            builder.setNegativeButton("Hủy", (dialog, which) -> dialog.cancel());
-            builder.show();
+            showReportDialog();
         });
 
         bottomSheetDialog.show();
+    }
+
+    private void showReportDialog() {
+        // Inflate custom layout for report dialog
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_report_user, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Báo cáo người dùng");
+        builder.setView(dialogView);
+
+        // Initialize views
+        RadioGroup reportReasonGroup = dialogView.findViewById(R.id.reportReasonGroup);
+        EditText customReasonInput = dialogView.findViewById(R.id.customReasonInput);
+        RadioButton customReasonRadio = dialogView.findViewById(R.id.radioCustomReason);
+
+        // Handle showing/hiding the custom reason input field
+        reportReasonGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.radioCustomReason) {
+                customReasonInput.setVisibility(View.VISIBLE);
+                customReasonInput.requestFocus();
+            } else {
+                customReasonInput.setVisibility(View.GONE);
+            }
+        });
+
+        // Create and show dialog
+        AlertDialog alertDialog = builder.create();
+
+        // Set up buttons
+        dialogView.findViewById(R.id.btnCancel).setOnClickListener(v -> alertDialog.dismiss());
+
+        dialogView.findViewById(R.id.btnSubmit).setOnClickListener(v -> {
+            String reason;
+            int selectedId = reportReasonGroup.getCheckedRadioButtonId();
+
+            if (selectedId == -1) {
+                Toast.makeText(requireContext(), "Vui lòng chọn lý do báo cáo", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (selectedId == R.id.radioCustomReason) {
+                reason = customReasonInput.getText().toString().trim();
+                if (reason.isEmpty()) {
+                    Toast.makeText(requireContext(), "Vui lòng nhập lý do báo cáo", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } else {
+                RadioButton selectedRadioButton = dialogView.findViewById(selectedId);
+                reason = selectedRadioButton.getText().toString();
+            }
+
+            // Show confirmation before submitting
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Xác nhận báo cáo")
+                    .setMessage("Bạn chắc chắn muốn báo cáo người dùng này với lý do: \"" + reason + "\"?")
+                    .setPositiveButton("Xác nhận", (dialog, which) -> submitReport(reason, alertDialog))
+                    .setNegativeButton("Hủy", null)
+                    .show();
+        });
+
+        alertDialog.show();
+    }
+
+    private void submitReport(String reason, AlertDialog parentDialog) {
+        // Show loading progress
+        View loadingView = getLayoutInflater().inflate(R.layout.dialog_loading, null);
+        AlertDialog loadingDialog = new AlertDialog.Builder(requireContext())
+                .setView(loadingView)
+                .setCancelable(false)
+                .create();
+        loadingDialog.show();
+
+        // Call API to report user
+        AuthService authService = RetrofitClient.getClient().create(AuthService.class);
+        String reportedUserId = profileIds.get(currentProfileIndex);
+        ReportDto reportDto = new ReportDto(reportedUserId, reason);
+        Log.d(TAG, "Sending report: " + new Gson().toJson(reportDto));
+        Call<ApiResponse<Report>> call = authService.sendReport("Bearer " + authToken, reportDto);
+
+        call.enqueue(new Callback<ApiResponse<Report>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Report>> call, Response<ApiResponse<Report>> response) {
+                loadingDialog.dismiss();
+                parentDialog.dismiss();
+
+                Log.d(TAG, "HTTP Status Code (sendReport): " + response.code());
+                if (response.isSuccessful() && response.body() != null && response.body().getStatus() == 200) {
+                    String message = response.body().getMessage() != null ? response.body().getMessage() : "Báo cáo thành công";
+                    Log.d(TAG, "Report successful: " + message);
+
+                    // Show success dialog
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Báo cáo thành công")
+                            .setMessage("Cảm ơn bạn đã báo cáo. Chúng tôi sẽ xem xét nhanh chóng.")
+                            .setPositiveButton("Đóng", (dialog, which) -> {
+                                profileIds.remove(currentProfileIndex);
+                                profileDataMap.remove(reportedUserId);
+                                nextProfile(getView());
+                            })
+                            .setCancelable(false)
+                            .show();
+                } else {
+                    if (response.code() == 401) {
+                        Toast.makeText(requireContext(), "Phiên đăng nhập hết hạn, vui lòng đăng nhập lại", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    String errorMessage = "Gửi báo cáo thất bại";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorMessage = response.errorBody().string();
+                            Log.e(TAG, "Error response: " + errorMessage);
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error parsing errorBody: " + e.getMessage(), e);
+                        }
+                    } else if (response.body() != null) {
+                        Log.e(TAG, "Response body: " + new Gson().toJson(response.body()));
+                        errorMessage = "Status: " + response.body().getStatus() + ", Message: " + response.body().getMessage();
+                    }
+
+                    // Show error dialog
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Lỗi")
+                            .setMessage("Không thể gửi báo cáo: " + errorMessage)
+                            .setPositiveButton("Đóng", null)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Report>> call, Throwable t) {
+                loadingDialog.dismiss();
+                parentDialog.dismiss();
+
+                Log.e(TAG, "Report API call failed: " + t.getMessage(), t);
+
+                // Show error dialog
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Lỗi kết nối")
+                        .setMessage("Không thể gửi báo cáo: " + t.getMessage())
+                        .setPositiveButton("Thử lại", (dialog, which) -> showReportDialog())
+                        .setNegativeButton("Hủy", null)
+                        .show();
+            }
+        });
     }
 }

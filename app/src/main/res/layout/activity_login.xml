@@ -131,6 +131,17 @@
                     android:scaleType="centerInside" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/guestLoginLink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng nhập bằng tài khoản khách"
+                android:textColor="@color/thunder"
+                android:fontFamily="@font/montserrat_medium"
+                android:padding="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center" />
+
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
