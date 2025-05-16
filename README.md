@@ -53,7 +53,7 @@ datingapp/
 
 1. Clone repository về máy:
    ```
-   git clone <repo-url>
+   git clone https://github.com/ThinhVo0/dating-app-ui
    ```
 2. Mở bằng **Android Studio** (Bản mới nhất khuyến nghị).
 3. Sync Gradle, cài đặt các dependencies.
